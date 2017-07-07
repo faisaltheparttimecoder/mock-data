@@ -1,0 +1,17 @@
+#!/bin/bash
+# Environment Variables
+unset GEMFIRE;
+unset JAVA_HOME;
+unset JAVA_ARGS;
+unset LOCATORS;
+unset SERVERS;
+# Locators
+export LOCATORS=1
+# Server Members
+export SERVERS=1
+# GemFire
+export JAVA_HOME="/usr/lib/jvm/java"
+export GEMFIRE="$HOME/pivotal-gemfire-9.0.4"
+export JAVA_ARGS="-Dgfsh.log-level=config -Dgfsh.log-dir=GemFire/gfsh"
+export PATH="$PATH:$GEMFIRE/bin"
+
