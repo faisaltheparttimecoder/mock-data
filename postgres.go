@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"./core"
+	"github.com/ielizaga/mockd/core"
 	"github.com/lib/pq"
 )
 

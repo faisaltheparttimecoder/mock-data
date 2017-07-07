@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
+	"github.com/ielizaga/mockd/core"
 	_ "github.com/lib/pq"
 	"github.com/op/go-logging"
-	"./core"
 )
 
 // All global variables

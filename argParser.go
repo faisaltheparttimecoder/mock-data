@@ -4,12 +4,13 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"./core"
+
+	"github.com/ielizaga/mockd/core"
 )
 
 type connector struct {
 	Db, Username, Password, Table string
-	HostName, RegionName	string
+	HostName, RegionName          string
 	Port, RowCount                int
 }
 
@@ -57,18 +58,18 @@ func ArgPaser() {
 	var engine_arg = os.Args[1]
 
 	switch {
-		case core.StringContains(engine_arg, engines): // Postgres command parser
-			postgresFlag.Parse(os.Args[2:])
+	case core.StringContains(engine_arg, engines): // Postgres command parser
+		postgresFlag.Parse(os.Args[2:])
 
-		case engine_arg == "gemfire": // GemFire Command Parser
-			gemfireFlag.Parse(os.Args[2:])
+	case engine_arg == "gemfire": // GemFire Command Parser
+		gemfireFlag.Parse(os.Args[2:])
 
-		case engine_arg == "help": // Help Menu
-			ShowHelp()
+	case engine_arg == "help": // Help Menu
+		ShowHelp()
 
-		default: // Error if command is invalid
-			fmt.Printf("ERROR: %q is not valid command.\n", os.Args[1])
-			ShowHelp()
+	default: // Error if command is invalid
+		fmt.Printf("ERROR: %q is not valid command.\n", os.Args[1])
+		ShowHelp()
 	}
 
 	// Parse the command line argument
@@ -81,7 +82,7 @@ func ArgPaser() {
 		Connector.Table = *postgresTableFlag
 		Connector.Port = *postgresPortFlag
 		Connector.RowCount = *postgresTotalRowsFlag
-	} 
+	}
 
 	if gemfireFlag.Parsed() {
 		DBEngine = "gemfire"
