@@ -1,4 +1,5 @@
-CREATE TABLE sample_255_col (
+DROP TABLE IF EXISTS sample3;
+CREATE TABLE sample3 (
      sample_col_1 smallint NOT NULL,
      sample_col_2 integer NOT NULL,
      sample_col_3 integer NOT NULL,
