@@ -12,6 +12,6 @@ export SERVERS=1
 # GemFire
 export JAVA_HOME="/usr/lib/jvm/java"
 export GEMFIRE="$HOME/pivotal-gemfire-9.0.4"
-export JAVA_ARGS="-Dgfsh.log-level=config -Dgfsh.log-dir=GemFire/gfsh"
+export JAVA_ARGS="-Dgfsh.log-level=config -Dgfsh.log-dir=$GEMFIRE/GemFire/gfsh"
 export PATH="$PATH:$GEMFIRE/bin"
 
