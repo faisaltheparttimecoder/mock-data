@@ -4,17 +4,17 @@ import (
 	"flag"
 	"fmt"
 	"os"
-
-	"github.com/ielizaga/mockd/core"
+	"./core"
 )
 
-type PostgresConnector struct {
+type connector struct {
 	Db, Username, Password, Table string
+	HostName, RegionName	string
 	Port, RowCount                int
 }
 
 var engines = []string{"postgres", "greenplum", "hawq"}
-var Connector PostgresConnector
+var Connector connector
 
 // Program Usage.
 func ShowHelp() {
@@ -45,17 +45,30 @@ func ArgPaser() {
 	postgresTableFlag := postgresFlag.String("t", "", "The table name to be filled in with mock data")
 	flag.Parse()
 
+	// GemFire Command Parser
+	gemfireFlag := flag.NewFlagSet("gemfire", flag.ExitOnError)
+	gemfireHostNameFlag := gemfireFlag.String("h", "localhost", "The server host name.")
+	gemfireRegionNameFlag := gemfireFlag.String("r", "replicatedRegion", "The region where the mock entries will be inserted.")
+	gemfirePortFlag := gemfireFlag.Int("p", 8080, "The port that is used by the REST API endpoint.")
+	gemfireTotalRowsFlag := gemfireFlag.Int("n", 1, "The total number of mocked objects that is needed.")
+	flag.Parse()
+
 	// If there is a command keyword provided then check to what is it and then parse the appropriate options
 	var engine_arg = os.Args[1]
 
 	switch {
-	case core.StringContains(engine_arg, engines): // Postgres command parser
-		postgresFlag.Parse(os.Args[2:])
-	case engine_arg == "help": // Help Menu
-		ShowHelp()
-	default: // Error if command is invalid
-		fmt.Printf("ERROR: %q is not valid command.\n", os.Args[1])
-		ShowHelp()
+		case core.StringContains(engine_arg, engines): // Postgres command parser
+			postgresFlag.Parse(os.Args[2:])
+
+		case engine_arg == "gemfire": // GemFire Command Parser
+			gemfireFlag.Parse(os.Args[2:])
+
+		case engine_arg == "help": // Help Menu
+			ShowHelp()
+
+		default: // Error if command is invalid
+			fmt.Printf("ERROR: %q is not valid command.\n", os.Args[1])
+			ShowHelp()
 	}
 
 	// Parse the command line argument
@@ -68,5 +81,13 @@ func ArgPaser() {
 		Connector.Table = *postgresTableFlag
 		Connector.Port = *postgresPortFlag
 		Connector.RowCount = *postgresTotalRowsFlag
+	} 
+
+	if gemfireFlag.Parsed() {
+		DBEngine = "gemfire"
+		Connector.HostName = *gemfireHostNameFlag
+		Connector.RegionName = *gemfireRegionNameFlag
+		Connector.Port = *gemfirePortFlag
+		Connector.RowCount = *gemfireTotalRowsFlag
 	}
 }

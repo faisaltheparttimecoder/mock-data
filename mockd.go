@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"github.com/ielizaga/mockd/core"
 	_ "github.com/lib/pq"
 	"github.com/op/go-logging"
+	"./core"
 )
 
 // All global variables
@@ -49,6 +49,12 @@ func main() {
 	// What is the database engine that needs to be used
 	if core.StringContains(DBEngine, engines) {
 		err := MockPostgres()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
+	} else if DBEngine == "gemfire" {
+		err := MockGemFire()
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
