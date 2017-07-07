@@ -78,7 +78,7 @@ func RandomBoolean() bool {
 
 // Random Paragraphs
 func RandomParagraphs() string {
-	return fake.ParagraphsN(50)
+	return fake.ParagraphsN(5)
 }
 
 // Random IPv6 & IPv4 Address
