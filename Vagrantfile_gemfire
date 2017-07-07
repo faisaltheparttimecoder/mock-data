@@ -1,0 +1,43 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# All Vagrant configuration is done below. The "2" in Vagrant.configure
+# configures the configuration version (we support older styles for
+# backwards compatibility). Please don't change it unless you know what
+# you're doing.
+Vagrant.configure("2") do |config|
+  config.vm.box = "centos/7"
+
+  config.vm.network "forwarded_port", guest: 8080, host: 8080
+  config.vm.network "forwarded_port", guest: 40401, host: 40401
+  config.vm.network "forwarded_port", guest: 10101, host: 10101
+  config.vm.network "forwarded_port", guest: 7070, host: 7070
+  config.vm.network "forwarded_port", guest: 10111, host: 10111
+
+  config.vm.provider "virtualbox" do |vb|
+    # Customize the amount of memory on the VM:
+    vb.memory = "4096"
+  end
+  
+  config.vm.hostname = "gemfire9"
+
+  # Enable provisioning with a shell script. Additional provisioners such as
+  # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
+  # documentation for more information about their specific syntax and use.
+  config.vm.provision "shell", inline: <<-SHELL
+    setenforce 0
+    sed -i 's/enforcing/disabled/' /etc/selinux/config
+    yum makecache fast
+    yum install -y wget java-1.8.0-openjdk-devel
+    yum clean all
+    echo "Downloading Gemfire 9"
+    wget -q -O "eula" --post-data="" --header="Authorization: Token H5WesDuDHJ4m6Xy69HU8" https://network.pivotal.io/api/v2/products/pivotal-gemfire/releases/5376/eula_acceptance
+    wget -q -O "pivotal-gemfire-9.0.4.tar.gz" --post-data="" --header="Authorization: Token H5WesDuDHJ4m6Xy69HU8" https://network.pivotal.io/api/v2/products/pivotal-gemfire/releases/5376/product_files/20296/download
+    echo "UnTaring Gem"
+    tar xf pivotal-gemfire-9.0.4.tar.gz
+    mkdir -p -v pivotal-gemfire-9.0.4/GemFire/gfsh
+    chown -R vagrant:vagrant .
+    ln -s /vagrant/provision/manage_cluster.sh /usr/bin/manage_cluster
+    echo "Provision done!"
+  SHELL
+end
