@@ -79,6 +79,8 @@ Vagrant.configure("2") do |config|
     yum clean all
     systemctl enable postgresql.service
     sudo -u postgres initdb -D /var/lib/pgsql/data
+    sed -i "s/#listen_addresses = 'localhost'/listen_addresses = '*'/" /var/lib/pgsql/data/postgresql.conf
+    echo "host    all             all             0.0.0.0/0            trust" >> /var/lib/pgsql/data/pg_hba.conf
     systemctl start postgresql.service
   SHELL
 end
