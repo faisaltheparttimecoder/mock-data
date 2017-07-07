@@ -53,6 +53,12 @@ func main() {
 			log.Error(err)
 			os.Exit(1)
 		}
+	} else if DBEngine == "gemfire" {
+		err := MockGemFire()
+		if err != nil {
+			log.Error(err)
+			os.Exit(1)
+		}
 	} else { // Unsupported database engine
 		log.Errorf("mockd application doesn't support the database: %s", DBEngine)
 		os.Exit(1)
