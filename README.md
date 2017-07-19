@@ -14,13 +14,13 @@ An ideal environment to make Mock-data work without any errors would be
 
 On a second iteration work has been done to ensure proper functioning with database constraints such as primary keys, unique keys or foreign keys. However, please **DO MAKE SURE TO TAKE A BAKCUP** of your database before you mock data in it as it has not been tested extensively.
 
-Check on the "Known Issues" section below for more information about currently identified bugs.
+Check on the "Known Issues" section below for more information about current identified bugs.
 
 # Important information and disclaimer
 
 Mock-data idea is to generate fake data in new test cluster and it is **NOT TO BE USED IN PRODUCTION ENVIRONMENTS**. Please ensure you have a backup of your database before running Mock-data in an environment you can't afford losing.
 
-# Supported database engines (hopefully will expand soon)
+# Supported database engines
 
 + PostgresSQL
 + Greenplum Database
