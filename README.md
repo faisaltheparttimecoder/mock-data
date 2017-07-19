@@ -3,7 +3,7 @@
 MockD is built of simple catchphrase
 
     Here are my tables
-    Load data for me
+    Load it [with data] for me
     I don't care how
 
 with MockD you can have your own tables defined with datatypes, just supply the connection, total data needed and the tables and leave MockD to build random generated dataset on those tables.
@@ -74,21 +74,7 @@ OPTIONS:
 
 ### MockD User
 
-+ [Download](https://github.com/ielizaga/mockd/archive/master.zip) the github repo or clone the github repo
-
-```
-git clone https://github.com/ielizaga/mockd.git
-```
-
-+ Navigate to the "bin" directory
-+ Use the appropriate binary that matches your OS
-
-```
-XXXXX:bin XXXXX ls -ltr
-total 26832
--rwxr-xr-x  1 XXXXX  XXXXX  6878692 Jul 16 10:44 mockd-mac
--rwxr-xr-x  1 XXXXX  XXXXX  6853562 Jul 16 10:44 mockd-linux
-```
+[Download](https://github.com/pivotal/mock-data/releases/tag/v1.0) the latest release and you're ready to go!
 
 **NOTE:** if you have the datatype UUID defined on the table, make sure you have the execute "uuidgen" installed on the OS.  
 
