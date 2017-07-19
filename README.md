@@ -1,4 +1,4 @@
-# Mock-data [![Go Version](https://img.shields.io/badge/go-v1.7.4-green.svg?style=flat-square)](https://golang.org/dl/) [![MIT License](https://img.shields.io/badge/License-MIT_License-green.svg?style=flat-square)](https://github.com/ielizaga/mockd/blob/master/LICENSE)
+# Mock-data [![Go Version](https://img.shields.io/badge/go-v1.7.4-green.svg?style=flat-square)](https://golang.org/dl/) [![MIT License](https://img.shields.io/badge/License-MIT_License-green.svg?style=flat-square)](https://github.com/pivotal/mock-data/blob/master/LICENSE)
 
     Here are my tables
     Load it [with data] for me
@@ -6,7 +6,7 @@
     
 Mock-data is the result of a Pivotal internal hackathon in July 2017. The original idea behind it is to allow users to test database queries with sets of fake data in any pre-defined table.
 
-With Mock-dat users can have their own tables defined with any particular datatypes. It's only needed to provide the target table(s) and the number of rows of randomly generated data to insert.
+With Mock-data users can have their own tables defined with any particular datatypes. It's only needed to provide the target table(s) and the number of rows of randomly generated data to insert.
 
 An ideal environment to make Mock-data work without any errors would be 
 + Tables with no constraints
@@ -88,7 +88,7 @@ git clone https://github.com/pivotal/mock-data.git
 or use "go get" to download the source after setting the GOPATH
 
 ```
-go get github.com/ielizaga/mockd
+go get github.com/pivotal/mock-data
 ```
 
 + Download all the dependencies
@@ -146,7 +146,7 @@ Usage of postgres:
 bin/mockd-mac <dbengine> -n <total rows> -u <user> -d <database> -t <table>
 ```
 
-![single table](https://github.com/ielizaga/mockd/blob/master/img/singletable.gif)
+![single table](https://github.com/pivotal/mock-data/blob/master/img/singletable.gif)
 
 + Mock multiple table with random data
 
@@ -154,7 +154,7 @@ bin/mockd-mac <dbengine> -n <total rows> -u <user> -d <database> -t <table>
 bin/mockd-mac <dbengine> -n <total rows> -u <user> -d <database> -t <table1>,<table2>,....
 ```
 
-![multiple table](https://github.com/ielizaga/mockd/blob/master/img/multipletable.gif)
+![multiple table](https://github.com/pivotal/mock-data/blob/master/img/multipletable.gif)
 
 + Mock entire database
 
@@ -162,7 +162,7 @@ bin/mockd-mac <dbengine> -n <total rows> -u <user> -d <database> -t <table1>,<ta
 bin/mockd-mac <dbengine> -n <total rows> -u <user> -d <database> -x
 ```
 
-![All Database](https://github.com/ielizaga/mockd/blob/master/img/alldb.gif)
+![All Database](https://github.com/pivotal/mock-data/blob/master/img/alldb.gif)
 
 # Known Issues
 
@@ -173,7 +173,7 @@ bin/mockd-mac <dbengine> -n <total rows> -u <user> -d <database> -x
 
 # Collaborate
 
-You can sumbit issues or pull request via [github](https://github.com/ielizaga/mockd) and we will try our best to fix them.
+You can sumbit issues or pull request via [github](https://github.com/pivotal/mock-data) and we will try our best to fix them.
 
 # Authors
 
