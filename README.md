@@ -1,39 +1,39 @@
-# MockD [![Go Version](https://img.shields.io/badge/go-v1.7.4-green.svg?style=flat-square)](https://golang.org/dl/) [![MIT License](https://img.shields.io/badge/License-MIT_License-green.svg?style=flat-square)](https://github.com/ielizaga/mockd/blob/master/LICENSE)
-                                                                                                                                                                                                       
-MockD is built of simple catchphrase
+# Mock-data [![Go Version](https://img.shields.io/badge/go-v1.7.4-green.svg?style=flat-square)](https://golang.org/dl/) [![MIT License](https://img.shields.io/badge/License-MIT_License-green.svg?style=flat-square)](https://github.com/ielizaga/mockd/blob/master/LICENSE)
 
     Here are my tables
     Load it [with data] for me
     I don't care how
+    
+Mock-data is the result of a Pivotal internal hackathon in July 2017. The original idea behind it is to allow users to test database queries with sets of fake data in any pre-defined table.
 
-with MockD you can have your own tables defined with datatypes, just supply the connection, total data needed and the tables and leave MockD to build random generated dataset on those tables.
+With Mock-dat users can have their own tables defined with any particular datatypes. It's only needed to provide the target table(s) and the number of rows of randomly generated data to insert.
 
-MockD does try to ensure it acknowledge the constraints in the database and try to fix PK / UK / FK constraints, but it not foolproof. hence its **HIGHLY RECOMMEDED** you do take a backup of your database before you ask MockD to load data.
-
-An ideal environment to make MockD work without any error's would be 
-
-+ No constraints
+An ideal environment to make Mock-data work without any errors would be 
++ Tables with no constraints
 + No custom datatypes
 
-Check on "Known Issues" below for things are currently not working
+On a second iteration work has been done to ensure proper functioning with database constraints such as primary keys, unique keys or foreign keys. However, please **DO MAKE SURE TO TAKE A BAKCUP** of your database before you mock data in it as it has not been tested extensively.
 
-# Important Information
+Check on the "Known Issues" section below for more information about currently identified bugs.
 
-MockD program is created for generating test data and **NOT TO BE USED IN PRODUCTION DATABASE**, ensure you have the backup of the database before asking MockD to load data for you.
+# Important information and disclaimer
 
-# Supported database
+Mock-data idea is to generate fake data in new test cluster and it is **NOT TO BE USED IN PRODUCTION ENVIRONMENTS**. Please ensure you have a backup of your database before running Mock-data in an environment you can't afford losing.
 
-+ Postgres
-+ Greenplum (GPDB)
-+ Hawq (HDB) 
-+ MySQL / Oracle ( coming soon <img src="https://media.giphy.com/media/MhS3BBBdYAxEc/giphy.gif" width="18" height="10"> ) 
+# Supported database engines (hopefully will expand soon)
+
++ PostgresSQL
++ Greenplum Database
++ HAWQ/HDB
++ MySQL (coming soon?) 
++ Oracle (coming soon?) 
 
 # Supported datatypes
 
 + All datatypes that are listed on the [postgres datatype](https://www.postgresql.org/docs/9.6/static/datatype.html) website are supported
-+ As Greenplum / Hawq is a fork from postgres, the supported postgres datatype also applies here.
++ As Greenplum / HAWQ are both base from postgres, the supported postgres datatype also apply in their case
 
-# Go Library Package Dependencies
+# Dependencies
 
 + [Data Faker](https://github.com/icrowley/fake) by icrowley
 + [Progress bar](https://github.com/vbauerster/mpb) by vbauerster
@@ -42,20 +42,19 @@ MockD program is created for generating test data and **NOT TO BE USED IN PRODUC
 
 # How it works.
 
-+ Parse the argument parameters
-+ Check if the database connection can be established and queries work.
-+ If all database flag is set, then extract all the tables in the database
-+ if tables are specified then uses only those tables.
-+ First creates a backup of all constraints ( like PK (primary key), UK, CK, FK ) and also unique index ( due to cascade nature of the drop constraints )
-+ Also store this constraint / Unique index information on the memory
-+ Before loading it will remove all the constraints on the table
-+ Once done, it will start its loaded by picking random data based on the columns datatype.
-+ Once its done, it read all the constraints information from the memory
-+ fixes PK and UK initially
-+ then fixes FK
-+ Check constraints are ignored ( since its not easy to translate it )
-+ Once done it loads all the constraints that it had backed up ( MockD fails mostly at this stage if its not able to autofix the constraints violation )
-+ Program ends.
++ PARSES the CLI arguments
++ CHECKS if the database connection can be established
++ IF all database flag is set, then extract all the tables in the database
++ ELSE IF tables are specified then uses only target tables
++ CREATES a backup of all constraints (PK, UK, CK, FK ) and unique indexes (due to cascade nature of the drop constraints)
++ STORES this constraint/unique index information in memory
++ REMOVES all the constraints on the table
++ STARTS loading random data based on the columns datatype
++ READS all the constraints information from memory
++ FIXES PK and UK initially
++ FIXES FK
++ CHECK constraints are ignored (coming soon?)
++ LOADS constraints that it had backed up (Mock-data can fail at this stage if its not able to fix the constraint violations)
 
 # Usage
 
@@ -72,7 +71,7 @@ OPTIONS:
 
 # How to use it
 
-### MockD User
+### Users
 
 [Download](https://github.com/pivotal/mock-data/releases/tag/v1.0) the latest release and you're ready to go!
 
@@ -80,10 +79,10 @@ OPTIONS:
 
 ### Developers
 
-+ [Download](https://github.com/ielizaga/mockd/archive/master.zip) the github repo or clone the github repo
++ Clone the github repo
 
 ```
-git clone https://github.com/ielizaga/mockd.git
+git clone https://github.com/pivotal/mock-data.git
 ```
 
 or use "go get" to download the source after setting the GOPATH
@@ -115,7 +114,7 @@ env GOOS=linux GOARCH=amd64 go build
 
 # Command Reference
 
-+ For postgres / greenplum / hawq 
++ For PostgresSQL / Greenplum Database / HAWQ
 
 ```
 XXXXX:bin XXXXX ./mockd-mac postgres -help
@@ -167,18 +166,15 @@ bin/mockd-mac <dbengine> -n <total rows> -u <user> -d <database> -x
 
 # Known Issues
 
-1. If you uses a small amount of rows to mock and you have defined a composite PK index, there are chances that the primary key would fail ( this is due to foreign key fix only runs after primary key fix )
-2. Still having issues with Check constraint, only check that works is "COLUMN > 0" & nothing else
-3. On Greenplum/HDB partition tables are not supported (due to check constraint issues defined above). 
+1. When using a small amount of rows and having defined a composite PK index, there are chances that the primary key would fail (this is due to foreign key fix only runs after primary key fix)
+2. Still having issues with Check constraint, only check that works is "COLUMN > 0"
+3. On Greenplum Datbase/HAWQ partition tables are not supported (due to check constraint issues defined above)
 4. Custom datatypes are not supported
 
+# Collaborate
 
-# Community
-
-You can sumbit issues or pull request via [github](https://github.com/ielizaga/mockd) and we will try our level best to fix them..
+You can sumbit issues or pull request via [github](https://github.com/ielizaga/mockd) and we will try our best to fix them.
 
 # Authors
 
 [![Ignacio](https://img.shields.io/badge/github-Ignacio_Elizaga-green.svg?style=social)](https://github.com/ielizaga) [![Aitor](https://img.shields.io/badge/github-Aitor_Cedres-green.svg?style=social)](https://github.com/Zerpet) [![Juan](https://img.shields.io/badge/github-Juan_Ramos-green.svg?style=social)](https://github.com/jujoramos) [![Faisal](https://img.shields.io/badge/github-Faisal_Ali-green.svg?style=social)](https://github.com/faisaltheparttimecoder) [![Adam](https://img.shields.io/badge/github-Adam_Clevy-green.svg?style=social)](https://github.com/adamclevy)
-
-
