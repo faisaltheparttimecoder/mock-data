@@ -2,10 +2,9 @@ package main
 
 import (
 	"os"
-
-	"github.com/ielizaga/mockd/core"
 	_ "github.com/lib/pq"
 	"github.com/op/go-logging"
+	"github.com/ielizaga/mockd/core"
 )
 
 // All global variables
@@ -15,11 +14,14 @@ var (
 
 // Define the logging format, used in the project
 var (
-	log    = logging.MustGetLogger("mockd")
+	log = logging.MustGetLogger("mockd")
 	format = logging.MustStringFormatter(
-		`%{color}%{time:2006-01-02 15:04:05.000}:%{level:s} > %{color:reset}%{message}`,
+	`%{color}%{time:2006-01-02 15:04:05.000}:%{level:s} > %{color:reset}%{message}`,
 	)
 )
+
+// file timestamp
+var ExecutionTimestamp = core.TimeNow()
 
 // An Engine is an implementation of a database
 // engine like PostgreSQL, MySQL or Greenplum
@@ -30,14 +32,15 @@ type Engine struct {
 
 // A Table is an implementation of a database with a set of columns and datatypes
 type Table struct {
-	tabname string
-	columns map[string]string
+	tabname  string
+	columns  map[string]string
 }
 
 // Main block
 func main() {
 
 	// Logger for go-logging package
+	// create backend for os.Stderr, set the format and update the logger to what logger to be used
 	backend := logging.NewLogBackend(os.Stderr, "", 0)
 	backendFormatter := logging.NewBackendFormatter(backend, format)
 	logging.SetBackend(backendFormatter)
@@ -46,20 +49,18 @@ func main() {
 	log.Info("Parsing all the command line arguments")
 	ArgPaser()
 
+	// This execution timestamp
+	log.Infof("Timestamp of this mockd execution: %s", ExecutionTimestamp)
+
 	// What is the database engine that needs to be used
-	if core.StringContains(DBEngine, engines) {
+	// call the appropriate program that is specific to database engine
+	if DBEngine == "postgres" {
 		err := MockPostgres()
 		if err != nil {
 			log.Error(err)
 			os.Exit(1)
 		}
-	} else if DBEngine == "gemfire" {
-		err := MockGemFire()
-		if err != nil {
-			log.Error(err)
-			os.Exit(1)
-		}
-	} else { // Unsupported database engine
+	} else { // Unsupported database engine.
 		log.Errorf("mockd application doesn't support the database: %s", DBEngine)
 		os.Exit(1)
 	}
