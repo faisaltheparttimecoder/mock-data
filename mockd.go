@@ -2,9 +2,10 @@ package main
 
 import (
 	"os"
+
 	_ "github.com/lib/pq"
 	"github.com/op/go-logging"
-	"github.com/ielizaga/mockd/core"
+	"github.com/pivotal/mock-data/core"
 )
 
 // All global variables
@@ -14,9 +15,9 @@ var (
 
 // Define the logging format, used in the project
 var (
-	log = logging.MustGetLogger("mockd")
+	log    = logging.MustGetLogger("mockd")
 	format = logging.MustStringFormatter(
-	`%{color}%{time:2006-01-02 15:04:05.000}:%{level:s} > %{color:reset}%{message}`,
+		`%{color}%{time:2006-01-02 15:04:05.000}:%{level:s} > %{color:reset}%{message}`,
 	)
 )
 
@@ -32,8 +33,8 @@ type Engine struct {
 
 // A Table is an implementation of a database with a set of columns and datatypes
 type Table struct {
-	tabname  string
-	columns  map[string]string
+	tabname string
+	columns map[string]string
 }
 
 // Main block

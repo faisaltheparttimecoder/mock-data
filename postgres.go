@@ -4,20 +4,21 @@ import (
 	"database/sql"
 	"fmt"
 	"strings"
+
 	"github.com/lib/pq"
-	"github.com/ielizaga/mockd/core"
-	"github.com/ielizaga/mockd/db/postgres"
+	"github.com/pivotal/mock-data/core"
+	"github.com/pivotal/mock-data/db/postgres"
 )
 
 // Global Variables
 var (
 	skippedTab []string
-	db *sql.DB
-	stmt *sql.Stmt
+	db         *sql.DB
+	stmt       *sql.Stmt
 )
 
 // Progress Database connection
-func dbConn() (error) {
+func dbConn() error {
 	dbconn, err := sql.Open(DBEngine, fmt.Sprintf("user=%v password=%v host=%v port=%v dbname=%v sslmode=disable", Connector.Username, Connector.Password, Connector.Host, Connector.Port, Connector.Db))
 	if err != nil {
 		return fmt.Errorf("Cannot establish a database connection: %v\n", err)
@@ -54,7 +55,7 @@ func dbVersion() error {
 }
 
 // Extract all the tables in the database
-func dbExtractTables() ([]string, error){
+func dbExtractTables() ([]string, error) {
 
 	log.Info("Extracting all the tables in the database")
 	var tableString []string
@@ -196,7 +197,7 @@ func splitter(columns map[string]string, tabname string) error {
 	}
 
 	// Start the progress bar
-	progressMsg := "(Mocking Table: " + schema+"."+tabname+ ")"
+	progressMsg := "(Mocking Table: " + schema + "." + tabname + ")"
 	core.ProgressBar(Connector.RowCount, progressMsg)
 
 	// Commit the data to the database
@@ -212,7 +213,7 @@ func splitter(columns map[string]string, tabname string) error {
 }
 
 // Start a transaction block and commit the data
-func commitData(schema, tabname string,  colkey, dtkeys []string) error {
+func commitData(schema, tabname string, colkey, dtkeys []string) error {
 
 	// Start a transaction
 	txn, err := db.Begin()
@@ -227,37 +228,37 @@ func commitData(schema, tabname string,  colkey, dtkeys []string) error {
 	}
 
 	// Iterate through connector row count and build data for each datatype
-	DataTypePickerLoop: // Label the loop to break, if there is a datatype that we don't support
-		for i:=0; i<Connector.RowCount; i++ {
+DataTypePickerLoop: // Label the loop to break, if there is a datatype that we don't support
+	for i := 0; i < Connector.RowCount; i++ {
 
-			// data collector
-			var data []interface{}
+		// data collector
+		var data []interface{}
 
-			// Generate data based on the columns datatype
-			for _, v := range dtkeys {
-				dataoutput, err := core.BuildData(v)
-				if err != nil {
-					if strings.HasPrefix(fmt.Sprint(err) , "Unsupported datatypes found") {
-						log.Errorf("Skipping table \"%s\" due to error \"%v\"", tabname, err)
-						skippedTab = append(skippedTab, tabname)
-						break DataTypePickerLoop // break the loop
-					} else {
-						return err
-					}
-
-				}
-				data = append(data, dataoutput)
-			}
-
-			// Execute the statement
-			_, err = stmt.Exec(data...)
+		// Generate data based on the columns datatype
+		for _, v := range dtkeys {
+			dataoutput, err := core.BuildData(v)
 			if err != nil {
-				return err
-			}
+				if strings.HasPrefix(fmt.Sprint(err), "Unsupported datatypes found") {
+					log.Errorf("Skipping table \"%s\" due to error \"%v\"", tabname, err)
+					skippedTab = append(skippedTab, tabname)
+					break DataTypePickerLoop // break the loop
+				} else {
+					return err
+				}
 
-			// Increment progress bar
-			core.IncrementBar()
+			}
+			data = append(data, dataoutput)
 		}
+
+		// Execute the statement
+		_, err = stmt.Exec(data...)
+		if err != nil {
+			return err
+		}
+
+		// Increment progress bar
+		core.IncrementBar()
+	}
 
 	// Close the statement
 	err = stmt.Close()

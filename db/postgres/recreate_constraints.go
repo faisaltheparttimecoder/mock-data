@@ -1,11 +1,12 @@
 package postgres
 
 import (
-	"fmt"
 	"database/sql"
-	"github.com/ielizaga/mockd/core"
+	"fmt"
 	"strings"
+
 	"github.com/op/go-logging"
+	"github.com/pivotal/mock-data/core"
 )
 
 var (
@@ -21,7 +22,7 @@ func FixConstraints(db *sql.DB, timestamp string) error {
 	for _, v := range constr {
 		log.Infof("Checking for any %s KEYS, fixing them if there is any violations", v)
 		for _, con := range savedConstraints[v] {
-			switch  {
+			switch {
 			case v == "PRIMARY":
 				err := fixPKey(db, con, v)
 				if err != nil {
@@ -120,7 +121,7 @@ func fixPKey(db *sql.DB, pk constraint, fixtype string) error {
 }
 
 // Get total violations
-func getTotalViolation(db *sql.DB, query string) (int, error ) {
+func getTotalViolation(db *sql.DB, query string) (int, error) {
 
 	var TotalViolators int
 
@@ -246,6 +247,7 @@ func fixFKey(db *sql.DB, fk constraint) error {
 type foreignKey struct {
 	table, column, reftable, refcolumn string
 }
+
 func getFKeyObjects(fk constraint) (foreignKey, error) {
 
 	var foriegnClause foreignKey
@@ -278,6 +280,7 @@ func getFKeyObjects(fk constraint) (foreignKey, error) {
 
 	return foriegnClause, nil
 }
+
 // Update the foriegn key violation tables.
 func UpdateFKViolationRecord(db *sql.DB, fkObjects foreignKey) error {
 
@@ -377,7 +380,7 @@ func updateFKViolators(db *sql.DB, fkObjects foreignKey, totalRows string) error
 }
 
 // Recreate all the constraints of the database ( in case we have dropped any )
-func recreateAllConstraints(db *sql.DB,timestamp string) error {
+func recreateAllConstraints(db *sql.DB, timestamp string) error {
 
 	// list the backup files collected.
 	for _, con := range constraints {

@@ -3,8 +3,9 @@ package postgres
 import (
 	"database/sql"
 	"fmt"
-	"github.com/ielizaga/mockd/core"
 	"strings"
+
+	"github.com/pivotal/mock-data/core"
 )
 
 type constraint struct {
@@ -12,9 +13,9 @@ type constraint struct {
 }
 
 var (
-	savedConstraints = map[string][]constraint{"PRIMARY":{}, "CHECK":{}, "UNIQUE":{}, "FOREIGN":{}}
-	constraints = []string{"p", "f", "u", "c"}
-	ignoreErr = []string{
+	savedConstraints = map[string][]constraint{"PRIMARY": {}, "CHECK": {}, "UNIQUE": {}, "FOREIGN": {}}
+	constraints      = []string{"p", "f", "u", "c"}
+	ignoreErr        = []string{
 		"pq: multiple primary keys for table",
 		"already exists"}
 )
@@ -37,7 +38,6 @@ func BackupDDL(db *sql.DB, timestamp string) error {
 
 	return nil
 }
-
 
 // Backup all the constraints
 func backupConstraints(db *sql.DB, timestamp string) error {
@@ -69,7 +69,7 @@ func backupConstraints(db *sql.DB, timestamp string) error {
 			if err != nil {
 				return err
 			}
-			savedConstraints[ctype] = append(savedConstraints[ctype], constraint{table: table, column:conkey})
+			savedConstraints[ctype] = append(savedConstraints[ctype], constraint{table: table, column: conkey})
 		}
 	}
 
@@ -79,7 +79,7 @@ func backupConstraints(db *sql.DB, timestamp string) error {
 // Backup all the unique index
 func backupIndexes(db *sql.DB, timestamp string) error {
 
-	filename :="mockd_index_backup_u_" + timestamp + ".sql"
+	filename := "mockd_index_backup_u_" + timestamp + ".sql"
 	rows, err := db.Query(GetPGIndexDDL())
 	for rows.Next() {
 		var table, index string
@@ -99,7 +99,7 @@ func backupIndexes(db *sql.DB, timestamp string) error {
 		}
 
 		// Save all the index information
-		savedConstraints["UNIQUE"] = append(savedConstraints["UNIQUE"], constraint{table: table, column:index})
+		savedConstraints["UNIQUE"] = append(savedConstraints["UNIQUE"], constraint{table: table, column: index})
 	}
 
 	return nil
@@ -120,7 +120,7 @@ func RemoveConstraints(db *sql.DB, table string) error {
 		var tab, conname, concol, contype string
 
 		// Scan and store the rows
-		err = rows.Scan(&tab, &conname, &concol,  &contype)
+		err = rows.Scan(&tab, &conname, &concol, &contype)
 		if err != nil {
 			return fmt.Errorf("Error extracting all the constriant list on the table: %v", err)
 		}

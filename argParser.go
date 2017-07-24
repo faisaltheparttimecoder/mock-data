@@ -4,16 +4,17 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"github.com/ielizaga/mockd/core"
 	"strings"
+
+	"github.com/pivotal/mock-data/core"
 )
 
 // Connector struct
 type connector struct {
-	Engine string
+	Engine                              string
 	Db, Username, Password, Host, Table string
-	Port, RowCount  int
-	AllTables, IgnoreConstraints bool
+	Port, RowCount                      int
+	AllTables, IgnoreConstraints        bool
 }
 
 // The connector
@@ -58,16 +59,16 @@ func ArgPaser() {
 
 	// If there is a command keyword provided then check to what is it and then parse the appropriate options
 	switch {
-		// Postgres command parser
-		case core.StringContains(engineArgs, postgresEngines):
-			postgresFlag.Parse(os.Args[2:])
-		// Help Menu
-		case engineArgs == "help":
-			ShowHelp()
-		// If not of the list of supported engines, error out
-		default:
-			log.Errorf("%q is not valid command.", os.Args[1])
-			ShowHelp()
+	// Postgres command parser
+	case core.StringContains(engineArgs, postgresEngines):
+		postgresFlag.Parse(os.Args[2:])
+	// Help Menu
+	case engineArgs == "help":
+		ShowHelp()
+	// If not of the list of supported engines, error out
+	default:
+		log.Errorf("%q is not valid command.", os.Args[1])
+		ShowHelp()
 	}
 
 	// Parse the command line argument
@@ -93,7 +94,7 @@ func ArgPaser() {
 			fmt.Printf("Usage of engine: %s\n", Connector.Engine)
 			postgresFlag.PrintDefaults()
 			os.Exit(1)
-		} else if !Connector.AllTables  && strings.TrimSpace(Connector.Table) == "" { // if -t is empty
+		} else if !Connector.AllTables && strings.TrimSpace(Connector.Table) == "" { // if -t is empty
 			log.Error("Provide the list of tables (-t) to mock or -x for all database.\n")
 			fmt.Printf("Usage of engine: %s\n", Connector.Engine)
 			postgresFlag.PrintDefaults()
