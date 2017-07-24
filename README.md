@@ -1,7 +1,7 @@
-# Mock-data [![Go Version](https://img.shields.io/badge/go-v1.7.4-green.svg?style=flat-square)](https://golang.org/dl/) [![MIT License](https://img.shields.io/badge/License-MIT_License-green.svg?style=flat-square)](https://github.com/pivotal/mock-data/blob/master/LICENSE)
+# Mock-data [![Go Version](https://img.shields.io/badge/go-v1.7.4-green.svg?style=flat-square)](https://golang.org/dl/)
 
     Here are my tables
-    Load it [with data] for me
+    Load them [with data] for me
     I don't care how
     
 Mock-data is the result of a Pivotal internal hackathon in July 2017. The original idea behind it is to allow users to test database queries with sets of fake data in any pre-defined table.
