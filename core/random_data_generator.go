@@ -1,15 +1,16 @@
 package core
 
 import (
-	"time"
-	"math/rand"
-	"math"
 	"errors"
-	"github.com/icrowley/fake"
-	"os/exec"
-	"strings"
 	"fmt"
+	"math"
+	"math/rand"
+	"os/exec"
 	"strconv"
+	"strings"
+	"time"
+
+	"github.com/icrowley/fake"
 )
 
 // Random text generator based on the length of string needed
@@ -17,6 +18,15 @@ var r *rand.Rand
 
 func init() {
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
+}
+
+func RandomByte(maxlen int) []byte {
+	rand.Seed(time.Now().UnixNano())
+	result := make([]byte, r.Intn(maxlen)+1)
+	for i := range result {
+		result[i] = byte(r.Intn(255))
+	}
+	return result
 }
 
 func RandomString(strlen int) string {
@@ -30,11 +40,11 @@ func RandomString(strlen int) string {
 
 // Random Number generator based on the min and max specified
 func RandomInt(min, max int) (int, error) {
-	if min >= max  {
+	if min >= max {
 		return 0, errors.New("Max value is greater or equal to Min value, cannot generate data within these ranges")
 	}
 	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(max - min) + max, nil
+	return rand.Intn(max-min) + max, nil
 }
 
 // Random Float generator based on precision specified
@@ -48,7 +58,7 @@ func RandomFloat(min, max, precision int) (float64, error) {
 	if err != nil {
 		return 0.0, err
 	}
-	return float64(round(float64(randNumber) / rand.Float64() * output)) / output, nil
+	return float64(round(float64(randNumber)/rand.Float64()*output)) / output, nil
 }
 
 // Random calender date time generator
@@ -64,8 +74,8 @@ func RandomCalenderDateTime(fromyear, toyear int) (time.Time, error) {
 }
 
 // Random date
-func RandomDate(fromyear, toyear int) (string, error){
-	timestamp , err := RandomCalenderDateTime(fromyear, toyear)
+func RandomDate(fromyear, toyear int) (string, error) {
+	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
 		return "", err
 	}
@@ -73,8 +83,8 @@ func RandomDate(fromyear, toyear int) (string, error){
 }
 
 // Random Timestamp without time zone
-func RandomTimestamp(fromyear, toyear int) (string, error){
-	timestamp , err := RandomCalenderDateTime(fromyear, toyear)
+func RandomTimestamp(fromyear, toyear int) (string, error) {
+	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
 		return "", err
 	}
@@ -82,8 +92,8 @@ func RandomTimestamp(fromyear, toyear int) (string, error){
 }
 
 // Random Timestamp with time zone
-func RandomTimestamptz(fromyear, toyear int) (string, error){
-	timestamp , err := RandomCalenderDateTime(fromyear, toyear)
+func RandomTimestamptz(fromyear, toyear int) (string, error) {
+	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
 		return "", err
 	}
@@ -91,8 +101,8 @@ func RandomTimestamptz(fromyear, toyear int) (string, error){
 }
 
 // Random Time without time zone
-func RandomTime(fromyear, toyear int) (string, error){
-	timestamp , err := RandomCalenderDateTime(fromyear, toyear)
+func RandomTime(fromyear, toyear int) (string, error) {
+	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
 		return "", err
 	}
@@ -100,8 +110,8 @@ func RandomTime(fromyear, toyear int) (string, error){
 }
 
 // Random Timestamp without time zone
-func RandomTimetz(fromyear, toyear int) (string, error){
-	timestamp , err := RandomCalenderDateTime(fromyear, toyear)
+func RandomTimetz(fromyear, toyear int) (string, error) {
+	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
 		return "", err
 	}
@@ -137,7 +147,7 @@ func RandomIP() string {
 // Random bit
 func RandomBit(max int) string {
 	var bitValue string
-	for i:=0; i<max; i++ {
+	for i := 0; i < max; i++ {
 		if RandomBoolean() {
 			bitValue = bitValue + "1"
 		} else {
@@ -168,13 +178,13 @@ func RandomMacAddress() string {
 // Random Text Search Query
 func RandomTSQuery() string {
 	number, _ := RandomInt(1, 9999)
-	number = number%5
+	number = number % 5
 	if number == 0 {
 		return fake.WordsN(1) + " & " + fake.WordsN(1)
 	} else if number == 1 {
 		return fake.WordsN(1) + " | " + fake.WordsN(1)
 	} else if number == 2 {
-		return " ! " + fake.WordsN(1) + " & "  + fake.WordsN(1)
+		return " ! " + fake.WordsN(1) + " & " + fake.WordsN(1)
 	} else if number == 3 {
 		return fake.WordsN(1) + " & " + fake.WordsN(1) + "  & ! " + fake.WordsN(1)
 	} else {
@@ -182,7 +192,6 @@ func RandomTSQuery() string {
 	}
 	return ""
 }
-
 
 // Random Text Search Query
 func RandomTSVector() string {
@@ -195,9 +204,9 @@ func RandomGeometricData(randomInt int, GeoMetry string) string {
 	if GeoMetry == "point" {
 		return "(" + fake.DigitsN(2) + "," + fake.DigitsN(3) + ")"
 	} else if GeoMetry == "circle" {
-		return "(" + fake.DigitsN(2) + "," + fake.DigitsN(3) + ")," + fake.DigitsN(2) +")"
+		return "(" + fake.DigitsN(2) + "," + fake.DigitsN(3) + ")," + fake.DigitsN(2) + ")"
 	} else {
-		for i:=0; i < randomInt; i++ {
+		for i := 0; i < randomInt; i++ {
 			x, _ := RandomFloat(1, 10, 2)
 			y, _ := RandomFloat(1, 10, 2)
 			geometry = append(geometry, "("+fmt.Sprintf("%v", x)+","+fmt.Sprintf("%v", y)+")")
@@ -228,85 +237,85 @@ func RandomTXID() string {
 
 // Random JSON generator
 func RandomJson() string {
-	return  "{" +
-		"    \"_id\": \""+RandomString(24)+"\"," +
-		"    \"index\": \""+fake.DigitsN(10)+"\"," +
-		"    \"guid\": \""+RandomString(8)+"-"+RandomString(4)+"-"+RandomString(4)+"-"+RandomString(4)+"-"+RandomString(12)+"\"," +
-		"    \"isActive\": \""+strconv.FormatBool(RandomBoolean())+"\"," +
-		"    \"balance\": \"$"+fake.Digits()+"."+fake.DigitsN(2)+"\"," +
-		"    \"website\": \"https://"+fake.DomainName()+"/"+fake.WordsN(1)+"\"," +
-		"    \"age\": \""+fake.DigitsN(2)+"\"," +
-		"    \"username\": \""+fake.UserName()+"\"," +
-		"    \"eyeColor\": \""+fake.Color()+"\"," +
-		"    \"name\": \""+fake.FullName()+"\"," +
-		"    \"gender\": \""+fake.Gender()+"\"," +
-		"    \"company\": \""+fake.Company()+"\"," +
-		"    \"email\": \""+fake.EmailAddress()+"\"," +
-		"    \"phone\": \""+fake.Phone()+"\"," +
-		"    \"address\": \""+fake.StreetAddress()+"\"," +
-		"    \"zipcode\": \""+fake.Zip()+"\"," +
-		"    \"state\": \""+fake.State()+"\"," +
-		"    \"country\": \""+fake.Country()+"\"," +
-		"    \"about\": \""+fake.WordsN(12)+"\"," +
-		"    \"Machine IP\": \""+RandomIP()+"\"," +
-		"    \"job title\": \""+fake.JobTitle()+"\"," +
-		"    \"registered\": \""+strconv.Itoa(fake.Year(2000, 2050))+"-"+strconv.Itoa(fake.MonthNum())+"-"+strconv.Itoa(fake.Day())+"T"+fake.DigitsN(2)+":"+fake.DigitsN(2)+":"+fake.DigitsN(2)+" -"+fake.DigitsN(1)+":"+fake.DigitsN(2)+"\"," +
-		"    \"latitude\": \""+fake.DigitsN(2)+"."+fake.DigitsN(6)+"\"," +
-		"    \"longitude\": \""+fake.DigitsN(2)+"."+fake.DigitsN(6)+"\"," +
+	return "{" +
+		"    \"_id\": \"" + RandomString(24) + "\"," +
+		"    \"index\": \"" + fake.DigitsN(10) + "\"," +
+		"    \"guid\": \"" + RandomString(8) + "-" + RandomString(4) + "-" + RandomString(4) + "-" + RandomString(4) + "-" + RandomString(12) + "\"," +
+		"    \"isActive\": \"" + strconv.FormatBool(RandomBoolean()) + "\"," +
+		"    \"balance\": \"$" + fake.Digits() + "." + fake.DigitsN(2) + "\"," +
+		"    \"website\": \"https://" + fake.DomainName() + "/" + fake.WordsN(1) + "\"," +
+		"    \"age\": \"" + fake.DigitsN(2) + "\"," +
+		"    \"username\": \"" + fake.UserName() + "\"," +
+		"    \"eyeColor\": \"" + fake.Color() + "\"," +
+		"    \"name\": \"" + fake.FullName() + "\"," +
+		"    \"gender\": \"" + fake.Gender() + "\"," +
+		"    \"company\": \"" + fake.Company() + "\"," +
+		"    \"email\": \"" + fake.EmailAddress() + "\"," +
+		"    \"phone\": \"" + fake.Phone() + "\"," +
+		"    \"address\": \"" + fake.StreetAddress() + "\"," +
+		"    \"zipcode\": \"" + fake.Zip() + "\"," +
+		"    \"state\": \"" + fake.State() + "\"," +
+		"    \"country\": \"" + fake.Country() + "\"," +
+		"    \"about\": \"" + fake.WordsN(12) + "\"," +
+		"    \"Machine IP\": \"" + RandomIP() + "\"," +
+		"    \"job title\": \"" + fake.JobTitle() + "\"," +
+		"    \"registered\": \"" + strconv.Itoa(fake.Year(2000, 2050)) + "-" + strconv.Itoa(fake.MonthNum()) + "-" + strconv.Itoa(fake.Day()) + "T" + fake.DigitsN(2) + ":" + fake.DigitsN(2) + ":" + fake.DigitsN(2) + " -" + fake.DigitsN(1) + ":" + fake.DigitsN(2) + "\"," +
+		"    \"latitude\": \"" + fake.DigitsN(2) + "." + fake.DigitsN(6) + "\"," +
+		"    \"longitude\": \"" + fake.DigitsN(2) + "." + fake.DigitsN(6) + "\"," +
 		"    \"tags\": [" +
-		"      \""+fake.WordsN(1)+"\"," +
-		"      \""+fake.WordsN(1)+"\"," +
-		"      \""+fake.WordsN(1)+"\"," +
-		"      \""+fake.WordsN(1)+"\"," +
-		"      \""+fake.WordsN(1)+"\"," +
-		"      \""+fake.WordsN(1)+"\"," +
-		"      \""+fake.WordsN(1)+"\"" +
+		"      \"" + fake.WordsN(1) + "\"," +
+		"      \"" + fake.WordsN(1) + "\"," +
+		"      \"" + fake.WordsN(1) + "\"," +
+		"      \"" + fake.WordsN(1) + "\"," +
+		"      \"" + fake.WordsN(1) + "\"," +
+		"      \"" + fake.WordsN(1) + "\"," +
+		"      \"" + fake.WordsN(1) + "\"" +
 		"    ]," +
 		"    \"friends\": [" +
 		"      {" +
-		"        \"id\": \""+fake.DigitsN(2)+"\"," +
-		"        \"name\": \""+fake.FullName()+"\"" +
+		"        \"id\": \"" + fake.DigitsN(2) + "\"," +
+		"        \"name\": \"" + fake.FullName() + "\"" +
 		"      }," +
 		"      {" +
-		"        \"id\": \""+fake.DigitsN(2)+"\"," +
-		"        \"name\": \""+fake.FullName()+"\"" +
+		"        \"id\": \"" + fake.DigitsN(2) + "\"," +
+		"        \"name\": \"" + fake.FullName() + "\"" +
 		"      }," +
 		"      {" +
-		"        \"id\": \""+fake.DigitsN(2)+"\"," +
-		"        \"name\": \""+fake.FullName()+"\"" +
+		"        \"id\": \"" + fake.DigitsN(2) + "\"," +
+		"        \"name\": \"" + fake.FullName() + "\"" +
 		"      }" +
 		"    ]," +
-		"    \"greeting\": \""+fake.Sentence()+"\"," +
-		"    \"favoriteBrand\": \""+fake.Brand()+"\"" +
+		"    \"greeting\": \"" + fake.Sentence() + "\"," +
+		"    \"favoriteBrand\": \"" + fake.Brand() + "\"" +
 		"  }"
 }
 
 // Random XML Generator
 func RandomXML() string {
-	return "<?xml version=\""+fake.DigitsN(1)+"."+fake.DigitsN(1)+"\" encoding=\"UTF-8\"?>" +
-		"<shiporder orderid=\""+fake.Digits()+"\"" +
-		" xmlns:xsi=\"http://"+fake.DomainName()+"/"+fake.DigitsN(4)+"/"+fake.WordsN(1)+"\" " +
+	return "<?xml version=\"" + fake.DigitsN(1) + "." + fake.DigitsN(1) + "\" encoding=\"UTF-8\"?>" +
+		"<shiporder orderid=\"" + fake.Digits() + "\"" +
+		" xmlns:xsi=\"http://" + fake.DomainName() + "/" + fake.DigitsN(4) + "/" + fake.WordsN(1) + "\" " +
 		"xsi:noNamespaceSchemaLocation=\"shiporder.xsd\">" +
-		"  <orderperson>"+fake.FullName()+"</orderperson>" +
+		"  <orderperson>" + fake.FullName() + "</orderperson>" +
 		"  <shipto>" +
-		"    <name>"+fake.FullName()+"</name>" +
-		"    <address>"+fake.StreetAddress()+"</address>" +
-		"    <city>"+fake.City()+"</city>" +
-		"    <country>"+fake.Country()+"</country>" +
-		"    <email>"+fake.EmailAddress()+"</email>" +
-		"    <phone>"+fake.Phone()+"</phone>" +
+		"    <name>" + fake.FullName() + "</name>" +
+		"    <address>" + fake.StreetAddress() + "</address>" +
+		"    <city>" + fake.City() + "</city>" +
+		"    <country>" + fake.Country() + "</country>" +
+		"    <email>" + fake.EmailAddress() + "</email>" +
+		"    <phone>" + fake.Phone() + "</phone>" +
 		"  </shipto>" +
 		"  <item>" +
-		"    <title>"+fake.Title()+"</title>" +
-		"    <note>"+fake.Sentences()+"</note>" +
-		"    <quantity>"+fake.Digits()+"</quantity>" +
-		"    <color>"+fake.Color()+"</color>" +
-		"    <price>"+fake.Digits()+"."+fake.DigitsN(2)+"</price>" +
+		"    <title>" + fake.Title() + "</title>" +
+		"    <note>" + fake.Sentences() + "</note>" +
+		"    <quantity>" + fake.Digits() + "</quantity>" +
+		"    <color>" + fake.Color() + "</color>" +
+		"    <price>" + fake.Digits() + "." + fake.DigitsN(2) + "</price>" +
 		"  </item>" +
 		"  <item>" +
-		"    <title>"+fake.Title()+"</title>" +
-		"    <quantity>"+fake.Digits()+"</quantity>" +
-		"    <price>"+fake.Digits()+"."+fake.DigitsN(2)+"</price>" +
+		"    <title>" + fake.Title() + "</title>" +
+		"    <quantity>" + fake.Digits() + "</quantity>" +
+		"    <price>" + fake.Digits() + "." + fake.DigitsN(2) + "</price>" +
 		"  </item>" +
 		"</shiporder>"
 }
