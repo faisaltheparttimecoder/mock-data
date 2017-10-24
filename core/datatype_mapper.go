@@ -1,8 +1,8 @@
 package core
 
 import (
-	"strings"
 	"fmt"
+	"strings"
 )
 
 // Data Generator
@@ -30,8 +30,8 @@ func BuildData(dt string) (interface{}, error) {
 	var geoDataTypekeywords = []string{"path", "polygon", "line", "lseg", "box", "circle", "point"}
 
 	// Text & bytes datatypes
-	var parakeywords = []string{"text", "bytea"}
-
+	var parakeywords = []string{"text"}
+	var bytekeywords = []string{"bytea"}
 	switch {
 
 	// Generate Random Integer
@@ -104,6 +104,9 @@ func BuildData(dt string) (interface{}, error) {
 	case StringContains(dt, parakeywords):
 		return RandomParagraphs(), nil
 
+	case StringContains(dt, bytekeywords):
+		return RandomByte(1024 * 1024), nil
+
 	// Generate Random float values
 	case StringContains(dt, floatkeywords):
 		value, err := RandomFloat(1, intranges["smallint"], 3)
@@ -140,7 +143,7 @@ func BuildData(dt string) (interface{}, error) {
 		if err != nil {
 			return "", fmt.Errorf("Build UUID: %v", err)
 		}
-		return uuid , nil
+		return uuid, nil
 
 	// Random MacAddr Generator
 	case strings.HasPrefix(dt, "macaddr"):
@@ -186,4 +189,3 @@ func BuildData(dt string) (interface{}, error) {
 
 	return "", nil
 }
-
