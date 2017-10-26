@@ -8,6 +8,9 @@ import (
 	"github.com/pivotal/mock-data/core"
 )
 
+// Version of Mock-data
+var version = "1.1"
+
 // All global variables
 var (
 	DBEngine string
@@ -47,7 +50,6 @@ func main() {
 	logging.SetBackend(backendFormatter)
 
 	// Parse the arguments that has been passed on to the OS
-	log.Info("Parsing all the command line arguments")
 	ArgPaser()
 
 	// This execution timestamp

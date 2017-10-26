@@ -20,7 +20,7 @@ func init() {
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
-func RandomByte(maxlen int) []byte {
+func RandomBytea(maxlen int) []byte {
 	rand.Seed(time.Now().UnixNano())
 	result := make([]byte, r.Intn(maxlen)+1)
 	for i := range result {

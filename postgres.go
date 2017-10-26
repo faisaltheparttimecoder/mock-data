@@ -30,7 +30,7 @@ func dbConn() error {
 // Check if we can run the query and extract the version of the database
 func dbVersion() error {
 
-	log.Info("Obtaining the version of the database")
+	log.Infof("Obtaining the version of the DB Engine: \"%s\"", Connector.Engine)
 	var version string
 
 	// Obtain the version of the database
@@ -48,7 +48,7 @@ func dbVersion() error {
 	}
 
 	// Print the version of the database on the logs
-	log.Infof("Version of the database: %v", version)
+	log.Infof("Version of the DB Engine \"%s\": %v", Connector.Engine, version)
 
 	return nil
 
@@ -57,7 +57,7 @@ func dbVersion() error {
 // Extract all the tables in the database
 func dbExtractTables() ([]string, error) {
 
-	log.Info("Extracting all the tables in the database")
+	log.Infof("Extracting all the tables in the database: \"%s\"", Connector.Db)
 	var tableString []string
 	var rows *sql.Rows
 	var err error
@@ -147,7 +147,7 @@ func extractor(table_info []Table) error {
 	// constraint issues.
 	// THEORY: already exists would fail and not available would be created.
 	if !Connector.IgnoreConstraints {
-		log.Info("Backup up all the constraint in the database")
+		log.Infof("Backup up all the constraint in the database: \"%s\"", Connector.Db)
 		err := postgres.BackupDDL(db, ExecutionTimestamp)
 		if err != nil {
 			return err
@@ -323,7 +323,7 @@ func MockPostgres() error {
 
 		// Recreate all the constraints of the table unless user wants to ignore it
 		if !Connector.IgnoreConstraints {
-			err = postgres.FixConstraints(db, ExecutionTimestamp)
+			err = postgres.FixConstraints(db, ExecutionTimestamp, Connector.Debug)
 			if err != nil {
 				backupFiles, _ := core.ListFile(".", "*_"+ExecutionTimestamp+".sql")
 				log.Criticalf("Constraints creation failed, all the DDL are saved in the files: \n%v", strings.Join(backupFiles, "\n"))

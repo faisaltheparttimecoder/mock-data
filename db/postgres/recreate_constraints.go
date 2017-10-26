@@ -14,7 +14,7 @@ var (
 )
 
 // fix the data loaded so that we can reenable the constraints
-func FixConstraints(db *sql.DB, timestamp string) error {
+func FixConstraints(db *sql.DB, timestamp string, debug bool) error {
 
 	// Fix the constraints in this order
 	//var constr = []string{"PRIMARY", "UNIQUE", "CHECK", "FOREIGN"}
@@ -24,12 +24,12 @@ func FixConstraints(db *sql.DB, timestamp string) error {
 		for _, con := range savedConstraints[v] {
 			switch {
 			case v == "PRIMARY":
-				err := fixPKey(db, con, v)
+				err := fixPKey(db, con, v, debug)
 				if err != nil {
 					return err
 				}
 			case v == "UNIQUE": // Run the same logic as primary key
-				err := fixPKey(db, con, v)
+				err := fixPKey(db, con, v, debug)
 				if err != nil {
 					return err
 				}
@@ -39,7 +39,7 @@ func FixConstraints(db *sql.DB, timestamp string) error {
 					return err
 				}
 			case v == "FOREIGN":
-				err := fixFKey(db, con)
+				err := fixFKey(db, con, debug)
 				if err != nil {
 					return err
 				}
@@ -57,7 +57,7 @@ func FixConstraints(db *sql.DB, timestamp string) error {
 }
 
 // Fix Primary Key
-func fixPKey(db *sql.DB, pk constraint, fixtype string) error {
+func fixPKey(db *sql.DB, pk constraint, fixtype string, debug bool) error {
 
 	var TotalViolators int = 1
 
@@ -68,7 +68,9 @@ func fixPKey(db *sql.DB, pk constraint, fixtype string) error {
 	}
 	cols := strings.Trim(keys, "()")
 
-	log.Debugf("Checking / Fixing %s KEY Violation table: %s, column: %s", fixtype, pk.table, cols)
+	if debug {
+		log.Debugf("Checking / Fixing %s KEY Violation table: %s, column: %s", fixtype, pk.table, cols)
+	}
 
 	// Loop till we get a 0 value
 	for TotalViolators > 0 {
@@ -227,7 +229,7 @@ func fixCheck(db *sql.DB, ck constraint) error {
 }
 
 // Fix Foreign Key
-func fixFKey(db *sql.DB, fk constraint) error {
+func fixFKey(db *sql.DB, fk constraint, debug bool) error {
 
 	// The objects involved in this foriegn key clause
 	fkeyObjects, err := getFKeyObjects(fk)
@@ -236,7 +238,7 @@ func fixFKey(db *sql.DB, fk constraint) error {
 	}
 
 	// Time to fix the foriegn key issues
-	err = UpdateFKViolationRecord(db, fkeyObjects)
+	err = UpdateFKViolationRecord(db, fkeyObjects, debug)
 	if err != nil {
 		return err
 	}
@@ -282,7 +284,7 @@ func getFKeyObjects(fk constraint) (foreignKey, error) {
 }
 
 // Update the foriegn key violation tables.
-func UpdateFKViolationRecord(db *sql.DB, fkObjects foreignKey) error {
+func UpdateFKViolationRecord(db *sql.DB, fkObjects foreignKey, debug bool) error {
 
 	var TotalViolators int = 1
 
@@ -292,7 +294,10 @@ func UpdateFKViolationRecord(db *sql.DB, fkObjects foreignKey) error {
 		return err
 	}
 
-	log.Debugf("Checking / Fixing FOREIGN KEY Violation table: %s, column: %s, reference: %s(%s)", fkObjects.table, fkObjects.table, fkObjects.reftable, fkObjects.refcolumn)
+	if debug {
+		log.Debugf("Checking / Fixing FOREIGN KEY Violation table: %s, column: %s, reference: %s(%s)", fkObjects.table, fkObjects.table, fkObjects.reftable, fkObjects.refcolumn)
+
+	}
 
 	// Loop till we reach the the end of the loop
 	for TotalViolators > 0 {

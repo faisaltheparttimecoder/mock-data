@@ -5,16 +5,15 @@ import (
 	"fmt"
 	"os"
 	"strings"
-
 	"github.com/pivotal/mock-data/core"
 )
 
 // Connector struct
 type connector struct {
-	Engine                              string
-	Db, Username, Password, Host, Table string
-	Port, RowCount                      int
-	AllTables, IgnoreConstraints        bool
+	Engine                                  string
+	Db, Username, Password, Host, Table     string
+	Port, RowCount                          int
+	AllTables, IgnoreConstraints, Debug     bool
 }
 
 // The connector
@@ -28,9 +27,11 @@ DATABASE ENGINE:
 	postgres        Postgres database
 	greenplum       Greenplum database
 	hdb             Hawq Database
-	help            Show help
 OPTIONS:
-	Execute "mockd <database engine> -h" for all the database specific options
+	Execute "mockd <DATABASE ENGINE> -h" for all the database specific options
+OTHERS:
+	"mockd version" for the version of the mockd application
+	"mockd help"    for reprinting this help menu
 
 `)
 	os.Exit(0)
@@ -50,7 +51,14 @@ func ArgPaser() {
 	postgresTableFlag := postgresFlag.String("t", "", "The table name to be filled in with mock data")
 	postgresAllDBFlag := postgresFlag.Bool("x", false, "Mock all the tables in the database")
 	postgresIgnoreConstrFlag := postgresFlag.Bool("i", false, "Ignore checking and fixing constraint issues")
+	postgresDebugFlag := postgresFlag.Bool("debug", false, "Print debug information")
 	flag.Parse()
+
+	// If no COMMAND keyword provided then show the help menu.
+	if len(os.Args) == 1 {
+		log.Errorf("Missing Database engine parameters ...")
+		ShowHelp()
+	}
 
 	// Greenplum , HDB is built on top of postgres, so they will use the same Mock logic
 	var engineArgs = os.Args[1]
@@ -59,17 +67,24 @@ func ArgPaser() {
 
 	// If there is a command keyword provided then check to what is it and then parse the appropriate options
 	switch {
-	// Postgres command parser
-	case core.StringContains(engineArgs, postgresEngines):
-		postgresFlag.Parse(os.Args[2:])
-	// Help Menu
-	case engineArgs == "help":
-		ShowHelp()
-	// If not of the list of supported engines, error out
-	default:
-		log.Errorf("%q is not valid command.", os.Args[1])
-		ShowHelp()
+		// MockD Version
+		case engineArgs == "version":
+			fmt.Printf("MockD Version: %s\n", version)
+			os.Exit(0)
+		// Help Menu
+		case engineArgs == "help":
+			ShowHelp()
+		// Postgres command parser
+		case core.StringContains(engineArgs, postgresEngines):
+			postgresFlag.Parse(os.Args[2:])
+		// If not of the list of supported engines, error out
+		default:
+			log.Errorf("%q is not valid database engine ...", os.Args[1])
+			ShowHelp()
 	}
+
+	// All checks passed lets parse the command line arguments
+	log.Info("Parsing all the command line arguments")
 
 	// Parse the command line argument
 	// Postgres database engine
@@ -87,6 +102,7 @@ func ArgPaser() {
 		Connector.RowCount = *postgresTotalRowsFlag
 		Connector.AllTables = *postgresAllDBFlag
 		Connector.IgnoreConstraints = *postgresIgnoreConstrFlag
+		Connector.Debug = *postgresDebugFlag
 
 		// If both -t and -x are provided, error out
 		if Connector.AllTables && strings.TrimSpace(Connector.Table) != "" {
