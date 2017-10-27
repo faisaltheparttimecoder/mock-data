@@ -5,6 +5,9 @@ import (
 	"strings"
 )
 
+// Array function argument catcher
+var ArrayArgs = make(map[string]interface{})
+
 // Data Generator
 // It provided random data based on datatypes.
 func BuildData(dt string) (interface{}, error) {
@@ -34,7 +37,8 @@ func BuildData(dt string) (interface{}, error) {
 		case StringHasPrefix(dt, intkeywords):
 			if strings.HasSuffix(dt, "[]") { // Its requesting for a array of data
 				nonArraydt := strings.Replace(dt, "[]", "", 1)
-				value, err := RandomIntArray(-intranges[nonArraydt], intranges[nonArraydt])
+				ArrayArgs = map[string]interface{}{"intmin": -intranges[nonArraydt], "intmax": intranges[nonArraydt]}
+				value, err := ArrayGenerator("int")
 				if err != nil {
 					return "", fmt.Errorf("Build Integer Array: %v", err)
 				}
@@ -54,7 +58,8 @@ func BuildData(dt string) (interface{}, error) {
 				return "", fmt.Errorf("Getting Character Length: %v", err)
 			}
 			if strings.HasSuffix(dt, "[]") {
-				value := RandomStringArray(l)
+				ArrayArgs["strlen"] = l
+				value, _ := ArrayGenerator("string")
 				return value, nil
 			} else {
 				value := RandomString(l)
@@ -64,7 +69,8 @@ func BuildData(dt string) (interface{}, error) {
 		// Generate Random date
 		case strings.HasPrefix(dt, "date"):
 			if strings.HasSuffix(dt, "[]") {
-				value, err := RandomDateArray(fromyear, toyear)
+				ArrayArgs = map[string]interface{}{"fromyear": fromyear, "toyear": toyear}
+				value, err := ArrayGenerator("date")
 				if err != nil {
 					return "", fmt.Errorf("Build Date Array: %v", err)
 				}
@@ -80,7 +86,8 @@ func BuildData(dt string) (interface{}, error) {
 		// Generate Random timestamp without timezone
 		case strings.HasPrefix(dt, "timestamp without time zone"):
 			if strings.HasSuffix(dt, "[]") {
-				value, err := RandomTimestampArray(fromyear, toyear)
+				ArrayArgs = map[string]interface{}{"fromyear": fromyear, "toyear": toyear}
+				value, err := ArrayGenerator("timestamp")
 				if err != nil {
 					return "", fmt.Errorf("Build Timestamp  without timezone Array: %v", err)
 				}
@@ -96,7 +103,8 @@ func BuildData(dt string) (interface{}, error) {
 		// Generate Random timestamp with timezone
 		case strings.HasPrefix(dt, "timestamp with time zone"):
 			if strings.HasSuffix(dt, "[]") {
-				value, err := RandomTimestamptzArray(fromyear, toyear)
+				ArrayArgs = map[string]interface{}{"fromyear": fromyear, "toyear": toyear}
+				value, err := ArrayGenerator("timestamptz")
 				if err != nil {
 					return "", fmt.Errorf("Build Timestamp with timezone Array: %v", err)
 				}
@@ -112,7 +120,8 @@ func BuildData(dt string) (interface{}, error) {
 		// Generate Random time without timezone
 		case StringHasPrefix(dt, Intervalkeywords):
 			if strings.HasSuffix(dt, "[]") {
-				value, err := RandomTimeArray(fromyear, toyear)
+				ArrayArgs = map[string]interface{}{"fromyear": fromyear, "toyear": toyear}
+				value, err := ArrayGenerator("time")
 				if err != nil {
 					return "", fmt.Errorf("Build Array Time without timezone: %v", err)
 				}
@@ -128,7 +137,8 @@ func BuildData(dt string) (interface{}, error) {
 		// Generate Random time with timezone
 		case strings.HasPrefix(dt, "time with time zone"):
 			if strings.HasSuffix(dt, "[]") {
-				value, err := RandomTimetzArray(fromyear, toyear)
+				ArrayArgs = map[string]interface{}{"fromyear": fromyear, "toyear": toyear}
+				value, err := ArrayGenerator("timetz")
 				if err != nil {
 					return "", fmt.Errorf("Build Time with timezone array: %v", err)
 				}
@@ -142,17 +152,28 @@ func BuildData(dt string) (interface{}, error) {
 			}
 
 		// Generate Random ips
-		case StringContains(dt, ipkeywords):
-			return RandomIP(), nil
+		case StringHasPrefix(dt, ipkeywords):
+			if strings.HasSuffix(dt, "[]") {
+				value, _ := ArrayGenerator("IP")
+				return value, nil
+			} else {
+				return RandomIP(), nil
+			}
 
 		// Generate Random boolean
-		case strings.EqualFold(dt, "boolean"):
-			return RandomBoolean(), nil
+		case strings.HasPrefix(dt, "boolean"):
+			if strings.HasSuffix(dt, "[]") {
+				value, _ := ArrayGenerator("bool")
+				return value, nil
+			} else {
+				return RandomBoolean(), nil
+			}
 
 		// Generate Random text
 		case strings.HasPrefix(dt, "text"):
 			if strings.HasSuffix(dt, "[]") {
-				return RandomParagraphsArray(), nil
+				value, _ := ArrayGenerator("text")
+				return value, nil
 			} else {
 				return RandomParagraphs(), nil
 			}
@@ -164,7 +185,8 @@ func BuildData(dt string) (interface{}, error) {
 		// Generate Random float values
 		case StringHasPrefix(dt, floatkeywords):
 			if strings.HasSuffix(dt, "[]") { // Float array
-				value, err := RandomfloatArray(1, intranges["smallint"], 3)
+				ArrayArgs = map[string]interface{}{"floatmin": 1, "floatmax": intranges["smallint"], "floatprecision": 3}
+				value, err := ArrayGenerator("float")
 				if err != nil {
 					return "", fmt.Errorf("Build Float Array: %v", err)
 				}
@@ -184,7 +206,8 @@ func BuildData(dt string) (interface{}, error) {
 				return "", fmt.Errorf("Build Numeric: %v", err)
 			}
 			if strings.HasSuffix(dt, "[]") { // Numeric Array
-				value, err := RandomfloatArray(0, max, precision)
+				ArrayArgs = map[string]interface{}{"floatmin": 0, "floatmax": max, "floatprecision": precision}
+				value, err := ArrayGenerator("float")
 				if err != nil {
 					return "", fmt.Errorf("Build Numeric Float Array: %v", err)
 				}
@@ -205,7 +228,11 @@ func BuildData(dt string) (interface{}, error) {
 				return "", fmt.Errorf("Build bit: %v", err)
 			}
 			if strings.HasSuffix(dt, "[]") {
-				value := RandomBitArray(l)
+				ArrayArgs["bitlen"] = l
+				value, err := ArrayGenerator("bit")
+				if err != nil {
+					return "", fmt.Errorf("Build bit array: %v", err)
+				}
 				return value, nil
 			} else {
 				value := RandomBit(l)
@@ -214,15 +241,28 @@ func BuildData(dt string) (interface{}, error) {
 
 		// Random UUID generator
 		case strings.HasPrefix(dt, "uuid"):
-			uuid, err := RandomUUID()
-			if err != nil {
-				return "", fmt.Errorf("Build UUID: %v", err)
+			if strings.HasSuffix(dt, "[]") {
+				uuid, err := ArrayGenerator("uuid")
+				if err != nil {
+					return "", fmt.Errorf("Build UUID Array: %v", err)
+				}
+				return uuid, nil
+			} else {
+				uuid, err := RandomUUID()
+				if err != nil {
+					return "", fmt.Errorf("Build UUID: %v", err)
+				}
+				return uuid, nil
 			}
-			return uuid, nil
 
 		// Random MacAddr Generator
 		case strings.HasPrefix(dt, "macaddr"):
-			return RandomMacAddress(), nil
+			if strings.HasSuffix(dt, "[]") {
+				value, _ := ArrayGenerator("macaddr")
+				return value, nil
+			} else {
+				return RandomMacAddress(), nil
+			}
 
 		// Random Json
 		case strings.HasPrefix(dt, "json"):
@@ -233,20 +273,40 @@ func BuildData(dt string) (interface{}, error) {
 			return RandomXML(), nil
 
 		// Random Text Search Query
-		case strings.EqualFold(dt, "tsquery"):
-			return RandomTSQuery(), nil
+		case strings.HasPrefix(dt, "tsquery"):
+			if strings.HasSuffix(dt, "[]") {
+				value, _ := ArrayGenerator("tsquery")
+				return value, nil
+			} else {
+				return RandomTSQuery(), nil
+			}
 
 		// Random Text Search Vector
-		case strings.EqualFold(dt, "tsvector"):
-			return RandomTSVector(), nil
+		case strings.HasPrefix(dt, "tsvector"):
+			if strings.HasSuffix(dt, "[]") {
+				value, _ := ArrayGenerator("tsquery")
+				return value, nil
+			} else {
+				return RandomTSVector(), nil
+			}
 
 		// Random Log Sequence number
-		case strings.EqualFold(dt, "pg_lsn"):
-			return RandomLSN(), nil
+		case strings.HasPrefix(dt, "pg_lsn"):
+			if strings.HasSuffix(dt, "[]") {
+				value, _ := ArrayGenerator("pg_lsn")
+				return value, nil
+			} else {
+				return RandomLSN(), nil
+			}
 
 		// Random Log Sequence number
-		case strings.EqualFold(dt, "txid_snapshot"):
-			return RandomTXID(), nil
+		case strings.HasPrefix(dt, "txid_snapshot"):
+			if strings.HasSuffix(dt, "[]") {
+				value, _ := ArrayGenerator("txid_snapshot")
+				return value, nil
+			} else {
+				return RandomTXID(), nil
+			}
 
 		// Random GeoMetric data
 		case StringContains(dt, geoDataTypekeywords):
@@ -257,6 +317,8 @@ func BuildData(dt string) (interface{}, error) {
 				randomInt, _ = RandomInt(1, 2)
 			}
 			return RandomGeometricData(randomInt, dt), nil
+
+		// If there is no datatype found then send the below message
 		default:
 			return "", fmt.Errorf("Unsupported datatypes found: %v", dt)
 	}
