@@ -61,6 +61,7 @@ func main() {
 		err := MockPostgres()
 		if err != nil {
 			log.Error(err)
+			log.Info("mockd program has completed with errors")
 			os.Exit(1)
 		}
 	} else { // Unsupported database engine.

@@ -97,6 +97,18 @@ func StringContains(item string, slice []string) bool {
 	return ok
 }
 
+// Build a method to find if the value starts with specific word within a slice
+func StringHasPrefix(item string, slice []string) bool {
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		if strings.HasPrefix(item, s) {
+			set[item] = struct{}{}
+		}
+	}
+	_, ok := set[item]
+	return ok
+}
+
 // Extract total characters that the datatype char can store.
 func CharLen(dt string) (int, error) {
 	var rgx = regexp.MustCompile(`\((.*?)\)`)
@@ -126,8 +138,27 @@ func ColExtractor(conkey,regExp string) (string, error) {
 	return "", nil
 }
 
+// If given a datatype see if it has a bracket or not.
+func BracketsExists(dt string) bool {
+	var rgx = regexp.MustCompile(`\(.*\)`)
+	rs := rgx.FindStringSubmatch(dt)
+	if len(rs) > 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
 // Extract Float precision from the float datatypes
 func FloatPrecision(dt string) (int, int, error) {
+
+	// check if brackets exists, if it doesn't then add some virtual values
+	if !BracketsExists(dt) && strings.HasSuffix(dt, "[]") {
+		dt = strings.Replace(dt, "[]", "", 1) + "(5,3)[]"
+	} else if !BracketsExists(dt) && !strings.HasSuffix(dt, "[]") {
+		dt = dt + "(5,3)"
+	}
+	// Get the ranges in the brackets
 	var rgx = regexp.MustCompile(`\((.*?)\)`)
 	rs := rgx.FindStringSubmatch(dt)
 	split := strings.Split(rs[1], ",")
