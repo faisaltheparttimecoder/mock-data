@@ -6,6 +6,11 @@ import (
 	"github.com/icrowley/fake"
 )
 
+
+// Array function argument catcher
+var ArrayArgs = make(map[string]interface{})
+
+
 // Random string array
 func ArrayGenerator(dt string) (string, error) {
 
@@ -121,4 +126,23 @@ func ArrayGenerator(dt string) (string, error) {
 		resultArrayCollector = append(resultArrayCollector, "{" + strings.Join(resultArray, ",") + "}")
 	}
 	return "{" + strings.Join(resultArrayCollector, ",") + "}", nil
+}
+
+
+func GeometricArrayGenerator(maxInt int, geometryType string) string {
+	// Getting the value of itertors
+	maxIterations,_ := RandomInt(0, 6)
+	var resultArray []string
+
+	if geometryType == "box" {
+		value := RandomGeometricData(maxInt, geometryType, false)
+		resultArray = append(resultArray, value)
+	} else {
+		for i := 0; i < maxIterations; i++ { // Max number of arrays
+			value := RandomGeometricData(maxInt, geometryType, true)
+			resultArray = append(resultArray, value)
+		}
+	}
+
+	return "{" + strings.Join(resultArray, ",") + "}"
 }

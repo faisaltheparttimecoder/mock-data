@@ -201,20 +201,32 @@ func RandomTSVector() string {
 }
 
 // Random Geometric data
-func RandomGeometricData(randomInt int, GeoMetry string) string {
+func RandomGeometricData(randomInt int, GeoMetry string, IsItArray bool) string {
 	var geometry []string
-	if GeoMetry == "point" {
-		return "(" + fake.DigitsN(2) + "," + fake.DigitsN(3) + ")"
-	} else if GeoMetry == "circle" {
-		return "(" + fake.DigitsN(2) + "," + fake.DigitsN(3) + ")," + fake.DigitsN(2) + ")"
-	} else {
+	if GeoMetry == "point" { // Syntax for point datatype
+		if IsItArray { // If Array
+			return "\"(" + fake.DigitsN(2) + "," + fake.DigitsN(3) + ")\""
+		} else {
+			return "(" + fake.DigitsN(2) + "," + fake.DigitsN(3) + ")"
+		}
+	} else if GeoMetry == "circle" { // Syntax for circle datatype
+		if IsItArray { // If Array
+			return "\"(" + fake.DigitsN(2) + "," + fake.DigitsN(3) + ")," + fake.DigitsN(2) + ")\""
+		} else {
+			return "(" + fake.DigitsN(2) + "," + fake.DigitsN(3) + ")," + fake.DigitsN(2) + ")"
+		}
+
+	} else { // Syntax for the rest of geometry datatype
 		for i := 0; i < randomInt; i++ {
 			x, _ := RandomFloat(1, 10, 2)
 			y, _ := RandomFloat(1, 10, 2)
 			geometry = append(geometry, "("+fmt.Sprintf("%v", x)+","+fmt.Sprintf("%v", y)+")")
 		}
-
-		return "(" + strings.Join(geometry, ",") + ")"
+		if IsItArray { // If Array
+			return "\"(" + strings.Join(geometry, ",") + ")\""
+		} else {
+			return "(" + strings.Join(geometry, ",") + ")"
+		}
 	}
 	return ""
 }

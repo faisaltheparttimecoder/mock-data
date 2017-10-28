@@ -5,9 +5,6 @@ import (
 	"strings"
 )
 
-// Array function argument catcher
-var ArrayArgs = make(map[string]interface{})
-
 // Data Generator
 // It provided random data based on datatypes.
 func BuildData(dt string) (interface{}, error) {
@@ -309,14 +306,21 @@ func BuildData(dt string) (interface{}, error) {
 			}
 
 		// Random GeoMetric data
-		case StringContains(dt, geoDataTypekeywords):
+		case StringHasPrefix(dt, geoDataTypekeywords):
 			var randomInt int
 			if dt == "path" || dt == "polygon" {
 				randomInt, _ = RandomInt(1, 5)
 			} else {
 				randomInt, _ = RandomInt(1, 2)
 			}
-			return RandomGeometricData(randomInt, dt), nil
+			if strings.HasSuffix(dt, "[]") {
+				dtype := strings.Replace(dt, "[]", "", 1)
+				value := GeometricArrayGenerator(randomInt, dtype)
+				return value, nil
+			} else {
+				return RandomGeometricData(randomInt, dt, false), nil
+			}
+
 
 		// If there is no datatype found then send the below message
 		default:
