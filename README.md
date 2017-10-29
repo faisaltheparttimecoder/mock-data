@@ -166,7 +166,7 @@ bin/mockd-mac <dbengine> -n <total rows> -u <user> -d <database> -x
 
 # Known Issues
 
-1. When using a small amount of rows and having defined a composite PK index, there are chances that the primary key would fail (this is due to foreign key fix only runs after primary key fix)
+1. If you have a unique index on a foreign key column then there are chance the constraint creation would fail, since mockd doesn't pick up unique value for foriegn key value it picks up random values from the reference table.
 2. Still having issues with Check constraint, only check that works is "COLUMN > 0"
 3. On Greenplum Datbase/HAWQ partition tables are not supported (due to check constraint issues defined above)
 4. Custom datatypes are not supported

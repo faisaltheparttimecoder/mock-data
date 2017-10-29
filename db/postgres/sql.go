@@ -1,5 +1,7 @@
 package postgres
 
+import "strings"
+
 // Postgres version
 func PGVersion() string {
 	return "select version()"
@@ -135,10 +137,13 @@ func GetConstraintsPertab(tabname string) string {
 }
 
 // Get the datatype of the column
-func GetDatatype(tab, col string) string {
-	return "SELECT pg_catalog.Format_type(atttypid, atttypmod) " +
-	       "FROM pg_attribute WHERE attname = " +
-		"'"+col+"' AND attrelid = '"+tab+"'::regclass"
+func GetDatatype(tab string, columns []string) string {
+	whereClause := strings.Join(columns, "' or attname = '")
+	whereClause = strings.Replace(whereClause, "attname = ' ", "attname = '", -1)
+	query := "SELECT attname, pg_catalog.Format_type(atttypid, atttypmod) " +
+		     "FROM pg_attribute WHERE (attname = "+
+		     "'"+whereClause+"') AND attrelid = '"+tab+"'::regclass"
+	return query
 }
 
 
@@ -165,7 +170,7 @@ func UpdateIntPKey(tab, col, dt string) string {
 }
 
 // Fix String PK Violators
-func UpdateStringPKey(tab, col, whichrow, newdata string) string {
+func UpdatePKey(tab, col, whichrow, newdata string) string {
 	return  " UPDATE " + tab +
 		" SET " + col + " = '" + newdata + "'" +
 		" WHERE ctid = ( SELECT ctid FROM " + tab +
