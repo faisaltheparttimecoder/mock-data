@@ -251,8 +251,8 @@ func RandomTXID() string {
 }
 
 // Random JSON generator
-func RandomJson() string {
-	return "{" +
+func RandomJson(IsItArray bool) string {
+	  jsonData := "{" +
 		"    \"_id\": \"" + RandomString(24) + "\"," +
 		"    \"index\": \"" + fake.DigitsN(10) + "\"," +
 		"    \"guid\": \"" + RandomString(8) + "-" + RandomString(4) + "-" + RandomString(4) + "-" + RandomString(4) + "-" + RandomString(12) + "\"," +
@@ -303,11 +303,17 @@ func RandomJson() string {
 		"    \"greeting\": \"" + fake.Sentence() + "\"," +
 		"    \"favoriteBrand\": \"" + fake.Brand() + "\"" +
 		"  }"
+
+		if IsItArray {
+			return strings.Replace(jsonData, "\"", "\\\"", -1 )
+		} else {
+			return jsonData
+		}
 }
 
 // Random XML Generator
-func RandomXML() string {
-	return "<?xml version=\"" + fake.DigitsN(1) + "." + fake.DigitsN(1) + "\" encoding=\"UTF-8\"?>" +
+func RandomXML(IsItArray bool) string {
+	xmlData := "<?xml version=\"" + fake.DigitsN(1) + "." + fake.DigitsN(1) + "\" encoding=\"UTF-8\"?>" +
 		"<shiporder orderid=\"" + fake.Digits() + "\"" +
 		" xmlns:xsi=\"http://" + fake.DomainName() + "/" + fake.DigitsN(4) + "/" + fake.WordsN(1) + "\" " +
 		"xsi:noNamespaceSchemaLocation=\"shiporder.xsd\">" +
@@ -333,4 +339,10 @@ func RandomXML() string {
 		"    <price>" + fake.Digits() + "." + fake.DigitsN(2) + "</price>" +
 		"  </item>" +
 		"</shiporder>"
+
+	if IsItArray {
+		return strings.Replace(xmlData, "\"", "\\\"", -1 )
+	} else {
+		return xmlData
+	}
 }

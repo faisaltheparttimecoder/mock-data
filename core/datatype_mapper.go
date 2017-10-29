@@ -263,11 +263,19 @@ func BuildData(dt string) (interface{}, error) {
 
 		// Random Json
 		case strings.HasPrefix(dt, "json"):
-			return RandomJson(), nil
+			if strings.HasSuffix(dt, "[]") {
+				return JsonXmlArrayGenerator("json"), nil
+			} else {
+				return RandomJson(false), nil
+			}
 
 		// Random XML
-		case strings.EqualFold(dt, "xml"):
-			return RandomXML(), nil
+		case strings.HasPrefix(dt, "xml"):
+			if strings.HasSuffix(dt, "[]") {
+				return JsonXmlArrayGenerator("xml"), nil
+			} else {
+				return RandomXML(false), nil
+			}
 
 		// Random Text Search Query
 		case strings.HasPrefix(dt, "tsquery"):

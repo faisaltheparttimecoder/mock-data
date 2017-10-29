@@ -11,7 +11,7 @@ import (
 var ArrayArgs = make(map[string]interface{})
 
 
-// Random string array
+// Random array generator for array datatypes
 func ArrayGenerator(dt string) (string, error) {
 
 	// Getting the value of itertors
@@ -128,9 +128,10 @@ func ArrayGenerator(dt string) (string, error) {
 	return "{" + strings.Join(resultArrayCollector, ",") + "}", nil
 }
 
-
+// Random geometric array generators
 func GeometricArrayGenerator(maxInt int, geometryType string) string {
-	// Getting the value of itertors
+
+	// Getting the value of iterators
 	maxIterations,_ := RandomInt(0, 6)
 	var resultArray []string
 
@@ -145,4 +146,24 @@ func GeometricArrayGenerator(maxInt int, geometryType string) string {
 	}
 
 	return "{" + strings.Join(resultArray, ",") + "}"
+}
+
+// Random XML & Json array generators.
+func JsonXmlArrayGenerator(dt string) string {
+	// Getting the value of iterators
+	maxIterations,_ := RandomInt(0, 6)
+	var resultArray []string
+	var value string
+	for i := 0; i < maxIterations; i++ { // Max number of arrays
+
+		switch dt { // Choose the appropriate random data generators
+			case "json":
+				value = "\"" + RandomJson(true) + "\""
+			case "xml":
+				value = "\"" + RandomXML(true) + "\""
+		}
+
+		resultArray = append(resultArray, value)
+	}
+	return "{" + strings.Join(resultArray, ",")  + "}"
 }

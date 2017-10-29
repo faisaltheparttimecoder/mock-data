@@ -112,6 +112,9 @@ CREATE TABLE supported_datatypes (
   col_lseg_array                              lseg[],
   col_path_array                              path[],
   col_polygon_array                           polygon[],
-  col_point_array                             point[]
+  col_point_array                             point[],
+  col_json_array                              json[],
+  col_jsonb_array                             jsonb[],
+  col_xml_array                               xml[]
 
 );
