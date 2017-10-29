@@ -73,7 +73,7 @@ OPTIONS:
 
 ### Users
 
-[Download](https://github.com/pivotal/mock-data/releases/tag/v1.0) the latest release and you're ready to go!
+[Download](https://github.com/pivotal/mock-data/releases) the latest release and you're ready to go!
 
 **NOTE:** if you have the datatype UUID defined on the table, make sure you have the execute "uuidgen" installed on the OS.  
 
