@@ -46,7 +46,7 @@ func FixConstraints(db *sql.DB, timestamp string, debug bool) error {
 	}
 
 	// Recreate constraints
-	failureDetected, err := recreateAllConstraints(db, timestamp)
+	failureDetected, err := recreateAllConstraints(db, timestamp, debug)
 	if failureDetected || err != nil {
 		return err
 	}
@@ -55,7 +55,7 @@ func FixConstraints(db *sql.DB, timestamp string, debug bool) error {
 }
 
 // Recreate all the constraints of the database ( in case we have dropped any )
-func recreateAllConstraints(db *sql.DB, timestamp string) (bool, error) {
+func recreateAllConstraints(db *sql.DB, timestamp string, debug bool) (bool, error) {
 
 	var AnyErrors bool
 	log.Info("Starting to recreating all the constraints of the table ...")
@@ -78,10 +78,18 @@ func recreateAllConstraints(db *sql.DB, timestamp string) (bool, error) {
 			// on the screen and continue with the rest, since we don't want it to fail if we cannot
 			// recreate constraint of a single table.
 			for _, content := range contents {
+
+				// Print the constraints that we are going to fix.
+				if debug {
+					log.Debugf("Recreating the constraint: \"%v\"", content)
+				}
+
 				_, err = db.Exec(content)
 				if err != nil && !core.IgnoreErrorString(fmt.Sprintf("%s", err), ignoreErr) {
 					AnyErrors = true
 					log.Errorf("Failed to create constraints: \"%v\"", content)
+				} else if debug { // if debug is on, tell user that we are able to successful create it
+					log.Debugf("Successful in creating constraint: \"%v\"", content)
 				}
 			}
 		}

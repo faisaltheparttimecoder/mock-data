@@ -9,7 +9,7 @@ import (
 )
 
 // Version of Mock-data
-var version = "1.2"
+var version = "1.3"
 
 // All global variables
 var (
