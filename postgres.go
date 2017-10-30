@@ -326,8 +326,8 @@ func MockPostgres() error {
 			err = postgres.FixConstraints(db, ExecutionTimestamp, Connector.Debug)
 			if err != nil {
 				backupFiles, _ := core.ListFile(".", "*_"+ExecutionTimestamp+".sql")
-				log.Criticalf("Constraints creation failed, all the DDL are saved in the files: \n%v", strings.Join(backupFiles, "\n"))
-				log.Criticalf("Will need your intervention to fix constraints")
+				log.Errorf("Some constraints creation failed (highlighted above), Will need your intervention to fix those constraints")
+				log.Errorf("All the DDL are saved in the files: \n%v", strings.Join(backupFiles, "\n"))
 				return err
 			}
 		}

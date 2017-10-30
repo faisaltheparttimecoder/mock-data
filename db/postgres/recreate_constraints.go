@@ -46,8 +46,8 @@ func FixConstraints(db *sql.DB, timestamp string, debug bool) error {
 	}
 
 	// Recreate constraints
-	err := recreateAllConstraints(db, timestamp)
-	if err != nil {
+	failureDetected, err := recreateAllConstraints(db, timestamp)
+	if failureDetected || err != nil {
 		return err
 	}
 
@@ -55,30 +55,43 @@ func FixConstraints(db *sql.DB, timestamp string, debug bool) error {
 }
 
 // Recreate all the constraints of the database ( in case we have dropped any )
-func recreateAllConstraints(db *sql.DB, timestamp string) error {
+func recreateAllConstraints(db *sql.DB, timestamp string) (bool, error) {
+
+	var AnyErrors bool
+	log.Info("Starting to recreating all the constraints of the table ...")
 
 	// list the backup files collected.
 	for _, con := range constraints {
 		backupFile, err := core.ListFile(".", "*_"+con+"_"+timestamp+".sql")
 		if err != nil {
-			return fmt.Errorf("Error in getting the list of backup files: %v", err)
+			return AnyErrors, fmt.Errorf("Error in getting the list of backup files: %v", err)
 		}
 
 		// run it only if we do find the backup file
 		if len(backupFile) > 0 {
 			contents, err := core.ReadFile(backupFile[0])
 			if err != nil {
-				return fmt.Errorf("Error in reading the backup files: %v", err)
+				return AnyErrors, fmt.Errorf("Error in reading the backup files: %v", err)
 			}
 
+			// Recreate all constraints one by one, if we can't create it then display the message
+			// on the screen and continue with the rest, since we don't want it to fail if we cannot
+			// recreate constraint of a single table.
 			for _, content := range contents {
 				_, err = db.Exec(content)
 				if err != nil && !core.IgnoreErrorString(fmt.Sprintf("%s", err), ignoreErr) {
-					return fmt.Errorf("Error in recreating constraints: %v", err)
+					AnyErrors = true
+					log.Errorf("Failed to create constraints: \"%v\"", content)
 				}
 			}
 		}
 	}
 
-	return nil
+	// If any error detected, tell the user about it
+	if AnyErrors {
+		return AnyErrors, fmt.Errorf("Detected failure in creating constraints... ")
+	} else { // else we are all good.
+		return AnyErrors, nil
+	}
+
 }
