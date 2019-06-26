@@ -79,9 +79,11 @@ func BuildData(dt string) (interface{}, error) {
 				}
 				return value, nil
 			}
-
+		
 		// Generate Random timestamp without timezone
-		case strings.HasPrefix(dt, "timestamp without time zone"):
+		// Updated at 2019-06-26, Add code to support timestamp(6) without time zone
+
+		case strings.HasPrefix(dt, "timestamp without time zone"), strings.HasPrefix(dt, "timestamp(6) without time zone"):
 			if strings.HasSuffix(dt, "[]") {
 				ArrayArgs = map[string]interface{}{"fromyear": fromyear, "toyear": toyear}
 				value, err := ArrayGenerator("timestamp")
