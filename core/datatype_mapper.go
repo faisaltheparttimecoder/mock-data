@@ -3,6 +3,9 @@ package core
 import (
 	"fmt"
 	"strings"
+	"regexp"
+	"strconv"
+	"math/rand"
 )
 
 // Data Generator
@@ -79,7 +82,7 @@ func BuildData(dt string) (interface{}, error) {
 				}
 				return value, nil
 			}
-
+		
 		// Generate Random timestamp without timezone
 		case strings.HasPrefix(dt, "timestamp without time zone"):
 			if strings.HasSuffix(dt, "[]") {
@@ -97,6 +100,28 @@ func BuildData(dt string) (interface{}, error) {
 				return value, nil
 			}
 
+		/* 
+		=== Updated at 2019-06-26 ===
+		Added below code to handle data type from timestamp(0) to timestampe(6) with/without time zone
+		The data type can be find in this doc: https://gpdb.docs.pivotal.io/5200/ref_guide/data_types.html 
+		*/
+		case regexp.MustCompile(`timestamp\([0-6]\) without time zone`).MatchString(dt), regexp.MustCompile(`timestamp\([0-6]\) with time zone`).MatchString(dt):
+			value, err := RandomTimestamp(fromyear, toyear)     // get a random timestamp with format like: 2018-04-10 01:19:22
+			if err != nil {
+				return "", fmt.Errorf("Build Timestamp[p] without timezone: %v", err)
+			}
+	    	ts_reg := regexp.MustCompile(`\([0-6]\)`)
+			decimal, _ := strconv.Atoi( strings.Split(ts_reg.FindString(dt),"")[1] )  // capture the decimal in timestamp[x]
+	    	var timestamp_decimal string
+			for i := 0; i < decimal; i++ {
+				timestamp_decimal = timestamp_decimal + strconv.Itoa(rand.Intn(9)) // use rand() to generate random decimal in timestamp
+			}
+			if len(timestamp_decimal) > 0 {
+				value = value + "." + timestamp_decimal
+			}
+			return value,nil
+		/* End of Updated */
+		
 		// Generate Random timestamp with timezone
 		case strings.HasPrefix(dt, "timestamp with time zone"):
 			if strings.HasSuffix(dt, "[]") {

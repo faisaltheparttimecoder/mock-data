@@ -36,7 +36,7 @@ Mock-data idea is to generate fake data in new test cluster and it is **NOT TO B
 # Dependencies
 
 + [Data Faker](https://github.com/icrowley/fake) by icrowley
-+ [Progress bar](https://github.com/vbauerster/mpb) by vbauerster
++ [Progress bar](https://github.com/vbauerster/mpb) by vbauerster, had to use v3.0.4, most of the latest version is not compatible anymore
 + [Postgres Driver](https://github.com/lib/pq) by lib/pq
 + [Go Logger](https://github.com/op/go-logging) by op/go-logging
 
