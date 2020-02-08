@@ -23,7 +23,6 @@ func ConnectDB() *pg.DB {
 
 // Execute queries in the database
 func ExecuteDB(stmt string) (pg.Result, error) {
-
 	// Connect to database
 	db := ConnectDB()
 	defer db.Close()
@@ -59,14 +58,13 @@ func IsStringEmpty(s string) bool {
 	return true
 }
 
-
 // Progress Bar
 func StartProgressBar(text string, max int) *progressbar.ProgressBar {
 	return progressbar.NewOptions(max,
 		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionSetBytes(10000),
-		progressbar.OptionSetWidth(15),
+		progressbar.OptionSetWidth(50),
 		progressbar.OptionSetDescription(fmt.Sprintf("[cyan]%s[reset]", text)),
 		progressbar.OptionShowCount(),
 		progressbar.OptionSetTheme(progressbar.Theme{
@@ -89,4 +87,15 @@ func RemoveSpecialCharacters(s string) string {
 		Fatalf("error in compiling the string to remove special characters: %v", err)
 	}
 	return reg.ReplaceAllString(s, "")
+}
+
+// Inserting a array needs all the single quotes escaped
+// the below function does just that
+// i.e. If its array then replace " with escape to load to database
+func FormatForArray(s string , isItArray bool) string {
+	if isItArray {
+		return strings.Replace(s, "\"", "\\\"", -1)
+	} else {
+		return s
+	}
 }

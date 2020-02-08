@@ -122,7 +122,6 @@ var tablesCmd = &cobra.Command{
 
 // Initialize the cobra command line
 func init() {
-
 	// Load the environment variable using viper
 	viper.AutomaticEnv()
 
@@ -170,5 +169,4 @@ func init() {
 		"Under which schema do these fake tables need to be created? (NOTE: only used in create-tables flag)")
 	tablesCmd.Flags().StringVarP(&cmdOptions.Tab.FakeTablesRows, "mock-tables", "t", "",
 		"Fake selected list of tables with fake data, to add in multiple tables use \",\" b/w table names ")
-
 }
