@@ -2,12 +2,11 @@
 
 
 [[projects]]
-  digest = "1:47420c4c3ee9278a1792ce650372c5de72708e14c515063fe1e4de283e68d3dd"
+  digest = "1:b06d27db2f87588507f245345f329b4192809e72ab32385a26a6eb25988eb82e"
   name = "github.com/corpix/uarand"
   packages = ["."]
   pruneopts = "UT"
-  revision = "640b5a843a6aea7bf4a501eb04bc2b8c8c984344"
-  version = "v0.1.1"
+  revision = "031be390f409fb4bac8fb299e3bcd101479f89f8"
 
 [[projects]]
   digest = "1:abeb38ade3f32a92943e5be54f55ed6d6e3b6602761d74b4aab4c9dd45c18abd"
@@ -34,6 +33,14 @@
   pruneopts = "UT"
   revision = "1d957cb20f319c4a1e2db7d345824c12aefe5943"
   version = "v8.0.6"
+
+[[projects]]
+  digest = "1:582b704bebaa06b48c29b0cec224a6058a09c86883aaddabde889cd1a5f73e1b"
+  name = "github.com/google/uuid"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "0cd6bf5da1e1c83f8b45653022c74f71af0538a4"
+  version = "v1.1.1"
 
 [[projects]]
   digest = "1:c0d19ab64b32ce9fe5cf4ddceba78d5bc9807f0016db6b1183599da3dcc24d10"
@@ -215,7 +222,7 @@
   name = "golang.org/x/crypto"
   packages = ["pbkdf2"]
   pruneopts = "UT"
-  revision = "a0c6ece9d31a0ebfbd3ddf2d290cfb1265ba47c7"
+  revision = "ecb85df213405b7d32e4d73cb5bbaace2ec88881"
 
 [[projects]]
   branch = "master"
@@ -269,6 +276,7 @@
   analyzer-version = 1
   input-imports = [
     "github.com/go-pg/pg",
+    "github.com/google/uuid",
     "github.com/icrowley/fake",
     "github.com/k0kubun/go-ansi",
     "github.com/schollz/progressbar",

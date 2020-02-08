@@ -92,8 +92,11 @@ func RemoveSpecialCharacters(s string) string {
 // Inserting a array needs all the single quotes escaped
 // the below function does just that
 // i.e. If its array then replace " with escape to load to database
-func FormatForArray(s string , isItArray bool) string {
+func FormatForArray(s string , isItArray, addQuotes bool) string {
 	if isItArray {
+		if addQuotes {
+			s = fmt.Sprintf("\"%s\"", s)
+		}
 		return strings.Replace(s, "\"", "\\\"", -1)
 	} else {
 		return s
