@@ -26,6 +26,8 @@ func SupportedDataTypes() []string {
 		"time with time zone,",
 		"timestamp with time zone,",
 		"timestamp without time zone,",
+		"timestamp(6) with time zone,",
+		"timestamp(6) without time zone,",
 		"money,",
 		"json,",
 		"jsonb,",

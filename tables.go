@@ -40,7 +40,7 @@ func createTableStatementGenerator(n int) string {
 
 	// Column
 	columnName := RemoveSpecialCharacters(cmdOptions.Tab.ColumnNamePrefix)
-	howManyColumns, _ := RandomInt(2, cmdOptions.Tab.MaxColumns)
+	howManyColumns := RandomInt(2, cmdOptions.Tab.MaxColumns)
 
 	// DataType
 	dataTypes := SupportedDataTypes()
@@ -48,8 +48,8 @@ func createTableStatementGenerator(n int) string {
 	tableColStatement := ""
 
 	// Column + DataTypes
-	for  i := 1; i <= howManyColumns; i++ {
-		j, _ := RandomInt(1, totalDataTypes)
+	for i := 1; i <= howManyColumns; i++ {
+		j := RandomInt(1, totalDataTypes)
 		if j <= totalDataTypes { // if the random number is greater than the array it would fail
 			tableColStatement = tableColStatement + fmt.Sprintf(
 				"%s_%d %s", columnName, i, dataTypes[j])
@@ -62,7 +62,7 @@ func createTableStatementGenerator(n int) string {
 	}
 
 	// Create table statement
-	return createTableDDL + fmt.Sprintf("%s);", strings.TrimRight(tableColStatement, ",") )
+	return createTableDDL + fmt.Sprintf("%s);", strings.TrimRight(tableColStatement, ","))
 }
 
 // Execute the create table statement generated above in the database
@@ -75,5 +75,43 @@ func createTable(n int) {
 	if err != nil {
 		Fatalf("Failure in creating the tables in the database %s, err: %v", cmdOptions.Database, err)
 	}
+}
 
+// Mock provided tables
+func MockTables() {
+	Infof("Starting mocking of table: %s", cmdOptions.Tab.FakeTablesRows)
+	whereClause := generateWhereClause()
+	tableList := dbExtractTables(whereClause)
+	MockTable(tableList)
+}
+
+// Generate the where clause from the table list provided
+func generateWhereClause() string {
+	Debug("Generating the where condition for the table list")
+
+	// where condition syntax
+	whereClause := "AND (n.nspname    || '.' || c.relname) IN (%s)"
+
+	// Loop and generate the where condition
+	var w []string
+	t := strings.Split(cmdOptions.Tab.FakeTablesRows, ",")
+	for _, table := range t {
+
+		// if there is no schema then add in public the default schema
+		if !strings.Contains(table, ".") {
+			table = fmt.Sprintf("%s.%s", cmdOptions.Tab.SchemaName, table)
+		}
+
+		// Separate the table name and schema name
+		s := strings.Split(table, ".")
+
+		// If no schema name is found then error out
+		if len(s) < 2 {
+			Fatalf("Table options should be of the format <schema>.<table>, table option: %s", table)
+		}
+
+		// generate the in clause
+		w = append(w, fmt.Sprintf("'%s.%s'", s[0], s[1]))
+	}
+	return fmt.Sprintf(whereClause, strings.Join(w, ","))
 }

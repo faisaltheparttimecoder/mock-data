@@ -30,18 +30,15 @@ func RandomString(strlen int) string {
 }
 
 // Random Number generator based on the min and max specified
-func RandomInt(min, max int) (int, error) {
+func RandomInt(min, max int) int {
 	if min >= max {
-		return 0, errors.New("max value is greater or equal to Min value, " +
-			"cannot generate data within these ranges")
+		return r.Intn(min-max) + min
 	}
-	rand.Seed(time.Now().UnixNano())
-	return rand.Intn(max-min) + min, nil
+	return r.Intn(max-min) + min
 }
 
 // Random Bytea data
 func RandomBytea(maxlen int) []byte {
-	rand.Seed(time.Now().UnixNano())
 	result := make([]byte, r.Intn(maxlen)+1)
 	for i := range result {
 		result[i] = byte(r.Intn(255))
@@ -54,13 +51,10 @@ func round(num float64) int {
 	return int(num + math.Copysign(0.5, num))
 }
 
-func RandomFloat(min, max, precision int) (float64, error) {
+func RandomFloat(min, max, precision int) (float64) {
 	output := math.Pow(10, float64(precision))
-	randNumber, err := RandomInt(min, max)
-	if err != nil {
-		return 0.0, err
-	}
-	return float64(round(float64(randNumber)/rand.Float64()*output)) / output, nil
+	randNumber := RandomInt(min, max)
+	return math.Floor(float64(float64(randNumber)/rand.Float64()) / output)
 }
 
 // Random calender date time generator
@@ -71,7 +65,7 @@ func RandomCalenderDateTime(fromyear, toyear int) (time.Time, error) {
 	min := time.Now().AddDate(fromyear, 0, 0).Unix()
 	max := time.Now().AddDate(toyear, 0, 0).Unix()
 	delta := max - min
-	sec := rand.Int63n(delta) + min
+	sec := r.Int63n(delta) + min
 	return time.Unix(sec, 0), nil
 }
 
@@ -94,12 +88,29 @@ func RandomTimestamp(fromyear, toyear int) (string, error) {
 }
 
 // Random Timestamp with time zone
-func RandomTimestamptz(fromyear, toyear int) (string, error) {
+func RandomTimeStampTz(fromyear, toyear int) (string, error) {
 	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
 		return "", err
 	}
 	return timestamp.Format("2006-01-02 15:04:05.000000"), nil
+}
+
+// Random Timestamp with decimals
+func RandomTimeStampTzWithDecimals(fromyear, toyear, decimal int) (string, error) {
+	var timestampDecimal string
+	d, err := RandomTimestamp(fromYear, toYear)
+	if err != nil {
+		return "", fmt.Errorf("randomizer with timestamp[p] without timezone failed: %v", err)
+	}
+	// use rand() to generate random decimal in timestamp
+	for i := 0; i < decimal; i++ {
+		timestampDecimal = timestampDecimal + strconv.Itoa(r.Intn(9))
+	}
+	if len(timestampDecimal) > 0 {
+		d = d + "." + timestampDecimal
+	}
+	return d, nil
 }
 
 // Random Time without time zone
@@ -122,10 +133,12 @@ func RandomTimetz(fromyear, toyear int) (string, error) {
 
 // Random bool generator based on if number is even or not
 func RandomBoolean() bool {
-	number, _ := RandomInt(1, 9999)
+	number := RandomInt(1, 9999)
 	var b bool
-	if b = false; number%2 == 0 {
+	if number%2 == 0 {
 		b = true
+	} else {
+		b = false
 	}
 	return b
 }
@@ -138,7 +151,7 @@ func RandomParagraphs() string {
 
 // Random IPv6 & IPv4 Address
 func RandomIP() string {
-	number, _ := RandomInt(1, 9999)
+	number := RandomInt(1, 9999)
 	var ip string
 	if ip = fake.IPv6(); number%2 == 0 {
 		ip = fake.IPv4()
@@ -150,8 +163,10 @@ func RandomIP() string {
 func RandomBit(max int) string {
 	var bitValue string
 	for i := 0; i < max; i++ {
-		if bitValue = bitValue + "0"; RandomBoolean() {
+		if RandomBoolean() {
 			bitValue = bitValue + "1"
+		} else {
+			bitValue = bitValue + "0";
 		}
 	}
 	return bitValue
@@ -159,7 +174,7 @@ func RandomBit(max int) string {
 
 // Random UUID
 func RandomUUID() string {
-	return strings.TrimSpace(uuid.New().String())
+	return uuid.New().String()
 }
 
 // Random Mac Address
@@ -172,7 +187,7 @@ func RandomMacAddress() string {
 
 // Random Text Search Query
 func RandomTSQuery() string {
-	number, _ := RandomInt(1, 9999)
+	number := RandomInt(1, 9999)
 	number = number % 5
 	if number == 0 {
 		return fake.WordsN(1) + " & " + fake.WordsN(1)
@@ -195,22 +210,20 @@ func RandomTSVector() string {
 
 // Random Geometric data
 func RandomGeometricData(randomInt int, GeoMetry string, IsItArray bool) string {
-	var geometry []string
 	var data string
-	if GeoMetry == "point" { // Syntax for point datatype
-		data = fmt.Sprintf("(%s,%s)", fake.DigitsN(2), fake.DigitsN(3))
-		return FormatForArray(data, IsItArray, true)
-	} else if GeoMetry == "circle" { // Syntax for circle datatype
-		data = fmt.Sprintf("(%s,%s,%s)", fake.DigitsN(2), fake.DigitsN(3), fake.DigitsN(2))
-		return FormatForArray(data, IsItArray, true)
-	} else { // Syntax for the rest of geometry datatype
-		for i := 0; i < randomInt; i++ {
-			x, _ := RandomFloat(1, 10, 2)
-			y, _ := RandomFloat(1, 10, 2)
-			geometry = append(geometry, fmt.Sprintf("(%v,%v)", x, y))
-		}
-		data = fmt.Sprintf("(%s)", strings.Join(geometry, ","))
-		return FormatForArray(data, IsItArray, true)
+	if GeoMetry == "point" { // Syntax for point data type
+		data = fmt.Sprintf("%d,%d",
+			RandomInt(1, 999), RandomInt(1, 999))
+		return FormatForArray(data, IsItArray)
+	} else if GeoMetry == "circle" { // Syntax for circle data type
+		data = fmt.Sprintf("<(%d,%d),%d>",
+			RandomInt(1, 999), RandomInt(1, 999), RandomInt(1, 999))
+		return FormatForArray(data, IsItArray)
+	} else { // Syntax for rest
+		data = fmt.Sprintf("%d,%d,%d,%d",
+			RandomInt(1, 999), RandomInt(1, 999),
+			RandomInt(1, 999), RandomInt(1, 999))
+		return FormatForArray(data, IsItArray)
 	}
 	return ""
 }
@@ -234,18 +247,23 @@ func RandomTXID() string {
 
 // Random JSON generator
 func RandomJson(IsItArray bool) string {
-	jsonData := fmt.Sprintf(JsonSkeleton(), RandomString(24), fake.DigitsN(10), RandomUUID(),
-		strconv.FormatBool(RandomBoolean()), fake.Digits(), fake.DigitsN(2), fake.DomainName(), fake.WordsN(1),
-		fake.DigitsN(2), fake.UserName(), fake.Color(), fake.FullName(), fake.Gender(), fake.Company(),
-		fake.EmailAddress(), fake.Phone(), fake.StreetAddress(), fake.Zip(), fake.State(), fake.Country(),
-		fake.WordsN(12), RandomIP(), fake.JobTitle(), strconv.Itoa(fake.Year(2000, 2050)),
-		strconv.Itoa(fake.MonthNum()), strconv.Itoa(fake.Day()), fake.DigitsN(2), fake.DigitsN(2),
-		fake.DigitsN(2), fake.DigitsN(1), fake.DigitsN(2), fake.DigitsN(2), fake.DigitsN(6),
-		fake.DigitsN(2), fake.DigitsN(6), fake.WordsN(1), fake.WordsN(1), fake.WordsN(1),
-		fake.WordsN(1), fake.WordsN(1), fake.WordsN(1), fake.WordsN(1), fake.DigitsN(2),
-		fake.FullName(), fake.DigitsN(2), fake.FullName(), fake.DigitsN(2), fake.FullName(), fake.Sentence(),
+	jsonData := fmt.Sprintf(JsonSkeleton(), RandomString(24),
+		fake.DigitsN(10), RandomUUID(), strconv.FormatBool(RandomBoolean()), fake.Digits(), fake.DigitsN(2),
+		fake.DomainName(), fake.WordsN(1), fake.DigitsN(2), fake.UserName(), fake.Color(), fake.FullName(),
+		fake.Gender(), fake.Company(), fake.EmailAddress(), fake.Phone(), fake.StreetAddress(), fake.Zip(),
+		fake.State(), fake.Country(), fake.WordsN(12), RandomIP(), fake.JobTitle(),
+		strconv.Itoa(fake.Year(2000, 2050)), strconv.Itoa(fake.MonthNum()), strconv.Itoa(fake.Day()),
+		fake.DigitsN(2), fake.DigitsN(2), fake.DigitsN(2), fake.DigitsN(1), fake.DigitsN(2),
+		fake.DigitsN(2), fake.DigitsN(6), fake.DigitsN(2), fake.DigitsN(6), fake.WordsN(1),
+		fake.WordsN(1), fake.WordsN(1), fake.WordsN(1), fake.WordsN(1), fake.WordsN(1),
+		fake.WordsN(1), fake.DigitsN(2), fake.FullName(), fake.DigitsN(2), fake.FullName(),
+		fake.DigitsN(2), fake.FullName(), fake.Sentence(),
 		fake.Brand())
-	return FormatForArray(jsonData, IsItArray, false)
+	if IsItArray {
+		return strings.Replace(jsonData, "\"", "\\\"", -1)
+	} else {
+		return jsonData
+	}
 }
 
 // Random XML Generator
@@ -254,5 +272,9 @@ func RandomXML(IsItArray bool) string {
 		fake.DigitsN(4), fake.WordsN(1), fake.FullName(), fake.FullName(), fake.StreetAddress(), fake.City(),
 		fake.Country(), fake.EmailAddress(), fake.Phone(), fake.Title(), fake.Sentences(), fake.Digits(), fake.Color(),
 		fake.Digits(), fake.DigitsN(2), fake.Title(), fake.Digits(), fake.Digits(), fake.DigitsN(2))
-	return FormatForArray(xmlData, IsItArray, false)
+	if IsItArray {
+		return strings.Replace(xmlData, "\"", "\\\"", -1)
+	} else {
+		return xmlData
+	}
 }

@@ -13,15 +13,16 @@ var (
 
 // Root command line options
 type Command struct {
-	Debug    bool
-	Username string
-	Password string
-	Database string
-	Hostname string
-	Port     int
-	DB       Database
-	Tab      Tables
-	Rows     int64
+	Debug            bool
+	Username         string
+	Password         string
+	Database         string
+	Hostname         string
+	Port             int
+	DB               Database
+	Tab              Tables
+	Rows             int
+	IgnoreConstraint bool
 }
 
 // Database command line options
@@ -58,6 +59,9 @@ var rootCmd = &cobra.Command{
 			Fatalf("Argument Error: minimum row cannot be less than 1")
 		}
 
+		// Ensure we can make a successful connection to the database
+		// by printing the version of the database we are going to mock
+		dbVersion()
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		Fatalf("No sub commands used, please run \"%s --help\" for all the options", programName)
@@ -69,7 +73,7 @@ var databaseCmd = &cobra.Command{
 	Use:     "database",
 	Aliases: []string{`d`},
 	Short:   "Mock at database level",
-	Long:    "Creates a fake database & also can mock the whole database",
+	Long:    "Creates a fake tables mimicking a real life database & also can mock the whole database",
 	PreRun: func(cmd *cobra.Command, args []string) {
 		// Error out if no flags set
 		if !cmdOptions.DB.FakeDBTableRows && !cmdOptions.DB.FakeDB {
@@ -80,6 +84,10 @@ var databaseCmd = &cobra.Command{
 		// if there is a request to create a fake database, run the demo database script
 		if cmdOptions.DB.FakeDB {
 			ExecuteDemoDatabase()
+		}
+		// Mock the full database
+		if cmdOptions.DB.FakeDBTableRows {
+			MockDatabase()
 		}
 	},
 }
@@ -111,11 +119,19 @@ var tablesCmd = &cobra.Command{
 		if IsStringEmpty(cmdOptions.Tab.ColumnNamePrefix) || IsStringEmpty(cmdOptions.Tab.TableNamePrefix) {
 			Fatalf("Cannot have the column or table prefix empty, please check the arguments")
 		}
+		// If schema name is empty
+		if IsStringEmpty(cmdOptions.Tab.SchemaName) {
+			Fatalf("Cannot have the schema name empty, please check the arguments")
+		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		// if there is a request to create fake tables then
+		// If there is a request to create fake tables then
 		if cmdOptions.Tab.FakeNewTables {
 			CreateFakeTables()
+		}
+		// if there is a request to mock few tables
+		if !IsStringEmpty(cmdOptions.Tab.FakeTablesRows) {
+			MockTables()
 		}
 	},
 }
@@ -128,7 +144,7 @@ func init() {
 	// Root command flags
 	rootCmd.PersistentFlags().BoolVarP(&cmdOptions.Debug, "verbose", "v",
 		false, "Enable verbose or debug logging")
-	rootCmd.PersistentFlags().Int64VarP(&cmdOptions.Rows, "rows", "r",
+	rootCmd.PersistentFlags().IntVarP(&cmdOptions.Rows, "rows", "r",
 		10, "Total rows to be faked or mocked")
 	rootCmd.PersistentFlags().IntVarP(&cmdOptions.Port, "port", "p",
 		viper.GetInt("PGPORT"), "Port number of the postgres database")
@@ -140,12 +156,14 @@ func init() {
 		viper.GetString("PGPASSWORD"), "Password for the user to connect to database")
 	rootCmd.PersistentFlags().StringVarP(&cmdOptions.Database, "database", "d",
 		viper.GetString("PGDATABASE"), fmt.Sprintf("Database to %s the data", programName))
+	rootCmd.Flags().BoolVarP(&cmdOptions.IgnoreConstraint, "ignore", "i",
+		false, "ignore checking and fixing constraints")
 
 	// Attach the sub commands
 	rootCmd.AddCommand(databaseCmd)
 	rootCmd.AddCommand(tablesCmd)
 
-	// Database command flags
+	// Database command flagss
 	databaseCmd.Flags().BoolVarP(&cmdOptions.DB.FakeDB, "create-db", "c", false,
 		"Create fake tables mimicking a real life database")
 	databaseCmd.Flags().BoolVarP(&cmdOptions.DB.FakeDBTableRows, "full-database", "f", false,
@@ -158,15 +176,14 @@ func init() {
 		"How many fake tables is needed?")
 	tablesCmd.Flags().IntVarP(&cmdOptions.Tab.MaxColumns, "max-table-columns", "m", 10,
 		"Max number of columns that is needed i.e columns can be from 1 upto this max value")
-	tablesCmd.Flags().BoolVarP(&cmdOptions.Tab.CaseSensitive, "case-sensitive-table-name", "i",
+	tablesCmd.Flags().BoolVarP(&cmdOptions.Tab.CaseSensitive, "case-sensitive-table-name", "j",
 		false, "Table name with only lowercase or a mix of lower and uppercase")
 	tablesCmd.Flags().StringVarP(&cmdOptions.Tab.TableNamePrefix, "table-name-prefix", "x",
 		"mock_data", "Prefix the mocked table with this name")
 	tablesCmd.Flags().StringVarP(&cmdOptions.Tab.ColumnNamePrefix, "column-name-prefix", "y",
 		"mock_data", "Prefix the mocked table columns with this name")
 	tablesCmd.Flags().StringVarP(&cmdOptions.Tab.SchemaName, "schema-name", "s",
-		"public",
-		"Under which schema do these fake tables need to be created? (NOTE: only used in create-tables flag)")
+		"public", "Under which schema do these fake tables need to be created or mocked?")
 	tablesCmd.Flags().StringVarP(&cmdOptions.Tab.FakeTablesRows, "mock-tables", "t", "",
 		"Fake selected list of tables with fake data, to add in multiple tables use \",\" b/w table names ")
 }
