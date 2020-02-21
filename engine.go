@@ -122,7 +122,7 @@ func buildTimeWithTz(dt string) (interface{}, error) {
 	if isItArray {
 		return ArrayGenerator("timetz", dt, fromYear, toYear)
 	}
-	return RandomTimetz(fromYear, toYear)
+	return RandomTimeTz(fromYear, toYear)
 }
 
 // Ip's builder
@@ -383,7 +383,7 @@ func randomDataByDataTypeForArray(dt, originalDt string, min, max int) (string, 
 	} else if dt == "text" {
 		return fake.WordsN(1), nil
 	} else if dt == "timetz" {
-		return RandomTimetz(min, max)
+		return RandomTimeTz(min, max)
 	} else if dt == "bool" {
 		if RandomBoolean() {
 			return "true", nil
