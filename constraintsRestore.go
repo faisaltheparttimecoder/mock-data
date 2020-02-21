@@ -7,7 +7,7 @@ import (
 
 var (
 	ignoreErr = []string{
-		"pq: multiple primary keys for table",
+		"ERROR #42P16 multiple primary keys for table",
 		"already exists"}
 )
 

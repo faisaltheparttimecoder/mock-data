@@ -247,8 +247,3 @@ func CharLen(dt string) (int, error) {
 	}
 	return returnValue, nil
 }
-
-// Replace the " from the name
-func replaceDoubleQuotes(s string) string {
-	return strings.Replace(s, "\"", "", -1)
-}

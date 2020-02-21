@@ -24,6 +24,7 @@ type Command struct {
 	Rows             int
 	IgnoreConstraint bool
 	DontPrompt       bool
+	SchemaName       string
 }
 
 // Database command line options
@@ -143,6 +144,21 @@ var tablesCmd = &cobra.Command{
 	},
 }
 
+// The schema sub commands
+var schemaCmd = &cobra.Command{
+	Use:     "schema",
+	Aliases: []string{`s`},
+	Short:   "Mock at schema level",
+	Long:    "Mock all the table under the schema",
+	PostRun: func(cmd *cobra.Command, args []string) {
+		Info("Successfully completed running the schema sub command")
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		// Mock all the tables at schema level
+		MockSchema()
+	},
+}
+
 // Initialize the cobra command line
 func init() {
 	// Load the environment variable using viper
@@ -171,6 +187,7 @@ func init() {
 	// Attach the sub commands
 	rootCmd.AddCommand(databaseCmd)
 	rootCmd.AddCommand(tablesCmd)
+	rootCmd.AddCommand(schemaCmd)
 
 	// Database command flags
 	databaseCmd.Flags().BoolVarP(&cmdOptions.DB.FakeDB, "create-db", "c", false,
@@ -195,4 +212,9 @@ func init() {
 		"public", "Under which schema do these fake tables need to be created or mocked?")
 	tablesCmd.Flags().StringVarP(&cmdOptions.Tab.FakeTablesRows, "mock-tables", "t", "",
 		"Fake selected list of tables with fake data, to add in multiple tables use \",\" b/w table names ")
+
+	// Schema command flags
+	schemaCmd.Flags().StringVarP(&cmdOptions.SchemaName, "schema-name", "n", "",
+		"Provide the schema name whose tables need to be mocked")
+	schemaCmd.MarkFlagRequired("schema-name")
 }

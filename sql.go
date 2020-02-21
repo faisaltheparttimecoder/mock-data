@@ -135,15 +135,13 @@ SELECT    n.nspname AS SCHEMA,
 FROM      pg_catalog.pg_class c 
 LEFT JOIN pg_catalog.pg_namespace n 
 ON        n.oid = c.relnamespace 
-WHERE     c.relkind IN ( 'r', 
-                        '' ) 
+WHERE     c.relkind IN ( 'r', '' ) 
 AND       n.nspname <> 'pg_catalog' 
 AND       n.nspname <> 'information_schema' 
 AND       n.nspname !~ '^pg_toast' 
 AND       n.nspname <> 'gp_toolkit' 
 AND       c.relkind = 'r' 
-AND       c.relstorage IN ('a', 
-                           'h') 
+AND       c.relstorage IN ('a','h') 
 %s 
 ORDER BY  1
 `
@@ -343,9 +341,9 @@ FROM   (SELECT n.nspname
                                      'gp_toolkit', 
                                      'pg_toast', 'pg_bitmapindex' )) 
                AND indexdef LIKE 'CREATE UNIQUE%[2]s' 
-               AND schemaname 
-                   || '.' 
-                   || tablename = '%[1]s') a 
+               AND '"' || schemaname || '"'
+                   || '."' 
+                   || tablename || '"' = '%[1]s') a 
 ORDER  BY constrainttype 
 `
 	// db connection
@@ -353,7 +351,8 @@ ORDER  BY constrainttype
 	defer db.Close()
 
 	// add table information and execute the query
-	query = fmt.Sprintf(query, replaceDoubleQuotes(tabname), "%")
+	query = fmt.Sprintf(query, tabname, "%")
+
 	_, err := db.Query(&result, query)
 	if err != nil {
 		Debugf("query: %s", query)
@@ -540,7 +539,6 @@ SET    %[2]s =
 WHERE  %[2]s = '%[6]s'
 `
 	query = fmt.Sprintf(query, key.Table, key.Column, key.Refcolumn, key.Reftable, totalRows, whichRow)
-	//fmt.Println("query: %s", query)
 	_, err := ExecuteDB(query)
 	if err != nil {
 		fmt.Println()
