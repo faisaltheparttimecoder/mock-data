@@ -23,6 +23,7 @@ type Command struct {
 	Tab              Tables
 	Rows             int
 	IgnoreConstraint bool
+	DontPrompt       bool
 }
 
 // Database command line options
@@ -156,14 +157,16 @@ func init() {
 		viper.GetString("PGPASSWORD"), "Password for the user to connect to database")
 	rootCmd.PersistentFlags().StringVarP(&cmdOptions.Database, "database", "d",
 		viper.GetString("PGDATABASE"), fmt.Sprintf("Database to %s the data", programName))
-	rootCmd.Flags().BoolVarP(&cmdOptions.IgnoreConstraint, "ignore", "i",
-		false, "ignore checking and fixing constraints")
+	rootCmd.PersistentFlags().BoolVarP(&cmdOptions.IgnoreConstraint, "ignore", "i",
+		false, "Ignore checking and fixing constraints")
+	rootCmd.PersistentFlags().BoolVarP(&cmdOptions.DontPrompt, "dont-prompt", "q",
+		false, "Run without asking for confirmation")
 
 	// Attach the sub commands
 	rootCmd.AddCommand(databaseCmd)
 	rootCmd.AddCommand(tablesCmd)
 
-	// Database command flagss
+	// Database command flags
 	databaseCmd.Flags().BoolVarP(&cmdOptions.DB.FakeDB, "create-db", "c", false,
 		"Create fake tables mimicking a real life database")
 	databaseCmd.Flags().BoolVarP(&cmdOptions.DB.FakeDBTableRows, "full-database", "f", false,
