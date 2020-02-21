@@ -177,11 +177,11 @@ func FloatPrecision(dt string) (int, int, error) {
 	split := strings.Split(rs[1], ",")
 	m, err := strconv.Atoi(split[0])
 	if err != nil {
-		return 0, 0, fmt.Errorf("Float Precision (min): %v", err)
+		return 0, 0, fmt.Errorf("float Precision (min): %v", err)
 	}
 	p, err := strconv.Atoi(split[1])
 	if err != nil {
-		return 0, 0, fmt.Errorf("Float Precision (precision): %v", err)
+		return 0, 0, fmt.Errorf("float Precision (precision): %v", err)
 	}
 	return m, p, nil
 }
@@ -193,7 +193,7 @@ func ColExtractor(conkey, regExp string) (string, error) {
 	if len(rs) > 0 {
 		return rs[0], nil
 	} else {
-		return "", fmt.Errorf("Unable to extract the columns from the constraint key")
+		return "", fmt.Errorf("unable to extract the columns from the constraint key")
 	}
 	return "", nil
 }

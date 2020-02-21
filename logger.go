@@ -83,7 +83,6 @@ func Warnf(format string, args ...interface{}) {
 	}
 }
 
-
 // Error logs a message at level Error on the standard logger.
 func Error(args ...interface{}) {
 	if logger.Level >= logrus.ErrorLevel {
@@ -167,7 +166,7 @@ func fileInfo(skip int) string {
 }
 
 // Setup or Initialize the logger
-func initLogger(verbose bool)  {
+func initLogger(verbose bool) {
 	// Set the formatter option for logrus
 	formatter := new(logrus.TextFormatter)
 	formatter.TimestampFormat = "2006-01-02 15:04:05"
