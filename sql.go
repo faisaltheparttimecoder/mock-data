@@ -60,6 +60,7 @@ func dbVersion() {
 	query := "SELECT version()"
 	_, err := db.QueryOne(pg.Scan(&version), query)
 	if err != nil {
+		Debugf("query: %s", query)
 		Fatalf("Encountered error when connecting to the database, err: %v", err)
 	}
 	Infof("Version of the database: %s", version)
@@ -99,9 +100,10 @@ FROM   pg_catalog.pg_class c
 WHERE  c.relkind IN ( 'r', '' ) 
        AND n.nspname <> 'pg_catalog' 
        AND n.nspname <> 'information_schema' 
-       AND n.nspname ! ~'^pg_toast' 
-       AND n.nspname ! ~'^gp_toolkit' 
-       AND c.relkind = 'r' %s 
+       AND n.nspname !~ '^pg_toast' 
+       AND n.nspname !~ '^gp_toolkit' 
+       AND c.relkind = 'r' 
+       %s 
 ORDER  BY 1 
 `
 	// add where clause
@@ -110,6 +112,7 @@ ORDER  BY 1
 	// execute the query
 	_, err := db.Query(&result, query)
 	if err != nil {
+		Debugf("query: %s", query)
 		Fatalf("Encountered error when getting all the tables from postgres database, err: %v", err)
 	}
 
@@ -140,7 +143,8 @@ AND       n.nspname !~ '^pg_toast'
 AND       n.nspname <> 'gp_toolkit' 
 AND       c.relkind = 'r' 
 AND       c.relstorage IN ('a', 
-                           'h') %s 
+                           'h') 
+%s 
 ORDER BY  1
 `
 	// add where clause
@@ -149,6 +153,7 @@ ORDER BY  1
 	// execute the query
 	_, err := db.Query(&result, query)
 	if err != nil {
+		Debugf("query: %s", query)
 		Fatalf("Encountered error when getting all the tables from GPDB, err: %v", err)
 	}
 
@@ -187,6 +192,7 @@ ORDER BY a.attnum
 	query = fmt.Sprintf(query, tableName)
 	_, err := db.Query(&result, query)
 	if err != nil {
+		Debugf("query: %s", query)
 		Fatalf("Encountered error when getting all the columns from Postgres, err: %v", err)
 	}
 
@@ -228,6 +234,7 @@ ORDER BY        a.attnum
 	query = fmt.Sprintf(query, tableName)
 	_, err := db.Query(&result, query)
 	if err != nil {
+		Debugf("query: %s", query)
 		Fatalf("Encountered error when getting all the columns from GPDB, err: %v", err)
 	}
 
@@ -260,6 +267,7 @@ ORDER  BY tablename
 	query = fmt.Sprintf(query, conntype)
 	_, err := db.Query(&result, query)
 	if err != nil {
+		Debugf("query: %s", query)
 		Fatalf("Encountered error when getting all the constriants from database, err: %v", err)
 	}
 
@@ -292,6 +300,7 @@ WHERE  schemaname IN (SELECT nspname
 	// add table information and execute the query
 	_, err := db.Query(&result, query)
 	if err != nil {
+		Debugf("query: %s", query)
 		Fatalf("Encountered error when getting all the constriants from database, err: %v", err)
 	}
 
@@ -333,7 +342,7 @@ FROM   (SELECT n.nspname
                                      'pg_aoseg', 
                                      'gp_toolkit', 
                                      'pg_toast', 'pg_bitmapindex' )) 
-               AND indexdef LIKE 'CREATE UNIQUE%s' 
+               AND indexdef LIKE 'CREATE UNIQUE%[2]s' 
                AND schemaname 
                    || '.' 
                    || tablename = '%[1]s') a 
@@ -344,9 +353,10 @@ ORDER  BY constrainttype
 	defer db.Close()
 
 	// add table information and execute the query
-	query = fmt.Sprintf(query, tabname, "%")
+	query = fmt.Sprintf(query, replaceDoubleQuotes(tabname), "%")
 	_, err := db.Query(&result, query)
 	if err != nil {
+		Debugf("query: %s", query)
 		Fatalf("Encountered error when getting constraints for table %s from database, err: %v", tabname, err)
 	}
 
@@ -374,6 +384,7 @@ WHERE  attname = '%s'
 	query = fmt.Sprintf(query, whereClause, tab)
 	_, err := db.Query(&result, query)
 	if err != nil {
+		Debugf("query: %s", query)
 		Fatalf("Encountered error when getting data type for "+
 			"building constrints for table %s from database, err: %v", tab, err)
 	}
@@ -392,6 +403,8 @@ func getTotalPKViolator(tab, cols string) int {
 
 	_, err := db.Query(pg.Scan(&total), query)
 	if err != nil {
+		fmt.Println()
+		Debugf("query: %s", query)
 		Fatalf("Error when execute the query to extract pk violators: %v", err)
 	}
 
@@ -415,6 +428,8 @@ func GetPKViolators(tab, cols string) []DBViolationRow {
 	query := strings.Replace(getPKViolator(tab, cols), "SELECT "+cols, "SELECT "+cols+" AS row", -1)
 	_, err := db.Query(&result, query)
 	if err != nil {
+		fmt.Println()
+		Debugf("query: %s", query)
 		Fatalf("Error when execute the query to extract pk violators for table %s: %v", tab, err)
 	}
 
@@ -435,44 +450,101 @@ WHERE  ctid =
 	query = fmt.Sprintf(query, tab, col, newdata, whichrow)
 	_, err := ExecuteDB(query)
 	if err != nil {
+		fmt.Println()
 		Debugf("query: %s", query)
 		Fatalf("Error when updating the primary key for table %s, err: %v", tab, err)
 	}
 	return ""
 }
 
-// Get the foriegn violations keys
-func GetFKViolators(tab, col, reftab, refcol string) string {
-	return "SELECT " + col + " FROM " + tab + " where " + col + " NOT IN ( SELECT " + refcol + " from " + reftab + " )"
+// Get the foreign violations keys
+func getFKViolators(key ForeignKey) string {
+	query := `
+SELECT %[1]s 
+FROM   %[2]s 
+WHERE %[1]s  NOT IN 
+       ( 
+              SELECT %[3]s 
+              FROM   %[4]s )
+`
+	return fmt.Sprintf(query, key.Column, key.Table, key.Refcolumn, key.Reftable)
 }
 
 // Get total FK violators
-func GetTotalFKViolators(tab, col, reftab, refcol string) string {
-	return "SELECT COUNT(*) FROM (" + GetFKViolators(tab, col, reftab, refcol) + ") a"
+func GetTotalFKViolators(key ForeignKey) int {
+	var total int
+	query := `SELECT COUNT(*) FROM (%s) a`
+	query = fmt.Sprintf(query, getFKViolators(key))
+
+	// db connection
+	db := ConnectDB()
+	defer db.Close()
+
+	_, err := db.Query(pg.Scan(&total), query)
+	if err != nil {
+		fmt.Println()
+		Debugf("Query: %s", query)
+		Fatalf("Error when execute the query to total rows of foreign keys for table %s: %v", key.Table, err)
+	}
+
+	return total
 }
 
 // Total rows of the table
-func TotalRows(tab string) string {
-	return "SELECT COUNT(*) FROM " + tab
+func TotalRows(tab string) int {
+	var total int
+	query := fmt.Sprintf(`SELECT COUNT(*) FROM %s`, tab)
+
+	// db connection
+	db := ConnectDB()
+	defer db.Close()
+
+	_, err := db.Query(pg.Scan(&total), query)
+	if err != nil {
+		fmt.Println()
+		Debugf("query: %s", query)
+		Fatalf("Error when execute the query to total rows: %v", err)
+	}
+
+	return total
 }
 
-// Update FK violators
-func UpdateFKeys(fktab, fkcol, reftab, refcol, whichrow, totalRows string) string {
-	return "UPDATE " + fktab + " SET " + fkcol +
-		"=(SELECT " + refcol + " FROM " + reftab +
-		" OFFSET floor(random()*" + totalRows + ") LIMIT 1)" +
-		" WHERE " + fkcol + "='" + whichrow + "'"
+// Get the list of the FK violators
+func GetFKViolators(key ForeignKey) []DBViolationRow {
+	Debugf("Extracting the foreign violations for table %s and column %s", key.Table, key.Reftable)
+	var result []DBViolationRow
+
+	// db connection
+	db := ConnectDB()
+	defer db.Close()
+
+	query := strings.Replace(getFKViolators(key), "SELECT "+key.Column, "SELECT "+key.Column+" AS row", -1)
+	_, err := db.Query(&result, query)
+	if err != nil {
+		fmt.Println()
+		Debugf("query: %s", query)
+		Fatalf("Error when execute the query to extract fk violators for table %s: %v", key.Table, err)
+	}
+
+	return result
 }
 
-// Check key violation check
-func GetTotalCKViolator(tab, column, ckconstraint string) string {
-	return "SELECT COUNT(*) FROM ( " +
-		GetCKViolator(tab, column, ckconstraint) +
-		") a "
-}
-
-// Check Constraint violation
-func GetCKViolator(tab, column, ckconstraint string) string {
-	return "SELECT " + column +
-		"FROM " + tab + " WHERE not (" + ckconstraint + ")"
+// Update FK violators with rows from the referenced table
+func UpdateFKeys(key ForeignKey, totalRows int, whichRow string) {
+	query := `
+UPDATE %[1]s 
+SET    %[2]s = 
+       ( 
+              SELECT %[3]s 
+              FROM   %[4]s offset floor(random()*%[5]d) limit 1) 
+WHERE  %[2]s = '%[6]s'
+`
+	query = fmt.Sprintf(query, key.Table, key.Column, key.Refcolumn, key.Reftable, totalRows, whichRow)
+	//fmt.Println("query: %s", query)
+	_, err := ExecuteDB(query)
+	if err != nil {
+		fmt.Println()
+		Debugf("query: %s", query)
+		Fatalf("Error when updating the foreign key for table %s, err: %v", key.Table, err)
+	}
 }

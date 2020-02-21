@@ -81,6 +81,9 @@ var databaseCmd = &cobra.Command{
 			Fatalf("No flags set, run \"%s database --help\" for all options for this sub command", programName)
 		}
 	},
+	PostRun: func(cmd *cobra.Command, args []string) {
+		Info("Successfully completed running the database sub command")
+	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// if there is a request to create a fake database, run the demo database script
 		if cmdOptions.DB.FakeDB {
@@ -124,6 +127,9 @@ var tablesCmd = &cobra.Command{
 		if IsStringEmpty(cmdOptions.Tab.SchemaName) {
 			Fatalf("Cannot have the schema name empty, please check the arguments")
 		}
+	},
+	PostRun: func(cmd *cobra.Command, args []string) {
+		Info("Successfully completed running the table sub command")
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		// If there is a request to create fake tables then

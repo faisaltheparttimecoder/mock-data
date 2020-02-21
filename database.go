@@ -11,6 +11,7 @@ func ExecuteDemoDatabase() {
 	// Execute the demo database dump
 	_, err := ExecuteDB(demoDatabase())
 	if err != nil {
+		Fatalf("%v", err)
 		errMsg := fmt.Sprintf("%s", err)
 		failureMsg := fmt.Sprintf("Failure in creating a demo tables in the database %s, err: %v",
 			cmdOptions.Database, err)

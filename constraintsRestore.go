@@ -5,6 +5,17 @@ import (
 	"strings"
 )
 
+var (
+	ignoreErr = []string{
+		"pq: multiple primary keys for table",
+		"already exists"}
+)
+
+// Get Foriegn key objects
+type ForeignKey struct {
+	Table, Column, Reftable, Refcolumn string
+}
+
 // Ty to recreate all the constraints where ever we can
 func FixConstraints() {
 	//Fix the constraints in this order
@@ -20,21 +31,18 @@ func FixConstraints() {
 				fixPKey(con)
 			case v == "UNIQUE": // Run the same logic as primary key
 				fixPKey(con)
-			//case v == "CHECK": // TODO: Its hard to predict the check constraint ATM
-			//	fixCheck(db, con)
-			//case v == "FOREIGN":
-			//	fixFKey(con)
+				//case v == "CHECK": // TODO: Its hard to predict the check constraint ATM
+				//	fixCheck(db, con)
+			case v == "FOREIGN":
+				fixFKey(con)
 			}
 			bar.Add(1)
 		}
 		fmt.Println()
 	}
 
-	//// Recreate constraints
-	//failureDetected, err := recreateAllConstraints(db, timestamp, debug)
-	//if failureDetected || err != nil {
-	//	return err
-	//}
+	// Recreate constraints
+	recreateAllConstraints()
 }
 
 // Fix the primary key
@@ -69,7 +77,7 @@ func fixPKey(pk constraint) {
 	}
 }
 
-// Fix Primary Ket string violators.
+// Fix Primary Key string violators.
 func fixPKViolator(tab, col, dttype string) {
 	// Get all the strings that violates the primary key constraints
 	pkViolators := GetPKViolators(tab, col)
@@ -83,5 +91,122 @@ func fixPKViolator(tab, col, dttype string) {
 
 		// Replace the old data with new data
 		UpdatePKKey(tab, col, v.Row, fmt.Sprintf("%v", newdata))
+	}
+}
+
+// Fix the Foreign Keys
+func fixFKey(con constraint) {
+	Debugf("Fixing the Primary / Unique Key")
+	totalViolators := 1
+
+	// The objects involved in this foriegn key clause
+	fkeyObjects := getForeignKeyColumns(con)
+
+	// Time to fix the foreign key issues
+	// Get total number of records on the table
+	totalRow := TotalRows(fkeyObjects.Reftable)
+
+	Debugf("Checking / Fixing FOREIGN KEY Violation table: %s, column: %s, reference: %s(%s)",
+		fkeyObjects.Table, fkeyObjects.Column, fkeyObjects.Reftable, fkeyObjects.Refcolumn)
+
+	// Loop till we reach the the end of the loop
+	for totalViolators > 0 {
+
+		// Total foreign key violators
+		totalViolators = GetTotalFKViolators(*fkeyObjects)
+
+		// Run only if there is a violations else no
+		if totalViolators > 0 {
+			violators := GetFKViolators(*fkeyObjects)
+			for _, v := range violators {
+				UpdateFKeys(*fkeyObjects, totalRow, v.Row)
+			}
+		}
+	}
+
+}
+
+// Get Foreign Keys column and reference column
+func getForeignKeyColumns(con constraint) *ForeignKey {
+	// Extract reference clause from the value
+	refClause, err := ColExtractor(con.column, `REFERENCES[ \t]*([^\n\r]*\))`)
+	if err != nil {
+		Fatalf("Unable to extract reference key clause from fk clause: %v", err)
+	}
+
+	// Extract the fk column from the clause
+	fkCol, err := ColExtractor(strings.Replace(con.column, refClause, "", -1), `\(.*?\)`)
+	if err != nil {
+		Fatalf("Unable to extract foreign key column from fk clause: %v", err)
+	}
+	fkCol = strings.Trim(fkCol, "()")
+
+	// Extract the reference column from the clause
+	refCol, err := ColExtractor(refClause, `\(.*?\)`)
+	if err != nil {
+		Fatalf("Unable to extract reference key column from fk clause: %v", err)
+	}
+
+	// Extract reference table from the clause
+	refTab := strings.Replace(refClause, refCol, "", -1)
+	refTab = strings.Replace(refTab, "REFERENCES ", "", -1)
+	refCol = strings.Trim(refCol, "()")
+
+	return &ForeignKey{con.table, fkCol, refTab, refCol}
+}
+
+// Ignore Error strings matches
+func IgnoreErrorString(errmsg string) bool {
+	for _, ignore := range ignoreErr {
+		if strings.HasSuffix(errmsg, ignore) || strings.HasPrefix(errmsg, ignore) {
+			return true
+		}
+	}
+	return false
+}
+
+// Recreate all the constraints of the database ( in case we have dropped any )
+func recreateAllConstraints() {
+	Infof("Attempting to recreating all the constraints")
+	failedConstraintsFile := fmt.Sprintf("%s/failed_constraint_creations.sql", Path)
+	var AnyError bool = false
+
+	// list the backup files collected.
+	for _, con := range constraints {
+		backupFile, err := ListFile(Path, fmt.Sprintf("%s_constriant_backup_%s.sql", programName, con))
+		if err != nil {
+			Fatalf("Error when listing all the backup files from the directory %s, err: %v", Path, err)
+		}
+
+		// run it only if we do find the backup file
+		if len(backupFile) > 0 {
+			b := backupFile[0]
+			contents, err := ReadFile(b)
+			if err != nil {
+				Fatalf("Error in reading the backup file %s: %v", b, err)
+			}
+
+			// Start the progress bar
+			bar := StartProgressBar(fmt.Sprintf("Recreated the Constraint Type \"%s\"", con), len(contents))
+
+			// Recreate all constraints one by one, if we can't create it then display the message
+			// on the screen and continue with the rest, since we don't want it to fail if we cannot
+			// recreate constraint of a single table.
+			for _, content := range contents {
+				_, err := ExecuteDB(content)
+				if err != nil && !IgnoreErrorString(fmt.Sprintf("%s", err)) {
+					Debugf("Error creating constraint %s, err: %v", content, err)
+					WriteToFile(failedConstraintsFile, content+"\n")
+					AnyError = true
+				}
+				bar.Add(1)
+			}
+			fmt.Println()
+		}
+	}
+
+	if AnyError {
+		Warnf("There have been issue creating few constraints, all the "+
+			"constraints that failed has been saved on to file: %s", failedConstraintsFile)
 	}
 }

@@ -30,7 +30,7 @@ func BackupDDL() {
 func backupConstraints() {
 	Debugf("Backing up all the constraints from the database: %s", cmdOptions.Database)
 	for _, constr := range constraints {
-		filename := fmt.Sprintf("%s/mockd_constriant_backup_%s.sql", Path, constr)
+		filename := fmt.Sprintf("%s/%s_constriant_backup_%s.sql", Path, programName, constr)
 		constraintInfo := GetPGConstraintDDL(constr)
 		for _, c := range constraintInfo {
 			// DDL
