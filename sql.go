@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/go-pg/pg"
+	"strings"
 )
 
 var GreenplumOrPostgres = "greenplum"
@@ -31,9 +32,18 @@ type DBConstraintsByTable struct {
 	Constrainttype string
 }
 
+type DBConstraintsByDataType struct {
+	Colname string
+	Dtype   string
+}
+
 type DBIndex struct {
 	Tablename string
 	Indexdef  string
+}
+
+type DBViolationRow struct {
+	Row string
 }
 
 // Connection check and database version
@@ -358,4 +368,128 @@ ORDER BY constrainttype
 	}
 
 	return result
+}
+
+// Get the datatype of the column
+func getDatatype(tab string, columns []string) []DBConstraintsByDataType {
+	Debugf("Extracting constraint column data type info for table: %s", tab)
+	var result []DBConstraintsByDataType
+	whereClause := strings.Join(columns, "' or attname = '")
+	whereClause = strings.Replace(whereClause, "attname = ' ", "attname = '", -1)
+	query := `
+SELECT attname colname, 
+       pg_catalog.Format_type(atttypid, atttypmod) dtype
+FROM pg_attribute
+WHERE attname = '%s' 
+AND attrelid = '%s'::regclass
+`
+	// db connection
+	db := ConnectDB()
+	defer db.Close()
+
+	// add table information and execute the query
+	query = fmt.Sprintf(query, whereClause, tab)
+	_, err := db.Query(&result, query)
+	if err != nil {
+		Fatalf("Encountered error when getting data type for "+
+			"building constrints for table %s from database, err: %v", tab, err)
+	}
+
+	return result
+}
+
+// Primary key violation check
+func getTotalPKViolator(tab, cols string) int {
+	var total int
+	query := fmt.Sprintf(`SELECT COUNT(*) FROM ( %s ) a`, getPKViolator(tab, cols))
+
+	// db connection
+	db := ConnectDB()
+	defer db.Close()
+
+	_, err := db.Query(pg.Scan(&total), query)
+	if err != nil {
+		Fatalf("Error when execute the query to extract pk violators: %v", err)
+	}
+
+	return total
+}
+
+// Total Primary Key violator
+func getPKViolator(tab, cols string) string {
+	return fmt.Sprintf(`SELECT %[1]s FROM %[2]s GROUP BY %[1]s HAVING COUNT(*) > 1`, cols, tab)
+}
+
+// Get the list of the PK violators
+func GetPKViolators(tab, cols string) []DBViolationRow {
+	Debugf("Extracting the unique violations for table %s and column %s", tab, cols)
+	var result []DBViolationRow
+
+	// db connection
+	db := ConnectDB()
+	defer db.Close()
+
+	query := strings.Replace(getPKViolator(tab, cols), "SELECT "+cols, "SELECT "+cols+" AS row", -1)
+	_, err := db.Query(&result, query)
+	if err != nil {
+		Fatalf("Error when execute the query to extract pk violators for table %s: %v", tab, err)
+	}
+
+	return result
+}
+
+// Fix PK Violators
+func UpdatePKKey(tab, col, whichrow, newdata string) string {
+	query :=  `
+UPDATE %[1]s
+SET %[2]s = '%[3]s'
+WHERE ctid = ( SELECT ctid 
+               FROM %[1]s 
+               WHERE %[2]s = '%[4]s' 
+               LIMIT 1 
+             )
+`
+	query = fmt.Sprintf(query, tab, col, newdata, whichrow)
+	_, err := ExecuteDB(query)
+	if err != nil {
+		Debugf("query: %s", query)
+		Fatalf("Error when updating the primary key for table %s, err: %v", tab, err)
+	}
+	return ""
+}
+
+// Get the foriegn violations keys
+func GetFKViolators(tab, col, reftab, refcol string) string {
+	return "SELECT " + col + " FROM " + tab + " where " + col + " NOT IN ( SELECT " + refcol + " from " + reftab + " )"
+}
+
+// Get total FK violators
+func GetTotalFKViolators(tab, col, reftab, refcol string) string {
+	return "SELECT COUNT(*) FROM (" + GetFKViolators(tab, col, reftab, refcol) + ") a"
+}
+
+// Total rows of the table
+func TotalRows(tab string) string {
+	return "SELECT COUNT(*) FROM " + tab
+}
+
+// Update FK violators
+func UpdateFKeys(fktab, fkcol, reftab, refcol, whichrow, totalRows string) string {
+	return "UPDATE " + fktab + " SET " + fkcol +
+		"=(SELECT " + refcol + " FROM " + reftab +
+		" OFFSET floor(random()*" + totalRows + ") LIMIT 1)" +
+		" WHERE " + fkcol + "='" + whichrow + "'"
+}
+
+// Check key violation check
+func GetTotalCKViolator(tab, column, ckconstraint string) string {
+	return "SELECT COUNT(*) FROM ( " +
+		GetCKViolator(tab, column, ckconstraint) +
+		") a "
+}
+
+// Check Constraint violation
+func GetCKViolator(tab, column, ckconstraint string) string {
+	return "SELECT " + column +
+		"FROM " + tab + " WHERE not (" + ckconstraint + ")"
 }

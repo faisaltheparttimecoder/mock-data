@@ -17,3 +17,4 @@
 .idea/
 clean.sh
 vendor
+run_dev.sh

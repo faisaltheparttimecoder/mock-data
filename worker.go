@@ -19,6 +19,9 @@ func MockTable(tables []DBTables) {
 	if totalTables > 0 {
 		Debugf("Total number of tables to mock: %d", totalTables)
 		tableMocker(tables)
+		if !cmdOptions.IgnoreConstraint {
+			FixConstraints()
+		}
 	} else { // no tables found, explain that to the user and exit
 		Warn("No table available to mock the data, closing the program")
 	}
@@ -30,7 +33,9 @@ func tableMocker(tables []DBTables) {
 
 	// Before beginning the process, recheck with the user
 	// they still want to continue
-	_ = YesOrNoConfirmation()
+	if !cmdOptions.DontPrompt {
+		_ = YesOrNoConfirmation()
+	}
 
 	// User confirmed to continue, first extract the column
 	// and its data types
@@ -147,7 +152,7 @@ DataTypePickerLoop:
 		copyStatment := fmt.Sprintf(`COPY %s(%s) FROM STDIN WITH CSV DELIMITER '%s' QUOTE e'\x01'`,
 			tab, strings.Join(col, ","), delimiter)
 		_, err := db.CopyFrom(strings.NewReader(strings.Join(data, delimiter)), copyStatment)
-		
+
 		// Handle Error
 		if err != nil {
 			fmt.Println()
