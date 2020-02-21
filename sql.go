@@ -91,18 +91,18 @@ func allTablesPostgres(whereClause string) []DBTables {
 
 	// The query
 	query := `
-SELECT n.nspname as schema, c.relname as table
+SELECT n.nspname AS SCHEMA, 
+       c.relname AS table 
 FROM   pg_catalog.pg_class c 
        LEFT JOIN pg_catalog.pg_namespace n 
               ON n.oid = c.relnamespace 
 WHERE  c.relkind IN ( 'r', '' ) 
        AND n.nspname <> 'pg_catalog' 
        AND n.nspname <> 'information_schema' 
-       AND n.nspname !~ '^pg_toast' 
-       AND n.nspname !~ '^gp_toolkit' 
-       AND c.relkind = 'r' 
-       %s
-ORDER  BY 1
+       AND n.nspname ! ~'^pg_toast' 
+       AND n.nspname ! ~'^gp_toolkit' 
+       AND c.relkind = 'r' %s 
+ORDER  BY 1 
 `
 	// add where clause
 	query = fmt.Sprintf(query, whereClause)
@@ -127,19 +127,21 @@ func allTablesGPDB(whereClause string) []DBTables {
 
 	// The query
 	query := `
-SELECT n.nspname as schema, c.relname as table
-FROM   pg_catalog.pg_class c 
-       LEFT JOIN pg_catalog.pg_namespace n 
-              ON n.oid = c.relnamespace 
-WHERE  c.relkind IN ( 'r', '' ) 
-       AND n.nspname <> 'pg_catalog' 
-       AND n.nspname <> 'information_schema' 
-       AND n.nspname !~ '^pg_toast' 
-       AND n.nspname <> 'gp_toolkit' 
-       AND c.relkind = 'r' 
-       AND c.relstorage IN ('a', 'h') 
-       %s
-ORDER  BY 1
+SELECT    n.nspname AS SCHEMA, 
+          c.relname AS TABLE 
+FROM      pg_catalog.pg_class c 
+LEFT JOIN pg_catalog.pg_namespace n 
+ON        n.oid = c.relnamespace 
+WHERE     c.relkind IN ( 'r', 
+                        '' ) 
+AND       n.nspname <> 'pg_catalog' 
+AND       n.nspname <> 'information_schema' 
+AND       n.nspname !~ '^pg_toast' 
+AND       n.nspname <> 'gp_toolkit' 
+AND       c.relkind = 'r' 
+AND       c.relstorage IN ('a', 
+                           'h') %s 
+ORDER BY  1
 `
 	// add where clause
 	query = fmt.Sprintf(query, whereClause)
@@ -165,32 +167,20 @@ func columnExtractorPostgres(schema, table string) []DBColumns {
 
 	// The query
 	query := `
-SELECT 
-  a.attname as column, 
-  pg_catalog.Format_type(a.atttypid, a.atttypmod) as datatype, 
-  COALESCE(
-    (
-      SELECT 
-        substring(
-          pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128
-        ) 
-      FROM 
-        pg_catalog.pg_attrdef d 
-      WHERE 
-        d.adrelid = a.attrelid 
-        AND d.adnum = a.attnum 
-        AND a.atthasdef
-    ), 
-    ''
-  ) as sequence
-FROM 
-  pg_catalog.pg_attribute a 
-WHERE 
-  a.attrelid = '%s' :: regclass 
-  AND a.attnum > 0 
-  AND NOT a.attisdropped 
-ORDER BY 
-  a.attnum
+SELECT   a.attname                                       AS COLUMN, 
+         pg_catalog.Format_type(a.atttypid, a.atttypmod) AS datatype, 
+         COALESCE( 
+                    ( 
+                    SELECT substring( pg_catalog.Pg_get_expr(d.adbin, d.adrelid) for 128 ) 
+                    FROM   pg_catalog.pg_attrdef d 
+                    WHERE  d.adrelid = a.attrelid 
+                    AND    d.adnum = a.attnum 
+                    AND    a.atthasdef ), '' ) AS sequence 
+FROM     pg_catalog.pg_attribute a 
+WHERE    a.attrelid = '%s' :: regclass 
+AND      a.attnum > 0 
+AND      NOT a.attisdropped 
+ORDER BY a.attnum
 `
 
 	// add table information and execute the query
@@ -215,34 +205,23 @@ func columnExtractorGPDB(schema, table string) []DBColumns {
 
 	// The query
 	query := `
-SELECT 
-  a.attname as column, 
-  pg_catalog.Format_type(a.atttypid, a.atttypmod) as datatype, 
-  COALESCE(
-    (
-      SELECT 
-        substring(
-          pg_catalog.pg_get_expr(d.adbin, d.adrelid) for 128
-        ) 
-      FROM 
-        pg_catalog.pg_attrdef d 
-      WHERE 
-        d.adrelid = a.attrelid 
-        AND d.adnum = a.attnum 
-        AND a.atthasdef
-    ), 
-    ''
-  ) as sequence
-FROM 
-  pg_catalog.pg_attribute a 
-  LEFT OUTER JOIN pg_catalog.pg_attribute_encoding e ON e.attrelid = a.attrelid 
-  AND e.attnum = a.attnum 
-WHERE 
-  a.attrelid = '%s' :: regclass 
-  AND a.attnum > 0 
-  AND NOT a.attisdropped 
-ORDER BY 
-  a.attnum
+SELECT          a.attname                                       AS COLUMN, 
+                pg_catalog.Format_type(a.atttypid, a.atttypmod) AS datatype, 
+                COALESCE( 
+                           ( 
+                           SELECT substring( pg_catalog.Pg_get_expr(d.adbin, d.adrelid) for 128 ) 
+                           FROM   pg_catalog.pg_attrdef d 
+                           WHERE  d.adrelid = a.attrelid 
+                           AND    d.adnum = a.attnum 
+                           AND    a.atthasdef ), '' ) AS sequence 
+FROM            pg_catalog.pg_attribute a 
+LEFT OUTER JOIN pg_catalog.pg_attribute_encoding e 
+ON              e.attrelid = a.attrelid 
+AND             e.attnum = a.attnum 
+WHERE           a.attrelid = '%s' :: regclass 
+AND             a.attnum > 0 
+AND             NOT a.attisdropped 
+ORDER BY        a.attnum
 `
 
 	// add table information and execute the query
@@ -260,16 +239,18 @@ func GetPGConstraintDDL(conntype string) []DBConstraints {
 	Debugf("Extracting the DDL of the %s constraints", conntype)
 	var result []DBConstraints
 	query := `
-SELECT n.nspname || '.' || c.relname tablename, 
-	con.conname constraintname,
-    pg_catalog.pg_get_constraintdef(con.oid, true) constraintKey
-FROM  pg_catalog.pg_class c,
-      pg_catalog.pg_constraint con,
-      pg_catalog.pg_namespace n
-WHERE conrelid = c.oid
-AND n.oid = c.relnamespace
-AND contype = '%s'
-ORDER  BY tablename
+SELECT n.nspname 
+       || '.' 
+       || c.relname                                   tablename, 
+       con.conname                                    constraintname, 
+       pg_catalog.Pg_get_constraintdef(con.oid, true) constraintKey 
+FROM   pg_catalog.pg_class c, 
+       pg_catalog.pg_constraint con, 
+       pg_catalog.pg_namespace n 
+WHERE  conrelid = c.oid 
+       AND n.oid = c.relnamespace 
+       AND contype = '%s' 
+ORDER  BY tablename 
 `
 	// db connection
 	db := ConnectDB()
@@ -290,20 +271,19 @@ func GetPGIndexDDL() []DBIndex {
 	Debugf("Extracting the unique indexes")
 	var result []DBIndex
 	query := `
-SELECT schemaname ||'.'|| tablename tablename,
-       indexdef indexdef
-FROM   pg_indexes
-WHERE  schemaname IN (
-	SELECT nspname
-	FROM   pg_namespace
-	WHERE  nspname NOT IN (
-       'pg_catalog',
-       'information_schema',
-       'pg_aoseg',
-       'gp_toolkit',
-       'pg_toast', 'pg_bitmapindex' )
-	)
-AND indexdef LIKE 'CREATE UNIQUE%'
+SELECT schemaname 
+       || '.' 
+       || tablename tablename, 
+       indexdef     indexdef 
+FROM   pg_indexes 
+WHERE  schemaname IN (SELECT nspname 
+                      FROM   pg_namespace 
+                      WHERE  nspname NOT IN ( 'pg_catalog', 'information_schema' 
+                                              , 
+                                              'pg_aoseg', 
+                                              'gp_toolkit', 
+                                              'pg_toast', 'pg_bitmapindex' )) 
+       AND indexdef LIKE 'CREATE UNIQUE%' 
 `
 	// db connection
 	db := ConnectDB()
@@ -323,38 +303,41 @@ func GetConstraintsPertab(tabname string) []DBConstraintsByTable {
 	Debugf("Extracting constraint info for table: %s", tabname)
 	var result []DBConstraintsByTable
 	query := `
-SELECT * FROM (
-	SELECT n.nspname || '.' || c.relname tablename,
-		con.conname constraintname,
-    	pg_catalog.pg_get_constraintdef(con.oid, true) constraintcol,
-    	'constraint' constrainttype 
-	FROM  pg_catalog.pg_class c,
-          pg_catalog.pg_constraint con,
-          pg_namespace n
-	WHERE  c.oid = '%[1]s'::regclass
-	AND conrelid = c.oid
-	AND n.oid = c.relnamespace
-	AND contype IN ('u','f','c','p')
-	UNION
-	SELECT schemaname || '.' || tablename tablename,
-	    indexname conname,
-		indexdef concol,
-	   'index' contype
-	FROM   pg_indexes 
-	WHERE  schemaname IN (SELECT nspname
-    					  FROM   pg_namespace
-                          WHERE  nspname NOT IN (
-                          	'pg_catalog',
-		                  	'information_schema',
-		                  	'pg_aoseg',
-		                  	'gp_toolkit',
-                           	'pg_toast', 
-							'pg_bitmapindex')
-						)
-	AND indexdef LIKE 'CREATE UNIQUE%s'
-	AND schemaname || '.' || tablename = '%[1]s'
-	) a 
-ORDER BY constrainttype
+SELECT * 
+FROM   (SELECT n.nspname 
+               || '.' 
+               || c.relname                                   tablename, 
+               con.conname                                    constraintname, 
+               pg_catalog.Pg_get_constraintdef(con.oid, TRUE) constraintcol, 
+               'constraint'                                   constrainttype 
+        FROM   pg_catalog.pg_class c, 
+               pg_catalog.pg_constraint con, 
+               pg_namespace n 
+        WHERE  c.oid = '%[1]s' :: regclass 
+               AND conrelid = c.oid 
+               AND n.oid = c.relnamespace 
+               AND contype IN ( 'u', 'f', 'c', 'p' ) 
+        UNION 
+        SELECT schemaname 
+               || '.' 
+               || tablename tablename, 
+               indexname    conname, 
+               indexdef     concol, 
+               'index'      contype 
+        FROM   pg_indexes 
+        WHERE  schemaname IN (SELECT nspname 
+                              FROM   pg_namespace 
+                              WHERE  nspname NOT IN ( 
+                                     'pg_catalog', 'information_schema' 
+                                     , 
+                                     'pg_aoseg', 
+                                     'gp_toolkit', 
+                                     'pg_toast', 'pg_bitmapindex' )) 
+               AND indexdef LIKE 'CREATE UNIQUE%s' 
+               AND schemaname 
+                   || '.' 
+                   || tablename = '%[1]s') a 
+ORDER  BY constrainttype 
 `
 	// db connection
 	db := ConnectDB()
@@ -377,11 +360,11 @@ func getDatatype(tab string, columns []string) []DBConstraintsByDataType {
 	whereClause := strings.Join(columns, "' or attname = '")
 	whereClause = strings.Replace(whereClause, "attname = ' ", "attname = '", -1)
 	query := `
-SELECT attname colname, 
-       pg_catalog.Format_type(atttypid, atttypmod) dtype
-FROM pg_attribute
-WHERE attname = '%s' 
-AND attrelid = '%s'::regclass
+SELECT attname                                     colname, 
+       pg_catalog.Format_type(atttypid, atttypmod) dtype 
+FROM   pg_attribute 
+WHERE  attname = '%s' 
+       AND attrelid = '%s' :: regclass 
 `
 	// db connection
 	db := ConnectDB()
@@ -440,14 +423,14 @@ func GetPKViolators(tab, cols string) []DBViolationRow {
 
 // Fix PK Violators
 func UpdatePKKey(tab, col, whichrow, newdata string) string {
-	query :=  `
-UPDATE %[1]s
-SET %[2]s = '%[3]s'
-WHERE ctid = ( SELECT ctid 
-               FROM %[1]s 
-               WHERE %[2]s = '%[4]s' 
-               LIMIT 1 
-             )
+	query := `
+UPDATE %[1]s 
+SET    %[2]s = '%[3]s' 
+WHERE  ctid = 
+       ( 
+              SELECT ctid 
+              FROM   %[1]s 
+              WHERE  %[2]s = '%[4]s' limit 1 )
 `
 	query = fmt.Sprintf(query, tab, col, newdata, whichrow)
 	_, err := ExecuteDB(query)
