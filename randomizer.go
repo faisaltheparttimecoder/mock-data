@@ -12,9 +12,8 @@ import (
 	"time"
 )
 
-// Random text generator based on the length of string needed
+// Set the seed value of the random generator
 var r *rand.Rand
-
 func init() {
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
@@ -123,7 +122,7 @@ func RandomTime(fromyear, toyear int) (string, error) {
 }
 
 // Random Timestamp without time zone
-func RandomTimetz(fromyear, toyear int) (string, error) {
+func RandomTimeTz(fromyear, toyear int) (string, error) {
 	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
 		return "", err
@@ -134,13 +133,10 @@ func RandomTimetz(fromyear, toyear int) (string, error) {
 // Random bool generator based on if number is even or not
 func RandomBoolean() bool {
 	number := RandomInt(1, 9999)
-	var b bool
 	if number%2 == 0 {
-		b = true
-	} else {
-		b = false
+		return true
 	}
-	return b
+	return false
 }
 
 // Random Paragraphs
@@ -166,7 +162,7 @@ func RandomBit(max int) string {
 		if RandomBoolean() {
 			bitValue = bitValue + "1"
 		} else {
-			bitValue = bitValue + "0";
+			bitValue = bitValue + "0"
 		}
 	}
 	return bitValue
