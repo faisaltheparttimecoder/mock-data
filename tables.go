@@ -43,17 +43,12 @@ func createTableStatementGenerator(n int) string {
 	howManyColumns := RandomInt(2, cmdOptions.Tab.MaxColumns)
 
 	// DataType
-	dataTypes := SupportedDataTypes()
-	totalDataTypes := len(dataTypes)
 	tableColStatement := ""
 
 	// Column + DataTypes
 	for i := 1; i <= howManyColumns; i++ {
-		j := RandomInt(1, totalDataTypes)
-		if j <= totalDataTypes { // if the random number is greater than the array it would fail
-			tableColStatement = tableColStatement + fmt.Sprintf(
-				"%s_%d %s", columnName, i, dataTypes[j])
-		}
+		tableColStatement = tableColStatement + fmt.Sprintf("%s_%d %s", columnName,
+			i, RandomPickerFromArray(SupportedDataTypes()))
 	}
 
 	// do we have a column

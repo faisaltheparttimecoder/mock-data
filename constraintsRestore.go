@@ -196,7 +196,11 @@ func recreateAllConstraints() {
 				_, err := ExecuteDB(content)
 				if err != nil && !IgnoreErrorString(fmt.Sprintf("%s", err)) {
 					Debugf("Error creating constraint %s, err: %v", content, err)
-					WriteToFile(failedConstraintsFile, content+"\n")
+					err = WriteToFile(failedConstraintsFile, content+"\n")
+					if err != nil {
+						Fatalf("Error when saving the failed restore to file %s, err %v",
+							failedConstraintsFile, err)
+					}
 					AnyError = true
 				}
 				bar.Add(1)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/go-pg/pg"
 	"strings"
 )
 
@@ -10,7 +11,10 @@ type TableCollection struct {
 	Columns []DBColumns
 }
 
-var skippedTab []string
+var (
+	skippedTab []string
+	delimiter  = "$"
+)
 
 func MockTable(tables []DBTables) {
 	// Check if there is any rows on the table list, if yes then start
@@ -103,26 +107,21 @@ func BackupConstraintsAndStartDataLoading(tables []TableCollection) {
 	}
 
 	// If the program skipped the tables lets the users know
-	if len(skippedTab) > 0 {
-		Warnf("These tables are skipped since these datatypes are not supported by %s:%s",
-			programName, strings.Join(skippedTab, ","))
-	}
+	skipTablesWarning()
+
 	Infof("Completed loading mock data to %d tables", totalTables)
 }
 
 // Start Committing data to the database
 func CommitData(t TableCollection) {
 	// Start committing data
-	tab := fmt.Sprintf("\"%s\".\"%s\"", t.Schema, t.Table)
+	tab := GenerateTableName(t.Table, t.Schema)
 	msg := fmt.Sprintf("Mocking Table %s", tab)
 	bar := StartProgressBar(msg, cmdOptions.Rows)
 
-	// db connection
+	// Open db connection
 	db := ConnectDB()
 	defer db.Close()
-
-	// Delimiter
-	delimiter := "$"
 
 	// Name the for loop to break when we encounter error
 DataTypePickerLoop:
@@ -148,20 +147,39 @@ DataTypePickerLoop:
 			data = append(data, fmt.Sprintf("%v", d))
 		}
 
-		// Copy Statement and start loading
-		copyStatment := fmt.Sprintf(`COPY %s(%s) FROM STDIN WITH CSV DELIMITER '%s' QUOTE e'\x01'`,
-			tab, strings.Join(col, ","), delimiter)
-		_, err := db.CopyFrom(strings.NewReader(strings.Join(data, delimiter)), copyStatment)
-
-		// Handle Error
-		if err != nil {
-			fmt.Println()
-			Debugf("Table: %s", tab)
-			Debugf("Copy Statement: %s", copyStatment)
-			Debugf("Data: %s", strings.Join(data, delimiter))
-			Fatalf("Error during committing data: %v", err)
-		}
+		// Copy the data to the table
+		CopyData(tab, col, data, db)
 		bar.Add(1)
 	}
 	fmt.Println()
+}
+
+// Copy the data to the database table
+func CopyData(tab string, col []string, data []string, db *pg.DB) {
+	// Copy Statement and start loading
+	copyStatment := fmt.Sprintf(`COPY %s(%s) FROM STDIN WITH CSV DELIMITER '%s' QUOTE e'\x01'`,
+		tab, strings.Join(col, ","), delimiter)
+	_, err := db.CopyFrom(strings.NewReader(strings.Join(data, delimiter)), copyStatment)
+
+	// Handle Error
+	if err != nil {
+		fmt.Println()
+		Debugf("Table: %s", tab)
+		Debugf("Copy Statement: %s", copyStatment)
+		Debugf("Data: %s", strings.Join(data, delimiter))
+		Fatalf("Error during committing data: %v", err)
+	}
+}
+
+// Generate table name
+func GenerateTableName(tab, schema string) string {
+	return fmt.Sprintf("\"%s\".\"%s\"", schema, tab)
+}
+
+// Throw warning if there is skipped tables
+func skipTablesWarning() {
+	if len(skippedTab) > 0 {
+		Warnf("These tables are skipped since these datatypes are not supported by %s: %s",
+			programName, strings.Join(skippedTab, ","))
+	}
 }

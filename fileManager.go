@@ -63,3 +63,12 @@ func ReadFile(filename string) ([]string, error) {
 	}
 	return contentSaver, nil
 }
+
+// Current working directory
+func CurrentDir() (cwd string) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		Fatalf("Error when trying to get the current directory, err: %v", err)
+	}
+	return cwd
+}

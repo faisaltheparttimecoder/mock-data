@@ -25,6 +25,7 @@ type Command struct {
 	IgnoreConstraint bool
 	DontPrompt       bool
 	SchemaName       string
+	File             string
 }
 
 // Database command line options
@@ -64,6 +65,9 @@ var rootCmd = &cobra.Command{
 		// Ensure we can make a successful connection to the database
 		// by printing the version of the database we are going to mock
 		dbVersion()
+
+		// The database that we will be working on
+		Infof("The database that will be used by %s program is: %s", programName, cmdOptions.Database)
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		Fatalf("No sub commands used, please run \"%s --help\" for all the options", programName)
@@ -159,6 +163,36 @@ var schemaCmd = &cobra.Command{
 	},
 }
 
+// The custom sub commands
+var customCmd = &cobra.Command{
+	Use:     "custom",
+	Aliases: []string{`c`},
+	Short:   "Controlled mocking of tables",
+	Long:    "Control the data being written to the tables",
+	PostRun: func(cmd *cobra.Command, args []string) {
+		Info("Successfully completed running the custom sub command")
+	},
+	PreRun: func(cmd *cobra.Command, args []string) {
+		// no parameter is given
+		if IsStringEmpty(cmdOptions.Tab.FakeTablesRows) && IsStringEmpty(cmdOptions.File) {
+			Fatalf("No flags set, run \"%s custom --help\" for all options for this sub command", programName)
+		}
+		// If both is set
+		if !IsStringEmpty(cmdOptions.Tab.FakeTablesRows) && !IsStringEmpty(cmdOptions.File) {
+			Fatalf("Cannot run the table and loading of data via file together, choose one", programName)
+		}
+	},
+	Run: func(cmd *cobra.Command, args []string) {
+		// Mock all the tables at schema level
+		if !IsStringEmpty(cmdOptions.Tab.FakeTablesRows) {
+			GenerateMockPlan()
+		}
+		if !IsStringEmpty(cmdOptions.File) {
+			MockCustoms()
+		}
+	},
+}
+
 // Initialize the cobra command line
 func init() {
 	// Load the environment variable using viper
@@ -188,6 +222,7 @@ func init() {
 	rootCmd.AddCommand(databaseCmd)
 	rootCmd.AddCommand(tablesCmd)
 	rootCmd.AddCommand(schemaCmd)
+	rootCmd.AddCommand(customCmd)
 
 	// Database command flags
 	databaseCmd.Flags().BoolVarP(&cmdOptions.DB.FakeDB, "create-db", "c", false,
@@ -217,4 +252,10 @@ func init() {
 	schemaCmd.Flags().StringVarP(&cmdOptions.SchemaName, "schema-name", "n", "",
 		"Provide the schema name whose tables need to be mocked")
 	schemaCmd.MarkFlagRequired("schema-name")
+
+	// Custom command flags
+	customCmd.Flags().StringVarP(&cmdOptions.File, "file", "f", "",
+		"Mock the tables provided in the yaml file")
+	customCmd.Flags().StringVarP(&cmdOptions.Tab.FakeTablesRows, "table-name", "t", "",
+		"Provide the table name whose skeleton need to be copied to the file")
 }
