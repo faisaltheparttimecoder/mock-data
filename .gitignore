@@ -13,5 +13,8 @@
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
 
+# Local drive
 .idea/
-mockd_*.sql
+clean.sh
+vendor
+run_dev.sh
