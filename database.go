@@ -9,9 +9,13 @@ func ExecuteDemoDatabase() {
 	Infof("Create demo tables in the database: %s", cmdOptions.Database)
 
 	// Execute the demo database dump
-	_, err := ExecuteDB(demoDatabase())
+	var err error
+	if GreenplumOrPostgres == "postgres" {
+		_, err = ExecuteDB(demoDatabasePostgres())
+	} else {
+		_, err = ExecuteDB(demoDatabaseGreenplum())
+	}
 	if err != nil {
-		Fatalf("%v", err)
 		errMsg := fmt.Sprintf("%s", err)
 		failureMsg := fmt.Sprintf("Failure in creating a demo tables in the database %s, err: %v",
 			cmdOptions.Database, err)

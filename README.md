@@ -99,6 +99,11 @@ chmod +x /usr/local/bin/mock
 
 provided `/usr/local/bin` is part of the $PATH environment variable.
 
+# Examples
+
+For examples how to use the tool, please check out the [wiki](https://github.com/pivotal-legacy/mock-data/wiki) page for categories like
+ 
+
 # Known Issues
 
 1. If you have a unique index on a foreign key column then there are chance the constraint creation would fail, since mockd doesn't pick up unique value for foriegn key value it picks up random values from the reference table.
