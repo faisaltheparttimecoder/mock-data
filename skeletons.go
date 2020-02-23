@@ -575,7 +575,7 @@ CREATE TABLE public.film (
     film_id integer DEFAULT nextval('public.film_film_id_seq'::regclass) NOT NULL,
     title character varying(255) NOT NULL,
     description text,
-    release_year public.year,
+    release_year date,
     language_id smallint NOT NULL,
     rental_duration smallint DEFAULT 3 NOT NULL,
     rental_rate numeric(4,2) DEFAULT 4.99 NOT NULL,
@@ -1628,7 +1628,7 @@ func demoDatabaseGreenplum() string {
 	Debug("Creating a demo database for greenplum")
 	return `
 -- Sample database download from
--- http://www.postgresqltutorial.com/postgresql-sample-database/
+-- http://www.gpadminqltutorial.com/gpadminql-sample-database/
 --
 -- NOTE:
 --
@@ -1637,7 +1637,7 @@ func demoDatabaseGreenplum() string {
 -- the extracted data files.
 --
 --
--- PostgreSQL database dump
+-- gpadminQL database dump
 --
 
 SET statement_timeout = 0;
@@ -1727,7 +1727,6 @@ DROP TABLE IF EXISTS public.rental;
 DROP SEQUENCE IF EXISTS public.rental_rental_id_seq;
 DROP TABLE IF EXISTS public.payment;
 DROP SEQUENCE IF EXISTS public.payment_payment_id_seq;
-DROP VIEW IF EXISTS public.nicer_but_slower_film_list;
 DROP TABLE IF EXISTS public.language;
 DROP SEQUENCE IF EXISTS public.language_language_id_seq;
 DROP TABLE IF EXISTS public.inventory;
@@ -1749,7 +1748,6 @@ DROP TABLE IF EXISTS public.category;
 DROP SEQUENCE IF EXISTS public.category_category_id_seq;
 DROP TABLE IF EXISTS public.actor;
 DROP SEQUENCE IF EXISTS public.actor_actor_id_seq;
-DROP AGGREGATE IF EXISTS public.group_concat(text);
 DROP FUNCTION IF EXISTS public.rewards_report(min_monthly_purchases integer, min_dollar_amount_purchased numeric);
 DROP TABLE IF EXISTS public.customer;
 DROP SEQUENCE IF EXISTS public.customer_customer_id_seq;
@@ -1760,23 +1758,20 @@ DROP FUNCTION IF EXISTS public.inventory_held_by_customer(p_inventory_id integer
 DROP FUNCTION IF EXISTS public.get_customer_balance(p_customer_id integer, p_effective_date timestamp without time zone);
 DROP FUNCTION IF EXISTS public.film_not_in_stock(p_film_id integer, p_store_id integer, OUT p_film_count integer);
 DROP FUNCTION IF EXISTS public.film_in_stock(p_film_id integer, p_store_id integer, OUT p_film_count integer);
-DROP FUNCTION IF EXISTS public._group_concat(text, text);
 DROP DOMAIN IF EXISTS public.year;
 DROP TYPE IF EXISTS public.mpaa_rating;
-DROP ROLE IF EXISTS postgres;
-CREATE ROLE postgres;
 
 --
--- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
+-- Name: public; Type: SCHEMA; Schema: -; Owner: gpadmin
 --
 
 CREATE SCHEMA IF NOT EXISTS public;
 
 
-ALTER SCHEMA public OWNER TO postgres;
+ALTER SCHEMA public OWNER TO gpadmin;
 
 --
--- Name: actor_actor_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: actor_actor_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE actor_actor_id_seq
@@ -1787,10 +1782,10 @@ CREATE SEQUENCE actor_actor_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.actor_actor_id_seq OWNER TO postgres;
+ALTER TABLE public.actor_actor_id_seq OWNER TO gpadmin;
 
 --
--- Name: actor; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: actor; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE actor (
@@ -1804,10 +1799,10 @@ CREATE TABLE actor (
 );
 
 
-ALTER TABLE public.actor OWNER TO postgres;
+ALTER TABLE public.actor OWNER TO gpadmin;
 
 --
--- Name: category_category_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: category_category_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE category_category_id_seq
@@ -1818,10 +1813,10 @@ CREATE SEQUENCE category_category_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.category_category_id_seq OWNER TO postgres;
+ALTER TABLE public.category_category_id_seq OWNER TO gpadmin;
 
 --
--- Name: category; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: category; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE category (
@@ -1831,10 +1826,10 @@ CREATE TABLE category (
 );
 
 
-ALTER TABLE public.category OWNER TO postgres;
+ALTER TABLE public.category OWNER TO gpadmin;
 
 --
--- Name: film_film_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: film_film_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE film_film_id_seq
@@ -1845,10 +1840,10 @@ CREATE SEQUENCE film_film_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.film_film_id_seq OWNER TO postgres;
+ALTER TABLE public.film_film_id_seq OWNER TO gpadmin;
 
 --
--- Name: film; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: film; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE film (
@@ -1868,10 +1863,10 @@ CREATE TABLE film (
 );
 
 
-ALTER TABLE public.film OWNER TO postgres;
+ALTER TABLE public.film OWNER TO gpadmin;
 
 --
--- Name: film_actor; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: film_actor; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE film_actor (
@@ -1881,10 +1876,10 @@ CREATE TABLE film_actor (
 );
 
 
-ALTER TABLE public.film_actor OWNER TO postgres;
+ALTER TABLE public.film_actor OWNER TO gpadmin;
 
 --
--- Name: film_category; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: film_category; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE film_category (
@@ -1894,20 +1889,10 @@ CREATE TABLE film_category (
 );
 
 
-ALTER TABLE public.film_category OWNER TO postgres;
+ALTER TABLE public.film_category OWNER TO gpadmin;
 
 --
--- Name: actor_info; Type: VIEW; Schema: public; Owner: postgres
---
-
-CREATE VIEW actor_info AS
-    SELECT a.actor_id, a.first_name, a.last_name, group_concat(DISTINCT (((c.name)::text || ': '::text) || (SELECT group_concat((f.title)::text) AS group_concat FROM ((film f JOIN film_category fc ON ((f.film_id = fc.film_id))) JOIN film_actor fa ON ((f.film_id = fa.film_id))) WHERE ((fc.category_id = c.category_id) AND (fa.actor_id = a.actor_id)) GROUP BY fa.actor_id))) AS film_info FROM (((actor a LEFT JOIN film_actor fa ON ((a.actor_id = fa.actor_id))) LEFT JOIN film_category fc ON ((fa.film_id = fc.film_id))) LEFT JOIN category c ON ((fc.category_id = c.category_id))) GROUP BY a.actor_id, a.first_name, a.last_name;
-
-
-ALTER TABLE public.actor_info OWNER TO postgres;
-
---
--- Name: address_address_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: address_address_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE address_address_id_seq
@@ -1918,10 +1903,10 @@ CREATE SEQUENCE address_address_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.address_address_id_seq OWNER TO postgres;
+ALTER TABLE public.address_address_id_seq OWNER TO gpadmin;
 
 --
--- Name: address; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: address; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE address (
@@ -1936,10 +1921,10 @@ CREATE TABLE address (
 );
 
 
-ALTER TABLE public.address OWNER TO postgres;
+ALTER TABLE public.address OWNER TO gpadmin;
 
 --
--- Name: city_city_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: city_city_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE city_city_id_seq
@@ -1950,10 +1935,10 @@ CREATE SEQUENCE city_city_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.city_city_id_seq OWNER TO postgres;
+ALTER TABLE public.city_city_id_seq OWNER TO gpadmin;
 
 --
--- Name: city; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: city; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE city (
@@ -1964,10 +1949,10 @@ CREATE TABLE city (
 );
 
 
-ALTER TABLE public.city OWNER TO postgres;
+ALTER TABLE public.city OWNER TO gpadmin;
 
 --
--- Name: country_country_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: country_country_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE country_country_id_seq
@@ -1978,10 +1963,10 @@ CREATE SEQUENCE country_country_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.country_country_id_seq OWNER TO postgres;
+ALTER TABLE public.country_country_id_seq OWNER TO gpadmin;
 
 --
--- Name: country; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: country; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE country (
@@ -1991,30 +1976,10 @@ CREATE TABLE country (
 );
 
 
-ALTER TABLE public.country OWNER TO postgres;
+ALTER TABLE public.country OWNER TO gpadmin;
 
 --
--- Name: customer_list; Type: VIEW; Schema: public; Owner: postgres
---
-
-CREATE VIEW customer_list AS
-    SELECT cu.customer_id AS id, (((cu.first_name)::text || ' '::text) || (cu.last_name)::text) AS name, a.address, a.postal_code AS "zip code", a.phone, city.city, country.country, CASE WHEN cu.activebool THEN 'active'::text ELSE ''::text END AS notes, cu.store_id AS sid FROM (((customer cu JOIN address a ON ((cu.address_id = a.address_id))) JOIN city ON ((a.city_id = city.city_id))) JOIN country ON ((city.country_id = country.country_id)));
-
-
-ALTER TABLE public.customer_list OWNER TO postgres;
-
---
--- Name: film_list; Type: VIEW; Schema: public; Owner: postgres
---
-
-CREATE VIEW film_list AS
-    SELECT film.film_id AS fid, film.title, film.description, category.name AS category, film.rental_rate AS price, film.length, film.rating, group_concat((((actor.first_name)::text || ' '::text) || (actor.last_name)::text)) AS actors FROM ((((category LEFT JOIN film_category ON ((category.category_id = film_category.category_id))) LEFT JOIN film ON ((film_category.film_id = film.film_id))) JOIN film_actor ON ((film.film_id = film_actor.film_id))) JOIN actor ON ((film_actor.actor_id = actor.actor_id))) GROUP BY film.film_id, film.title, film.description, category.name, film.rental_rate, film.length, film.rating;
-
-
-ALTER TABLE public.film_list OWNER TO postgres;
-
---
--- Name: inventory_inventory_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: inventory_inventory_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE inventory_inventory_id_seq
@@ -2025,10 +1990,10 @@ CREATE SEQUENCE inventory_inventory_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.inventory_inventory_id_seq OWNER TO postgres;
+ALTER TABLE public.inventory_inventory_id_seq OWNER TO gpadmin;
 
 --
--- Name: inventory; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: inventory; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE inventory (
@@ -2039,10 +2004,10 @@ CREATE TABLE inventory (
 );
 
 
-ALTER TABLE public.inventory OWNER TO postgres;
+ALTER TABLE public.inventory OWNER TO gpadmin;
 
 --
--- Name: language_language_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: language_language_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE language_language_id_seq
@@ -2053,10 +2018,10 @@ CREATE SEQUENCE language_language_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.language_language_id_seq OWNER TO postgres;
+ALTER TABLE public.language_language_id_seq OWNER TO gpadmin;
 
 --
--- Name: language; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: language; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE language (
@@ -2066,20 +2031,10 @@ CREATE TABLE language (
 );
 
 
-ALTER TABLE public.language OWNER TO postgres;
+ALTER TABLE public.language OWNER TO gpadmin;
 
 --
--- Name: nicer_but_slower_film_list; Type: VIEW; Schema: public; Owner: postgres
---
-
-CREATE VIEW nicer_but_slower_film_list AS
-    SELECT film.film_id AS fid, film.title, film.description, category.name AS category, film.rental_rate AS price, film.length, film.rating, group_concat((((upper("substring"((actor.first_name)::text, 1, 1)) || lower("substring"((actor.first_name)::text, 2))) || upper("substring"((actor.last_name)::text, 1, 1))) || lower("substring"((actor.last_name)::text, 2)))) AS actors FROM ((((category LEFT JOIN film_category ON ((category.category_id = film_category.category_id))) LEFT JOIN film ON ((film_category.film_id = film.film_id))) JOIN film_actor ON ((film.film_id = film_actor.film_id))) JOIN actor ON ((film_actor.actor_id = actor.actor_id))) GROUP BY film.film_id, film.title, film.description, category.name, film.rental_rate, film.length, film.rating;
-
-
-ALTER TABLE public.nicer_but_slower_film_list OWNER TO postgres;
-
---
--- Name: payment_payment_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: payment_payment_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE payment_payment_id_seq
@@ -2090,10 +2045,10 @@ CREATE SEQUENCE payment_payment_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.payment_payment_id_seq OWNER TO postgres;
+ALTER TABLE public.payment_payment_id_seq OWNER TO gpadmin;
 
 --
--- Name: payment; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: payment; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE payment (
@@ -2106,10 +2061,10 @@ CREATE TABLE payment (
 );
 
 
-ALTER TABLE public.payment OWNER TO postgres;
+ALTER TABLE public.payment OWNER TO gpadmin;
 
 --
--- Name: rental_rental_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: rental_rental_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE rental_rental_id_seq
@@ -2120,10 +2075,10 @@ CREATE SEQUENCE rental_rental_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.rental_rental_id_seq OWNER TO postgres;
+ALTER TABLE public.rental_rental_id_seq OWNER TO gpadmin;
 
 --
--- Name: rental; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: rental; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE rental (
@@ -2137,20 +2092,20 @@ CREATE TABLE rental (
 );
 
 
-ALTER TABLE public.rental OWNER TO postgres;
+ALTER TABLE public.rental OWNER TO gpadmin;
 
 --
--- Name: sales_by_film_category; Type: VIEW; Schema: public; Owner: postgres
+-- Name: sales_by_film_category; Type: VIEW; Schema: public; Owner: gpadmin
 --
 
 CREATE VIEW sales_by_film_category AS
     SELECT c.name AS category, sum(p.amount) AS total_sales FROM (((((payment p JOIN rental r ON ((p.rental_id = r.rental_id))) JOIN inventory i ON ((r.inventory_id = i.inventory_id))) JOIN film f ON ((i.film_id = f.film_id))) JOIN film_category fc ON ((f.film_id = fc.film_id))) JOIN category c ON ((fc.category_id = c.category_id))) GROUP BY c.name ORDER BY sum(p.amount) DESC;
 
 
-ALTER TABLE public.sales_by_film_category OWNER TO postgres;
+ALTER TABLE public.sales_by_film_category OWNER TO gpadmin;
 
 --
--- Name: staff_staff_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: staff_staff_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE staff_staff_id_seq
@@ -2161,10 +2116,10 @@ CREATE SEQUENCE staff_staff_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.staff_staff_id_seq OWNER TO postgres;
+ALTER TABLE public.staff_staff_id_seq OWNER TO gpadmin;
 
 --
--- Name: staff; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: staff; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE staff (
@@ -2182,10 +2137,10 @@ CREATE TABLE staff (
 );
 
 
-ALTER TABLE public.staff OWNER TO postgres;
+ALTER TABLE public.staff OWNER TO gpadmin;
 
 --
--- Name: store_store_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: store_store_id_seq; Type: SEQUENCE; Schema: public; Owner: gpadmin
 --
 
 CREATE SEQUENCE store_store_id_seq
@@ -2196,10 +2151,10 @@ CREATE SEQUENCE store_store_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.store_store_id_seq OWNER TO postgres;
+ALTER TABLE public.store_store_id_seq OWNER TO gpadmin;
 
 --
--- Name: store; Type: TABLE; Schema: public; Owner: postgres; Tablespace: 
+-- Name: store; Type: TABLE; Schema: public; Owner: gpadmin; Tablespace: 
 --
 
 CREATE TABLE store (
@@ -2210,20 +2165,20 @@ CREATE TABLE store (
 );
 
 
-ALTER TABLE public.store OWNER TO postgres;
+ALTER TABLE public.store OWNER TO gpadmin;
 
 --
--- Name: public; Type: ACL; Schema: -; Owner: postgres
+-- Name: public; Type: ACL; Schema: -; Owner: gpadmin
 --
 
 REVOKE ALL ON SCHEMA public FROM PUBLIC;
-REVOKE ALL ON SCHEMA public FROM postgres;
-GRANT ALL ON SCHEMA public TO postgres;
+REVOKE ALL ON SCHEMA public FROM gpadmin;
+GRANT ALL ON SCHEMA public TO gpadmin;
 GRANT ALL ON SCHEMA public TO PUBLIC;
 
 
 --
--- PostgreSQL database dump complete
+-- gpadminQL database dump complete
 --
 `
 }

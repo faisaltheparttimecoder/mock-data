@@ -135,7 +135,8 @@ DataTypePickerLoop:
 			d, err := BuildData(c.Datatype)
 			if err != nil {
 				if strings.HasPrefix(fmt.Sprint(err), "unsupported datatypes found") {
-					Debugf("Table %s skipped: %v", tab, err)
+					Debugf("Table %s skipped, since the column %s, had unknown data type %s: %v",
+						tab, c.Column, c.Datatype, err)
 					skippedTab = append(skippedTab, tab)
 					bar.Add(cmdOptions.Rows)
 					break DataTypePickerLoop
