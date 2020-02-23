@@ -22,21 +22,22 @@ However, please **DO MAKE SURE TO TAKE A BACKUP** of your database before you mo
 
 Check on the "Known Issues" section below for more information about current identified bugs.
 
-### Important information and disclaimer
+# Important information and disclaimer
 
 Mock-data idea is to generate fake data in new test cluster and it is **NOT TO BE USED IN PRODUCTION ENVIRONMENTS**. Please ensure you have a backup of your database before running Mock-data in an environment you can't afford losing.
 
-### Supported database engines
+# Supported database engines & data types
 
+### Database Engine
 + PostgresSQL
 + Greenplum Database
 
-### Supported data types
+### Data types
 
 + All datatypes that are listed on the [postgres datatype](https://www.postgresql.org/docs/9.6/static/datatype.html) website are supported
 + As Greenplum / HAWQ are both base from postgres, the supported postgres datatype also apply in their case
 
-### How it works.
+# How it works.
 
 + PARSES the CLI arguments
 + CHECKS if the database connection can be established
@@ -52,14 +53,14 @@ Mock-data idea is to generate fake data in new test cluster and it is **NOT TO B
 + CHECK constraints are ignored (coming soon?)
 + LOADS constraints that it had backed up (Mock-data can fail at this stage if its not able to fix the constraint violations)
 
-### Known Issues
+# Known Issues
 
 1. If you have a unique index on a foreign key column then there are chance the constraint creation would fail, since mockd doesn't pick up unique value for foriegn key value it picks up random values from the reference table.
 2. Still having issues with Check constraint, only check that works is "COLUMN > 0"
 3. On Greenplum Datbase/HAWQ partition tables are not supported (due to check constraint issues defined above), so use the `custom` sub command to define the data to be inserted to the column with check constraints
 4. Custom data types are not supported, use `custom` sub command to control the data for that custom data types
 
-### Developers / Collaboration
+# Developers / Collaboration
 
 You can sumbit issues or pull request via [github](https://github.com/pivotal/mock-data) and we will try our best to fix them.
 
@@ -92,10 +93,10 @@ To customize this repository, follow the steps
     /bin/sh build.sh
     ```
 
-### License
+# License
 
 MIT
 
-### Authors
+# Authors
 
 [![Ignacio](https://img.shields.io/badge/github-Ignacio_Elizaga-green.svg?style=social)](https://github.com/ielizaga) [![Aitor](https://img.shields.io/badge/github-Aitor_Cedres-green.svg?style=social)](https://github.com/Zerpet) [![Juan](https://img.shields.io/badge/github-Juan_Ramos-green.svg?style=social)](https://github.com/jujoramos) [![Faisal](https://img.shields.io/badge/github-Faisal_Ali-green.svg?style=social)](https://github.com/faisaltheparttimecoder) [![Adam](https://img.shields.io/badge/github-Adam_Clevy-green.svg?style=social)](https://github.com/adamclevy)
