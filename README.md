@@ -115,7 +115,11 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
 
 # Examples
 
-For examples how to use the tool, please check out the [wiki](https://github.com/pivotal-legacy/mock-data/wiki) page for categories like
+Here is a simple demo of how the tool works, provide us your table and we will load the data for you
+
+![demo-table-loading](https://github.com/pivotal-legacy/mock-data/blob/image/images/faking-data-to-single-table.gif)
+
+For more examples how to use the tool, please check out the [wiki](https://github.com/pivotal-legacy/mock-data/wiki) page for categories like
 
 * Look here on how the [database connection](https://github.com/pivotal-legacy/mock-data/wiki/Connecting-to-Database) works
 * Read this section on how the subcommand [custom](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Custom) works
