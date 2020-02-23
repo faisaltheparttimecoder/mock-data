@@ -93,12 +93,12 @@ Use "mock [command] --help" for more information about a command.
 **Optional:**
 
 You can copy the mock program to the PATH folder, so that you can use the mock from anywhere in the terminal, for eg.s
-    ```
-    cp mock-darwin-amd64-v2.0 /usr/local/bin/mock
-    chmod +x /usr/local/bin/mock
-    ```
+```
+cp mock-darwin-amd64-v2.0 /usr/local/bin/mock
+chmod +x /usr/local/bin/mock
+```
 
-provided "/usr/local/bin" is part of the $PATH environment variable.
+provided `/usr/local/bin` is part of the $PATH environment variable.
 
 # Known Issues
 
