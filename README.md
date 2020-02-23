@@ -25,8 +25,8 @@ Check on the "Known Issues" section below for more information about current ide
 # Table of Contents
    * [Important information and disclaimer](#important-information-and-disclaimer)
    * [Supported database engines &amp; data types](#supported-database-engines--data-types)
-         * [Database Engine](#database-engine)
-         * [Data types](#data-types)
+        * [Database Engine](#database-engine)
+        * [Data types](#data-types)
    * [How it works.](#how-it-works)
    * [Usage](#usage)
    * [Installation](#installation)
