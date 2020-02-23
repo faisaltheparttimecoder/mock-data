@@ -53,6 +53,53 @@ Mock-data idea is to generate fake data in new test cluster and it is **NOT TO B
 + CHECK constraints are ignored (coming soon?)
 + LOADS constraints that it had backed up (Mock-data can fail at this stage if its not able to fix the constraint violations)
 
+# Usage
+```
+$ mock --help
+This program generates fake data into a postgres database cluster. 
+PLEASE DO NOT run on a mission critical databases
+
+Usage:
+  mock [flags]
+  mock [command]
+
+Available Commands:
+  custom      Controlled mocking of tables
+  database    Mock at database level
+  help        Help about any command
+  schema      Mock at schema level
+  tables      Mock at table level
+
+Flags:
+  -a, --address string    Hostname where the postgres database lives
+  -d, --database string   Database to mock the data
+  -q, --dont-prompt       Run without asking for confirmation
+  -h, --help              help for mock
+  -i, --ignore            Ignore checking and fixing constraints
+  -w, --password string   Password for the user to connect to database
+  -p, --port int          Port number of the postgres database
+  -r, --rows int          Total rows to be faked or mocked (default 10)
+  -u, --username string   Username to connect to the database
+  -v, --verbose           Enable verbose or debug logging
+      --version           version for mock
+
+Use "mock [command] --help" for more information about a command.
+```
+
+# Installation
+
+[Download](https://github.com/pivotal/mock-data/releases/latest) the latest release and you're ready to go!
+
+**Optional:**
+
+You can copy the mock program to the PATH folder, so that you can use the mock from anywhere in the terminal, for eg.s
+    ```
+    cp mock-darwin-amd64-v2.0 /usr/local/bin/mock
+    chmod +x /usr/local/bin/mock
+    ```
+
+provided "/usr/local/bin" is part of the $PATH environment variable.
+
 # Known Issues
 
 1. If you have a unique index on a foreign key column then there are chance the constraint creation would fail, since mockd doesn't pick up unique value for foriegn key value it picks up random values from the reference table.
@@ -80,7 +127,7 @@ To customize this repository, follow the steps
     dep ensure
     ```
 
-4. Make sure you have a demo postgres data to connect.
+4. Make sure you have a demo postgres database to connect.
 5. You are all set, you can run it locally using
 
     ```
