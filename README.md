@@ -35,14 +35,13 @@ Mock-data idea is to generate fake data in new test cluster and it is **NOT TO B
 ### Data types
 
 + All datatypes that are listed on the [postgres datatype](https://www.postgresql.org/docs/9.6/static/datatype.html) website are supported
-+ As Greenplum / HAWQ are both base from postgres, the supported postgres datatype also apply in their case
++ As Greenplum are both base from postgres, the supported postgres datatype also apply in their case
 
 # How it works.
 
 + PARSES the CLI arguments
 + CHECKS if the database connection can be established
-+ IF all database flag is set, then extract all the tables in the database
-+ ELSE IF tables are specified then uses only target tables
++ BASED on sub commands i.e either database , table or schema it pull / verifies the tables
 + CREATES a backup of all constraints (PK, UK, CK, FK ) and unique indexes (due to cascade nature of the drop constraints)
 + STORES this constraint/unique index information in memory and also saves it to the file under `$HOME/mock`
 + REMOVES all the constraints on the table
@@ -103,8 +102,8 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
 # Known Issues
 
 1. If you have a unique index on a foreign key column then there are chance the constraint creation would fail, since mockd doesn't pick up unique value for foriegn key value it picks up random values from the reference table.
-2. Still having issues with Check constraint, only check that works is "COLUMN > 0"
-3. On Greenplum Datbase/HAWQ partition tables are not supported (due to check constraint issues defined above), so use the `custom` sub command to define the data to be inserted to the column with check constraints
+2. CHECK constraints isn't supported , so recreating check constraints would fail, use `custom` subcommand to control the data being inserted
+3. On Greenplum Datbase tables are not supported (due to check constraint issues defined above), so use the `custom` sub command to define the data to be inserted to the column with check constraints
 4. Custom data types are not supported, use `custom` sub command to control the data for that custom data types
 
 # Developers / Collaboration
@@ -131,7 +130,7 @@ To customize this repository, follow the steps
 5. You are all set, you can run it locally using
 
     ```
-    go run *.go <commands> .....
+    go run *.go <commands> <flags.........>
     ```
 
 6. To build the package use
@@ -142,7 +141,7 @@ To customize this repository, follow the steps
 
 # License
 
-MIT
+The Project is licensed under [MIT](https://github.com/pivotal-legacy/mock-data/blob/master/LICENSE)
 
 # Authors
 
