@@ -27,7 +27,7 @@ Check on the "Known Issues" section below for more information about current ide
    * [Supported database engines &amp; data types](#supported-database-engines--data-types)
         * [Database Engine](#database-engine)
         * [Data types](#data-types)
-   * [How it works.](#how-it-works)
+   * [How it works](#how-it-works)
    * [Usage](#usage)
    * [Installation](#installation)
    * [Examples](#examples)
@@ -51,7 +51,7 @@ Mock-data idea is to generate fake data in new test cluster and it is **NOT TO B
 + All datatypes that are listed on the [postgres datatype](https://www.postgresql.org/docs/9.6/static/datatype.html) website are supported
 + As Greenplum are both base from postgres, the supported postgres datatype also apply in their case
 
-# How it works.
+# How it works
 
 + PARSES the CLI arguments
 + CHECKS if the database connection can be established
