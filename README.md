@@ -22,6 +22,20 @@ However, please **DO MAKE SURE TO TAKE A BACKUP** of your database before you mo
 
 Check on the "Known Issues" section below for more information about current identified bugs.
 
+# Table of Contents
+   * [Important information and disclaimer](#important-information-and-disclaimer)
+   * [Supported database engines &amp; data types](#supported-database-engines--data-types)
+         * [Database Engine](#database-engine)
+         * [Data types](#data-types)
+   * [How it works.](#how-it-works)
+   * [Usage](#usage)
+   * [Installation](#installation)
+   * [Examples](#examples)
+   * [Known Issues](#known-issues)
+   * [Developers / Collaboration](#developers--collaboration)
+   * [License](#license)
+   * [Authors](#authors)
+
 # Important information and disclaimer
 
 Mock-data idea is to generate fake data in new test cluster and it is **NOT TO BE USED IN PRODUCTION ENVIRONMENTS**. Please ensure you have a backup of your database before running Mock-data in an environment you can't afford losing.
