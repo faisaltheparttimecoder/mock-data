@@ -2,8 +2,8 @@
 
 # Get the program name and version
 MOCKERFILE="mock.go"
-PROGRAMNAME=`grep "programName " ${MOCKERFILE} | cut -d'=' -f2|sed 's/"//g'`
-PROGRAMVERSION=`grep "programVersion" ${MOCKERFILE} | cut -d'=' -f2|sed 's/"//g'|sed -e 's/^[[:space:]]*//'`
+PROGRAMNAME=`grep "programName " ${MOCKERFILE} | cut -d'=' -f2 | sed 's/"//g' | sed -e 's/^[[:space:]]*//'`
+PROGRAMVERSION=`grep "programVersion" ${MOCKERFILE} | cut -d'=' -f2 | sed 's/"//g' | sed -e 's/^[[:space:]]*//'`
 PLATFORM=("windows/amd64" "darwin/amd64" "linux/amd64")
 
 # Loop through the platform and build a package

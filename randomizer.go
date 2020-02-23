@@ -46,14 +46,10 @@ func RandomBytea(maxlen int) []byte {
 }
 
 // Random Float generator based on precision specified
-func round(num float64) int {
-	return int(num + math.Copysign(0.5, num))
-}
-
 func RandomFloat(min, max, precision int) (float64) {
 	output := math.Pow(10, float64(precision))
-	randNumber := RandomInt(min, max)
-	return math.Floor(float64(float64(randNumber)/rand.Float64()) / output)
+	randNumber := float64(min) + r.Float64() * float64(max - min) * 100
+	return math.Round(randNumber) / output
 }
 
 // Random calender date time generator
