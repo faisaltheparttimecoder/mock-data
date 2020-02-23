@@ -101,7 +101,7 @@ Use "mock [command] --help" for more information about a command.
 
 # Installation
 
-[Download](https://github.com/pivotal/mock-data/releases/latest) the latest release and you're ready to go!
+[Download](https://github.com/pivotal/mock-data/releases/latest) the latest release for your OS & Architecture and you're ready to go!
 
 **Optional:**
 
