@@ -32,7 +32,7 @@ func FixConstraints() {
 			case v == "UNIQUE": // Run the same logic as primary key
 				fixPKey(con)
 				//case v == "CHECK": // TODO: Its hard to predict the check constraint ATM
-				//	fixCheck(db, con)
+				//  fixCheck(db, con)
 			case v == "FOREIGN":
 				fixFKey(con)
 			}
@@ -210,7 +210,9 @@ func recreateAllConstraints() {
 	}
 
 	if AnyError {
-		Warnf("There have been issue creating few constraints, all the "+
-			"constraints that failed has been saved on to file: %s", failedConstraintsFile)
+		Warnf("There have been issue creating few constraints and would need manual cleanup at your end, " +
+			"all the constraints that failed has been saved on to file: %s", failedConstraintsFile)
 	}
 }
+
+

@@ -180,7 +180,7 @@ func GenerateTableName(tab, schema string) string {
 // Throw warning if there is skipped tables
 func skipTablesWarning() {
 	if len(skippedTab) > 0 {
-		Warnf("These tables are skipped since these datatypes are not supported by %s: %s",
+		Warnf("These tables are skipped since these data types are not supported by %s: %s",
 			programName, strings.Join(skippedTab, ","))
 	}
 }

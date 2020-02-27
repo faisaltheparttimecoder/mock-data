@@ -244,9 +244,11 @@ func GetPGConstraintDDL(conntype string) []DBConstraints {
 	Debugf("Extracting the DDL of the %s constraints", conntype)
 	var result []DBConstraints
 	query := `
-SELECT n.nspname 
-       || '.' 
-       || c.relname                                   tablename, 
+SELECT '"' 
+       || n.nspname 
+       || '"."' 
+       || c.relname 
+       || '"'                                         tablename, 
        con.conname                                    constraintname, 
        pg_catalog.Pg_get_constraintdef(con.oid, true) constraintKey 
 FROM   pg_catalog.pg_class c, 
@@ -277,10 +279,12 @@ func GetPGIndexDDL() []DBIndex {
 	Debugf("Extracting the unique indexes")
 	var result []DBIndex
 	query := `
-SELECT schemaname 
-       || '.' 
-       || tablename tablename, 
-       indexdef     indexdef 
+SELECT '"' 
+       || schemaname 
+       || '"."' 
+       || tablename 
+       || '"'   tablename, 
+       indexdef indexdef 
 FROM   pg_indexes 
 WHERE  schemaname IN (SELECT nspname 
                       FROM   pg_namespace 
