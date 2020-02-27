@@ -30,7 +30,7 @@ func BackupDDL() {
 func backupConstraints() {
 	Debugf("Backing up all the constraints from the database: %s", cmdOptions.Database)
 	for _, constr := range constraints {
-		filename := fmt.Sprintf("%s/%s_constriant_backup_%s.sql", Path, programName, constr)
+		filename := fmt.Sprintf("%s/%s_constraint_backup_%s.sql", Path, programName, constr)
 		constraintInfo := GetPGConstraintDDL(constr)
 		for _, c := range constraintInfo {
 			// DDL
@@ -51,7 +51,7 @@ func backupConstraints() {
 // Backup all the unique index
 func backupIndexes() {
 	Debugf("Backing up all the unique indexes from the database: %s", cmdOptions.Database)
-	filename := fmt.Sprintf("%s/mockd_constriant_backup_u.sql", Path)
+	filename := fmt.Sprintf("%s/mockd_constraint_backup_u.sql", Path)
 	indexes := GetPGIndexDDL()
 	for _, i := range indexes {
 		indexDDL := fmt.Sprintf("%s;\n", i.Indexdef)

@@ -158,8 +158,8 @@ DataTypePickerLoop:
 // Copy the data to the database table
 func CopyData(tab string, col []string, data []string, db *pg.DB) {
 	// Copy Statement and start loading
-	copyStatment := fmt.Sprintf(`COPY %s(%s) FROM STDIN WITH CSV DELIMITER '%s' QUOTE e'\x01'`,
-		tab, strings.Join(col, ","), delimiter)
+	copyStatment := fmt.Sprintf(`COPY %s("%s") FROM STDIN WITH CSV DELIMITER '%s' QUOTE e'\x01'`,
+		tab, strings.Join(col, "\",\""), delimiter)
 	_, err := db.CopyFrom(strings.NewReader(strings.Join(data, delimiter)), copyStatment)
 
 	// Handle Error
