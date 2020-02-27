@@ -320,7 +320,7 @@ FROM   (SELECT n.nspname
         FROM   pg_catalog.pg_class c, 
                pg_catalog.pg_constraint con, 
                pg_namespace n 
-        WHERE  c.oid = '"%[1]s"' :: regclass 
+        WHERE  c.oid = '%[1]s' :: regclass 
                AND conrelid = c.oid 
                AND n.oid = c.relnamespace 
                AND contype IN ( 'u', 'f', 'c', 'p' ) 
