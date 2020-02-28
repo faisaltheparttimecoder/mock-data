@@ -130,7 +130,7 @@ For more examples how to use the tool, please check out the [wiki](https://githu
 
 # Known Issues
 
-1. If you have a unique index on a foreign key column then there are chance the constraint creation would fail, since mockd doesn't pick up unique value for foriegn key value it picks up random values from the reference table.
+1. If you have a composite unique index where one column is part of foreign key column then there are chances the constraint creation would fail.
 2. Fixing CHECK constraints isn't supported due to complexity, so recreating check constraints would fail, use `custom` subcommand to control the data being inserted
 3. On Greenplum Database partition tables are not supported (due to check constraint issues defined above), so use the `custom` sub command to define the data to be inserted to the column with check constraints
 4. Custom data types are not supported, use `custom` sub command to control the data for that custom data types
