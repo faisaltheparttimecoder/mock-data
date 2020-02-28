@@ -59,7 +59,7 @@ func fixPKey(pk constraint) {
 	for totalViolators > 0 { // Loop till we get a 0 value (i.e 0 violation )
 		// How many violations are we having, if zero then loop breaks
 		totalViolators = getTotalPKViolator(pk.table, cols)
-		for totalViolators > 0 { // Found violation, time to fix it
+		if totalViolators > 0 { // Found violation, time to fix it
 
 			// If there are two or more columns forming a PK or UK
 			// lets only fix column by column.
