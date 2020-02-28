@@ -66,9 +66,9 @@ func columnExtractor(tables []DBTables) []TableCollection {
 	for _, t := range tables {
 		var tempColumns []DBColumns
 		if GreenplumOrPostgres == "postgres" {
-			columns = columnExtractorPostgres(t.Schema, t.Table)
+			columns = columnExtractorPostgres(fmt.Sprintf("\"%s\"", t.Schema), t.Table)
 		} else {
-			columns = columnExtractorGPDB(t.Schema, t.Table);
+			columns = columnExtractorGPDB(fmt.Sprintf("\"%s\"", t.Schema), t.Table)
 		}
 
 		// Loops through the columns and make a collection of tables
