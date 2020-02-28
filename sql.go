@@ -244,9 +244,11 @@ func GetPGConstraintDDL(conntype string) []DBConstraints {
 	Debugf("Extracting the DDL of the %s constraints", conntype)
 	var result []DBConstraints
 	query := `
-SELECT n.nspname 
-       || '.' 
-       || c.relname                                   tablename, 
+SELECT '"' 
+       || n.nspname 
+       || '"."' 
+       || c.relname 
+       || '"'                                         tablename, 
        con.conname                                    constraintname, 
        pg_catalog.Pg_get_constraintdef(con.oid, true) constraintKey 
 FROM   pg_catalog.pg_class c, 
@@ -277,10 +279,12 @@ func GetPGIndexDDL() []DBIndex {
 	Debugf("Extracting the unique indexes")
 	var result []DBIndex
 	query := `
-SELECT schemaname 
-       || '.' 
-       || tablename tablename, 
-       indexdef     indexdef 
+SELECT '"' 
+       || schemaname 
+       || '"."' 
+       || tablename 
+       || '"'   tablename, 
+       indexdef indexdef 
 FROM   pg_indexes 
 WHERE  schemaname IN (SELECT nspname 
                       FROM   pg_namespace 
@@ -545,4 +549,26 @@ WHERE  %[2]s = '%[6]s'
 		Debugf("query: %s", query)
 		Fatalf("Error when updating the foreign key for table %s, err: %v", key.Table, err)
 	}
+}
+
+// Delete the violating key
+func deleteViolatingConstraintKeys(tab string, column string) error {
+	Debugf("Deleting the rows the table that violates the constraints: %s:(%s)", tab, column )
+	query := `
+DELETE 
+FROM   %[1]s 
+WHERE  ( 
+              %[2]s) IN 
+       ( 
+                SELECT   %[2]s 
+                FROM     %[1]s 
+                GROUP BY %[2]s 
+                HAVING   count(*) > 1);
+`
+	query = fmt.Sprintf(query, tab, column)
+	_, err := ExecuteDB(query)
+	if err != nil {
+		return err
+	}
+	return nil
 }
