@@ -132,6 +132,10 @@ var tablesCmd = &cobra.Command{
 		if IsStringEmpty(cmdOptions.Tab.SchemaName) {
 			Fatalf("Cannot have the schema name empty, please check the arguments")
 		}
+		// If number of columns is greater than the limit, then error out
+		if cmdOptions.Tab.MaxColumns > 1600 {
+			Fatalf("Postgres cannot have more than 1600 columns, check the arguments")
+		}
 	},
 	PostRun: func(cmd *cobra.Command, args []string) {
 		Info("Successfully completed running the table sub command")
