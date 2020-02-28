@@ -553,7 +553,7 @@ WHERE  %[2]s = '%[6]s'
 
 // Delete the violating key
 func deleteViolatingConstraintKeys(tab string, column string) error {
-	Debugf("Deleting the rows the table that violates the constraints: %s:(%s)", tab, column )
+	Debugf("Deleting the rows of the table that violate the constraints: %s:(%s)", tab, column )
 	query := `
 DELETE 
 FROM   %[1]s 
