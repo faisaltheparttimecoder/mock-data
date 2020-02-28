@@ -137,7 +137,7 @@ func RandomBoolean() bool {
 
 // Random Paragraphs
 func RandomParagraphs() string {
-	n, _ := strconv.Atoi(fake.DigitsN(1))
+	n := RandomInt(1, 5)
 	return fake.ParagraphsN(n)
 }
 
