@@ -7,7 +7,7 @@ import (
 
 var (
 	programName        = "mock"
-	programVersion     = "v2.2"
+	programVersion     = "v2.3"
 	ExecutionTimestamp = TimeNow()
 	Path               = fmt.Sprintf("%s/%s/%s", os.Getenv("HOME"), programName, ExecutionTimestamp)
 )
