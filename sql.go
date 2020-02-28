@@ -550,3 +550,26 @@ WHERE  %[2]s = '%[6]s'
 		Fatalf("Error when updating the foreign key for table %s, err: %v", key.Table, err)
 	}
 }
+
+
+// Delete the violating key
+func deleteViolatingConstraintKeys(tab string, column string) error {
+	Debugf("Deleting the rows the table that violates the constraints: %s:(%s)", tab, column )
+	query := `
+DELETE 
+FROM   %[1]s 
+WHERE  ( 
+              %[2]s) IN 
+       ( 
+                SELECT   %[2]s 
+                FROM     %[1]s 
+                GROUP BY %[2]s 
+                HAVING   count(*) > 1);
+`
+	query = fmt.Sprintf(query, tab, column)
+	_, err := ExecuteDB(query)
+	if err != nil {
+		return err
+	}
+	return nil
+}

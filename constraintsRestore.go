@@ -196,12 +196,17 @@ func recreateAllConstraints() {
 				_, err := ExecuteDB(content)
 				if err != nil && !IgnoreErrorString(fmt.Sprintf("%s", err)) {
 					Debugf("Error creating constraint %s, err: %v", content, err)
-					err = WriteToFile(failedConstraintsFile, content+"\n")
-					if err != nil {
-						Fatalf("Error when saving the failed restore to file %s, err %v",
-							failedConstraintsFile, err)
+					// Try an attempt to recreate constraint again after deleting the
+					// violating row
+					successOrFailure := deleteViolatingPkOrUkConstriants(content)
+					if !successOrFailure { // didn't succeed, ask the user to fix it manually
+						err = WriteToFile(failedConstraintsFile, content+"\n")
+						if err != nil {
+							Fatalf("Error when saving the failed restore to file %s, err %v",
+								failedConstraintsFile, err)
+						}
+						AnyError = true
 					}
-					AnyError = true
 				}
 				bar.Add(1)
 			}
@@ -210,9 +215,39 @@ func recreateAllConstraints() {
 	}
 
 	if AnyError {
-		Warnf("There have been issue creating few constraints and would need manual cleanup at your end, " +
+		Warnf("There have been issue creating few constraints and would need manual cleanup at your end, "+
 			"all the constraints that failed has been saved on to file: %s", failedConstraintsFile)
 	}
 }
 
-
+// we tried to fix the primary key violation, but due to the nature
+// of how we fix the constraints like PK (or UK) followed by FK , there
+// are chances that we might inject duplicate keys again, for eg.s if
+// there is a PK ( or UK ) on a FK reference table. so the aim here
+// is, we will delete the rows that violates it and hoping that it will help in
+// recreating the constraints. Yes we will loose that row at least that help to
+// recreate constraints ( fingers crossed :) )
+func deleteViolatingPkOrUkConstriants(con string) bool {
+	Debugf("Attempting to run the constraint command %s second time, after deleting violating rows", con)
+	// does the DDL contain PK or UK keyword then do the following
+	// rest send them back for user to fix it.
+	if isSubStringAvailableOnString(con, "ADD CONSTRAINT.*PRIMARY KEY|ADD CONSTRAINT.*UNIQUE") {
+		column, _ := ColExtractor(con, `\(.*?\)`)
+		table, _ := ColExtractor(con, `ALTER TABLE(.*)ADD CONSTRAINT`)
+		table = strings.Trim(strings.Trim(table, "ALTER TABLE"), "ADD CONSTRAINT")
+		column = strings.Trim(column, "()")
+		err := deleteViolatingConstraintKeys(table, column)
+		if err != nil { // we failed to delete the the constraint violation rows
+			Debugf("Error when deleting rows from the constraint violation rows: %v", err)
+			return false
+		}
+		_, err = ExecuteDB(con) // retry to create the constraint again
+		if err != nil { // we failed to recreate the constraint
+			Debugf("Error when 2nd attempt to recreate constraint: %v", err)
+			return false
+		}
+		// successfully cleaned it up
+		return true
+	}
+	return false
+}
