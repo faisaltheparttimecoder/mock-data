@@ -173,7 +173,7 @@ func recreateAllConstraints() {
 
 	// list the backup files collected.
 	for _, con := range constraints {
-		backupFile, err := ListFile(Path, fmt.Sprintf("%s_constriant_backup_%s.sql", programName, con))
+		backupFile, err := ListFile(Path, fmt.Sprintf("%s_constraint_backup_%s.sql", programName, con))
 		if err != nil {
 			Fatalf("Error when listing all the backup files from the directory %s, err: %v", Path, err)
 		}
