@@ -209,6 +209,15 @@ func BracketsExists(dt string) bool {
 	}
 }
 
+// Does the string contain the substring
+func isSubStringAvailableOnString(s string, criteria string) bool {
+	var re = regexp.MustCompile(fmt.Sprintf("%s", criteria))
+	if re.MatchString(s) {
+		return true
+	}
+	return false
+}
+
 // Built a method to find if the values exits with a slice
 func StringContains(item string, slice []string) bool {
 	set := make(map[string]struct{}, len(slice))
