@@ -273,6 +273,10 @@ func RandomXML(IsItArray bool) string {
 
 // Pick Random Value from any array
 func RandomPickerFromArray(a []string) string {
-	n := r.Int() % len(a)
-	return a[n]
+	return a[RandomValueFromLength(len(a))]
+}
+
+// Random value from length
+func RandomValueFromLength(i int) int {
+	return r.Int() % i
 }

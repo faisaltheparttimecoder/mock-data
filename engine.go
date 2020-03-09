@@ -78,8 +78,8 @@ func BuildData(dt string) (interface{}, error) {
 		return buildTxidSnapShot(dt)
 	} else if StringHasPrefix(dt, geoDataTypekeywords) { // Random GeoMetric data
 		return buildGeometry(dt)
-	} else {
-		return "", fmt.Errorf("unsupported datatypes found: %v", dt)
+	} else { // if these are not the defaults, the ony custom we allow is enum data type, check if its them
+		return buildEnumDatatypes(dt)
 	}
 	return value, nil
 }
@@ -411,7 +411,6 @@ func randomDataByDataTypeForArray(dt, originalDt string, min, max int) (string, 
 
 // Random geometric array generators
 func GeometricArrayGenerator(maxInt int, geometryType string) string {
-
 	// Getting the value of iterators
 	maxIterations := RandomInt(1, 6)
 	var resultArray []string
@@ -447,4 +446,19 @@ func JsonXmlArrayGenerator(dt string) string {
 		resultArray = append(resultArray, value)
 	}
 	return fmt.Sprintf("{%s}", strings.Join(resultArray, ","))
+}
+
+// Enum datatypes
+func buildEnumDatatypes(dt string) (string, error) {
+	// Check if the data type is ENUM
+	enumOutput := checkEnumDatatype(dt)
+
+	// if there are none then pass in the error back to user
+	if len(enumOutput) <= 0 {
+		return "", fmt.Errorf("unsupported datatypes found: %v", dt)
+	}
+
+	// found some output, lets pick some random value
+	n := RandomValueFromLength(len(enumOutput))
+	return enumOutput[n].EnumValue, nil
 }

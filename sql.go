@@ -46,6 +46,12 @@ type DBViolationRow struct {
 	Row string
 }
 
+type EnumDataType struct {
+	EnumSchema string
+	EnumName   string
+	EnumValue  string
+}
+
 // Connection check and database version
 func dbVersion() {
 	Debug("Checking the version of the database")
@@ -408,7 +414,7 @@ func getTotalPKViolator(tab, cols string) int {
 	if err != nil {
 		fmt.Println()
 		Debugf("query: %s", query)
-		Fatalf("Error when execute the query to extract pk violators: %v", err)
+		Fatalf("Error when executing the query to extract pk violators: %v", err)
 	}
 
 	return total
@@ -433,7 +439,7 @@ func GetPKViolators(tab, cols string) []DBViolationRow {
 	if err != nil {
 		fmt.Println()
 		Debugf("query: %s", query)
-		Fatalf("Error when execute the query to extract pk violators for table %s: %v", tab, err)
+		Fatalf("Error when executing the query to extract pk violators for table %s: %v", tab, err)
 	}
 
 	return result
@@ -487,7 +493,7 @@ func GetTotalFKViolators(key ForeignKey) int {
 	if err != nil {
 		fmt.Println()
 		Debugf("Query: %s", query)
-		Fatalf("Error when execute the query to total rows of foreign keys for table %s: %v", key.Table, err)
+		Fatalf("Error when executing the query to total rows of foreign keys for table %s: %v", key.Table, err)
 	}
 
 	return total
@@ -506,7 +512,7 @@ func TotalRows(tab string) int {
 	if err != nil {
 		fmt.Println()
 		Debugf("query: %s", query)
-		Fatalf("Error when execute the query to total rows: %v", err)
+		Fatalf("Error when executing the query to total rows: %v", err)
 	}
 
 	return total
@@ -526,7 +532,7 @@ func GetFKViolators(key ForeignKey) []DBViolationRow {
 	if err != nil {
 		fmt.Println()
 		Debugf("query: %s", query)
-		Fatalf("Error when execute the query to extract fk violators for table %s: %v", key.Table, err)
+		Fatalf("Error when executing the query to extract fk violators for table %s: %v", key.Table, err)
 	}
 
 	return result
@@ -553,7 +559,7 @@ WHERE  %[2]s = '%[6]s'
 
 // Delete the violating key
 func deleteViolatingConstraintKeys(tab string, column string) error {
-	Debugf("Deleting the rows of the table that violate the constraints: %s:(%s)", tab, column )
+	Debugf("Deleting the rows of the table that violate the constraints: %s:(%s)", tab, column)
 	query := `
 DELETE 
 FROM   %[1]s 
@@ -571,4 +577,38 @@ WHERE  (
 		return err
 	}
 	return nil
+}
+
+// Check & provide values if the datatype is ENUM
+func checkEnumDatatype(dt string) []EnumDataType {
+	Debugf("Checking if the datatype is enum")
+	var result []EnumDataType
+
+	// db connection
+	db := ConnectDB()
+	defer db.Close()
+
+	// query
+	query := `
+SELECT n.nspname   AS enum_schema, 
+       t.typname   AS enum_name, 
+       e.enumlabel AS enum_value 
+FROM   pg_type t 
+       JOIN pg_enum e 
+         ON t.oid = e.enumtypid 
+       JOIN pg_catalog.pg_namespace n 
+         ON n.oid = t.typnamespace 
+WHERE  t.typname = '%s' 
+`
+	query = fmt.Sprintf(query, dt)
+
+	// Execute and provide the result
+	_, err := db.Query(&result, query)
+	if err != nil {
+		fmt.Println()
+		Debugf("query: %s", query)
+		Fatalf("Error when executing the query to check if the data type is enum:%v", err)
+	}
+
+	return result
 }
