@@ -20,8 +20,8 @@ var (
 	ipKeywords = []string{"inet", "cidr"}
 
 	// Integer data types
-	intKeywords = []string{"smallint", "integer", "bigint"}
-	intRanges   = map[string]int{"smallint": 2767, "integer": 7483647, "bigint": 372036854775807}
+	intKeywords = []string{"smallint", "integer", "bigint", "oid"}
+	intRanges   = map[string]int{"smallint": 2767, "integer": 7483647, "bigint": 372036854775807, "oid": 7483647}
 
 	// Decimal data types
 	floatKeywords = []string{"double precision", "real", "money"}

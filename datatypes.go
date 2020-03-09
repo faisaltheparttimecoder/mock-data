@@ -8,6 +8,7 @@ func SupportedDataTypes() []string {
 		"smallint,",
 		"smallserial,",
 		"serial,",
+		"oid,",
 		"float4,",
 		"float8,",
 		"numeric(4,2),",
@@ -99,6 +100,7 @@ CREATE TABLE supported_datatypes (
   col_smallint                                smallint,
   col_smallserial                             smallserial,
   col_serial                                  serial,
+  col_oid                                     oid,
 
   -- Float type
   col_real                                    float4,
