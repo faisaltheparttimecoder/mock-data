@@ -16,7 +16,6 @@ func CreateFakeTables() {
 		createTable(i)
 		bar.Add(1)
 	}
-	fmt.Println()
 
 	Infof("Completed creating %d fake tables on the database: %s", cmdOptions.Tab.TotalTables, cmdOptions.Database)
 }

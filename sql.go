@@ -412,7 +412,6 @@ func getTotalPKViolator(tab, cols string) int {
 
 	_, err := db.Query(pg.Scan(&total), query)
 	if err != nil {
-		fmt.Println()
 		Debugf("query: %s", query)
 		Fatalf("Error when executing the query to extract pk violators: %v", err)
 	}
@@ -437,7 +436,6 @@ func GetPKViolators(tab, cols string) []DBViolationRow {
 	query := strings.Replace(getPKViolator(tab, cols), "SELECT "+cols, "SELECT "+cols+" AS row", -1)
 	_, err := db.Query(&result, query)
 	if err != nil {
-		fmt.Println()
 		Debugf("query: %s", query)
 		Fatalf("Error when executing the query to extract pk violators for table %s: %v", tab, err)
 	}
@@ -491,7 +489,6 @@ func GetTotalFKViolators(key ForeignKey) int {
 
 	_, err := db.Query(pg.Scan(&total), query)
 	if err != nil {
-		fmt.Println()
 		Debugf("Query: %s", query)
 		Fatalf("Error when executing the query to total rows of foreign keys for table %s: %v", key.Table, err)
 	}
@@ -530,7 +527,6 @@ func GetFKViolators(key ForeignKey) []DBViolationRow {
 	query := strings.Replace(getFKViolators(key), "SELECT "+key.Column, "SELECT "+key.Column+" AS row", -1)
 	_, err := db.Query(&result, query)
 	if err != nil {
-		fmt.Println()
 		Debugf("query: %s", query)
 		Fatalf("Error when executing the query to extract fk violators for table %s: %v", key.Table, err)
 	}
@@ -605,7 +601,6 @@ WHERE  t.typname = '%s'
 	// Execute and provide the result
 	_, err := db.Query(&result, query)
 	if err != nil {
-		fmt.Println()
 		Debugf("query: %s", query)
 		Fatalf("Error when executing the query to check if the data type is enum:%v", err)
 	}

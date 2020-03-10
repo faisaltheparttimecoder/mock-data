@@ -172,6 +172,5 @@ func (c *Skeleton) LoadDataByConfiguration() {
 			CopyData(tab, col, data, db)
 			bar.Add(1)
 		}
-		fmt.Println()
 	}
 }

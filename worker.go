@@ -14,6 +14,8 @@ type TableCollection struct {
 var (
 	skippedTab []string
 	delimiter  = "$"
+	oneColumnTable []string
+	progressBarMsg = "Mocking Table %s"
 )
 
 func MockTable(tables []DBTables) {
@@ -56,7 +58,7 @@ func tableMocker(tables []DBTables) {
 
 // Extract the column and its datatypes of the table
 func columnExtractor(tables []DBTables) []TableCollection {
-	Info("Extracting the columns and datatype information")
+	Info("Extracting the columns and data type information")
 	var columns []DBColumns
 	var collection []TableCollection
 
@@ -71,11 +73,11 @@ func columnExtractor(tables []DBTables) []TableCollection {
 			columns = columnExtractorGPDB(fmt.Sprintf("\"%s\"", t.Schema), t.Table)
 		}
 
-		// There are instance where the table can have one column and datatype serial
+		// There are instance where the table can have one column and data type serial
+		// then lets save them for later loading via a different method
 		// take a look at the issue: https://github.com/pivotal-gss/mock-data/issues/29
-		// lets fix this
 		if len(columns) == 1 {
-			checkAndAddDataIfItsASerialDatatype(t, columns)
+			checkIfOneColumnIsASerialDatatype(t, columns)
 		}
 
 		// Loops through the columns and make a collection of tables
@@ -92,7 +94,6 @@ func columnExtractor(tables []DBTables) []TableCollection {
 		}
 		bar.Add(1)
 	}
-	fmt.Println()
 	return collection
 }
 
@@ -106,12 +107,15 @@ func BackupConstraintsAndStartDataLoading(tables []TableCollection) {
 	Infof("Total numbers of tables to mock: %d", totalTables)
 	for _, t := range tables {
 		// Remove Constraints
-		table := fmt.Sprintf("\"%s\".\"%s\"", t.Schema, t.Table)
+		table := GenerateTableName(t.Table, t.Schema)
 		RemoveConstraints(table)
 
 		// Start the committing data to the table
 		CommitData(t)
 	}
+
+	// Now load the one column serial data type table
+	addDataIfItsASerialDatatype()
 
 	// If the program skipped the tables lets the users know
 	skipTablesWarning()
@@ -123,8 +127,9 @@ func BackupConstraintsAndStartDataLoading(tables []TableCollection) {
 func CommitData(t TableCollection) {
 	// Start committing data
 	tab := GenerateTableName(t.Table, t.Schema)
-	msg := fmt.Sprintf("Mocking Table %s", tab)
+	msg := fmt.Sprintf(progressBarMsg, tab)
 	bar := StartProgressBar(msg, cmdOptions.Rows)
+	Debugf("Building and loading mock data to the table %s", tab)
 
 	// Open db connection
 	db := ConnectDB()
@@ -159,7 +164,6 @@ DataTypePickerLoop:
 		CopyData(tab, col, data, db)
 		bar.Add(1)
 	}
-	fmt.Println()
 }
 
 // Copy the data to the database table
@@ -171,7 +175,6 @@ func CopyData(tab string, col []string, data []string, db *pg.DB) {
 
 	// Handle Error
 	if err != nil {
-		fmt.Println()
 		Debugf("Table: %s", tab)
 		Debugf("Copy Statement: %s", copyStatment)
 		Debugf("Data: %s", strings.Join(data, delimiter))
@@ -179,26 +182,42 @@ func CopyData(tab string, col []string, data []string, db *pg.DB) {
 	}
 }
 
-// Insert data to the table if its only a single column with serial data type
-func checkAndAddDataIfItsASerialDatatype(t DBTables, c []DBColumns) {
-	Debugf("Check if the table %s.%s which has only a single column is of serial data type", t.Schema, t.Table)
+
+// Check its a serial datatype
+func checkIfOneColumnIsASerialDatatype(t DBTables, c []DBColumns) {
+	tab := GenerateTableName(t.Table, t.Schema)
 	column := c[0] // we know its only one , because we did a check on the parent function
-	total := 0
+	Debugf("Check if the table %s which has only a single column is of serial data type", tab)
+
+	// If they are save them for later use
 	if isItSerialDatatype(column) {
+		oneColumnTable = append(oneColumnTable, tab)
+	}
+}
+
+// Insert data to the table if its only a single column with serial data type
+func addDataIfItsASerialDatatype() {
+	for _, t := range oneColumnTable {
+		var total = 0
+		// Start the progress bar
+		bar := StartProgressBar(fmt.Sprintf(progressBarMsg, t), cmdOptions.Rows)
+		Debugf("Loading data for one column serial data type table %s", t)
+
+		// Start loading
 		for total < cmdOptions.Rows {
-			query := "INSERT INTO \"%s\".\"%s\" default values;"
-			query = fmt.Sprintf(query, t.Schema, t.Table)
+			query := "INSERT INTO %s default values;"
+			query = fmt.Sprintf(query, t)
 			_, err := ExecuteDB(query)
 			if err != nil {
-				Fatalf("Error when loading the serial datatype for table %s.%s, err: %v",
-					t.Schema, t.Table, err)
+				Fatalf("Error when loading the serial datatype for table %s, err: %v", t, err)
 			}
 			total++
+			bar.Add(1)
 		}
 	}
 }
 
-// Is it serial
+// Is it serial data type
 func isItSerialDatatype(c DBColumns) bool {
 	if strings.HasPrefix(c.Sequence, "nextval") {
 		return true

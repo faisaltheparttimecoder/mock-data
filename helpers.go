@@ -76,6 +76,9 @@ func StartProgressBar(text string, max int) *progressbar.ProgressBar {
 	}
 
 	return progressbar.NewOptions(max,
+		progressbar.OptionOnCompletion(func() {
+			fmt.Println()
+		}),
 		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
 		progressbar.OptionEnableColorCodes(true),
 		progressbar.OptionSetBytes(10000),

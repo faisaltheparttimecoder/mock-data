@@ -23,8 +23,9 @@ func FixConstraints() {
 	var constr = []string{"PRIMARY", "UNIQUE", "FOREIGN"}
 	for _, v := range constr {
 		totalViolations := len(savedConstraints[v])
-		Infof("Found %v violation of %s KEYS, attempting to fix them", totalViolations, v)
-		bar := StartProgressBar(fmt.Sprintf("Fixing %s KEYS violation", v), totalViolations)
+		k := strings.ToLower(v)
+		Infof("Found %v violation of %s keys, if found any attempting to fix them", totalViolations, k)
+		bar := StartProgressBar(fmt.Sprintf("Fixing %s keys violation", k), totalViolations)
 		for _, con := range savedConstraints[v] {
 			switch {
 			case v == "PRIMARY":
@@ -38,7 +39,6 @@ func FixConstraints() {
 			}
 			bar.Add(1)
 		}
-		fmt.Println()
 	}
 
 	// Recreate constraints
@@ -210,7 +210,6 @@ func recreateAllConstraints() {
 				}
 				bar.Add(1)
 			}
-			fmt.Println()
 		}
 	}
 
