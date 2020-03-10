@@ -134,7 +134,6 @@ For more examples how to use the tool, please check out the [wiki](https://githu
 2. Fixing CHECK constraints isn't supported due to complexity, so recreating check constraints would fail, use `custom` subcommand to control the data being inserted
 3. On Greenplum Database partition tables are not supported (due to check constraint issues defined above), so use the `custom` sub command to define the data to be inserted to the column with check constraints
 4. Custom data types are not supported, use `custom` sub command to control the data for that custom data types
-5. if you have index on Bytea column, then index creation would fail check the [issue](https://github.com/pivotal-gss/mock-data/issues/24) for more information.
 
 # Developers / Collaboration
 

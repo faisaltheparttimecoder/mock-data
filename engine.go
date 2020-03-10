@@ -154,7 +154,7 @@ func buildText(dt string) (interface{}, error) {
 
 // Bytea builder
 func buildBytea(dt string) (interface{}, error) {
-	return RandomBytea(1024 * 1024), nil
+	return RandomBytea(1024), nil
 }
 
 // Float builder
