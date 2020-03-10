@@ -70,6 +70,11 @@ func IsStringEmpty(s string) bool {
 
 // Progress Bar
 func StartProgressBar(text string, max int) *progressbar.ProgressBar {
+	// Turn off the progress bar when the Debug is one
+	if cmdOptions.Debug {
+		return &progressbar.ProgressBar{}
+	}
+
 	return progressbar.NewOptions(max,
 		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
 		progressbar.OptionEnableColorCodes(true),
