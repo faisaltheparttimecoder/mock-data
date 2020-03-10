@@ -71,10 +71,17 @@ func columnExtractor(tables []DBTables) []TableCollection {
 			columns = columnExtractorGPDB(fmt.Sprintf("\"%s\"", t.Schema), t.Table)
 		}
 
+		// There are instance where the table can have one column and datatype serial
+		// take a look at the issue: https://github.com/pivotal-gss/mock-data/issues/29
+		// lets fix this
+		if len(columns) == 1 {
+			checkAndAddDataIfItsASerialDatatype(t, columns)
+		}
+
 		// Loops through the columns and make a collection of tables
 		// & column, we ignore sequence since they are auto injected also
 		for _, c := range columns {
-			if !strings.HasPrefix(c.Sequence, "nextval") {
+			if !isItSerialDatatype(c) {
 				tempColumns = append(tempColumns, c)
 			}
 		}
@@ -170,6 +177,33 @@ func CopyData(tab string, col []string, data []string, db *pg.DB) {
 		Debugf("Data: %s", strings.Join(data, delimiter))
 		Fatalf("Error during committing data: %v", err)
 	}
+}
+
+// Insert data to the table if its only a single column with serial data type
+func checkAndAddDataIfItsASerialDatatype(t DBTables, c []DBColumns) {
+	Debugf("Check if the table %s which has only a single column is of serial data type")
+	column := c[0] // we know its only one , because we did a check on the parent function
+	total := 0
+	if isItSerialDatatype(column) {
+		for total < cmdOptions.Rows {
+			query := "INSERT INTO %s.%s default values;"
+			query = fmt.Sprintf(query, t.Schema, t.Table)
+			_, err := ExecuteDB(query)
+			if err != nil {
+				Fatalf("Error when loading the serial datatype for table %s.%s, err: %v",
+					t.Schema, t.Table, err)
+			}
+			total++
+		}
+	}
+}
+
+// Is it serial
+func isItSerialDatatype(c DBColumns) bool {
+	if strings.HasPrefix(c.Sequence, "nextval") {
+		return true
+	}
+	return false
 }
 
 // Generate table name
