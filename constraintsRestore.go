@@ -47,8 +47,9 @@ func FixConstraints() {
 
 // Fix the primary key
 func fixPKey(pk constraint) {
-	Debugf("Fixing the Primary / Unique Key")
+	Debugf("Fixing the Primary / Unique Key for table %s", pk.table)
 	totalViolators := 1
+	
 	// Extract the columns from the list that was collected during backup
 	keys, err := ColExtractor(pk.column, `\(.*?\)`)
 	if err != nil {
@@ -96,7 +97,6 @@ func fixPKViolator(tab, col, dttype string) {
 
 // Fix the Foreign Keys
 func fixFKey(con constraint) {
-	Debugf("Fixing the Primary / Unique Key")
 	totalViolators := 1
 
 	// The objects involved in this foriegn key clause
