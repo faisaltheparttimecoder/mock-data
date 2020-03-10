@@ -181,12 +181,12 @@ func CopyData(tab string, col []string, data []string, db *pg.DB) {
 
 // Insert data to the table if its only a single column with serial data type
 func checkAndAddDataIfItsASerialDatatype(t DBTables, c []DBColumns) {
-	Debugf("Check if the table %s which has only a single column is of serial data type")
+	Infof("Check if the table %s.%s which has only a single column is of serial data type", t.Schema, t.Table)
 	column := c[0] // we know its only one , because we did a check on the parent function
 	total := 0
 	if isItSerialDatatype(column) {
 		for total < cmdOptions.Rows {
-			query := "INSERT INTO %s.%s default values;"
+			query := "INSERT INTO \"%s\".\"%s\" default values;"
 			query = fmt.Sprintf(query, t.Schema, t.Table)
 			_, err := ExecuteDB(query)
 			if err != nil {
