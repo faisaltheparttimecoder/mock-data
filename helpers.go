@@ -206,6 +206,23 @@ func ColExtractor(conkey, regExp string) (string, error) {
 	return "", nil
 }
 
+// Trim brackets at the start and at the end
+func TrimPrefixNSuffix(s, prefix, suffix string) string {
+	return strings.TrimPrefix(strings.TrimSuffix(s, suffix) , prefix)
+}
+
+// Remove everything after a delimiter
+func RemoveEverySuffixAfterADelimiter(s string, d string) string {
+	// Protect from upper case and lower case bugs
+	s = strings.ToLower(s)
+	d = strings.ToLower(d)
+	if strings.Contains(s, d) {
+		spiltString := strings.Split(s, d)
+		return spiltString[0]
+	}
+	return s
+}
+
 // If given a datatype see if it has a bracket or not.
 func BracketsExists(dt string) bool {
 	var rgx = regexp.MustCompile(`\(.*\)`)
@@ -263,4 +280,11 @@ func CharLen(dt string) (int, error) {
 		returnValue = 1
 	}
 	return returnValue, nil
+}
+
+// New line if its not a debug
+func addNewLine() {
+	if !cmdOptions.Debug {
+		fmt.Println()
+	}
 }
