@@ -9,6 +9,7 @@ var (
 	ignoreErr = []string{
 		"ERROR #42P16 multiple primary keys for table",
 		"already exists"}
+	maxLoop = 10
 )
 
 // Get Foriegn key objects
@@ -49,25 +50,25 @@ func FixConstraints() {
 func fixPKey(pk constraint) {
 	Debugf("Fixing the Primary / Unique Key for table %s", pk.table)
 	totalViolators := 1
-	
+	totalLoop := 0
+
 	// Extract the columns from the list that was collected during backup
-	keys, err := ColExtractor(pk.column, `\(.*?\)`)
+	keys, err := ColExtractor(pk.column, `\(([^\[\]]*)\)`)
 	if err != nil {
 		Fatalf("unable to determine PK violators key columns: %v", err)
 	}
-	cols := strings.Trim(keys, "()")
+	cols := TrimPrefixNSuffix(RemoveEverySuffixAfterADelimiter(keys, " where "), "(", ")")
 
-	for totalViolators > 0 { // Loop till we get a 0 value (i.e 0 violation )
+	for totalViolators > 0 && totalLoop <= maxLoop { // Loop till we get a 0 value (i.e 0 violation ) or max 10 loops
 		// How many violations are we having, if zero then loop breaks
 		totalViolators = getTotalPKViolator(pk.table, cols)
 		if totalViolators > 0 { // Found violation, time to fix it
 
 			// If there are two or more columns forming a PK or UK
-			// lets only fix column by column.
-			totalColumns := strings.Split(cols, ",")
+			pkColumns := strings.Split(cols, ",")
 
 			// Get data type associated with the data types
-			dTypes := getDatatype(pk.table, totalColumns)
+			dTypes := getDatatype(pk.table, pkColumns)
 
 			//Fix the primary constraints by picking the columns from the
 			//array, i.e we update the column one by one.
@@ -75,6 +76,9 @@ func fixPKey(pk constraint) {
 				fixPKViolator(pk.table, v.Colname, v.Dtype)
 			}
 		}
+		// If there is still violation the function deleteViolatingPkOrUkConstraints takes
+		// care of it
+		totalLoop++
 	}
 }
 
@@ -109,6 +113,15 @@ func fixFKey(con constraint) {
 	Debugf("Checking / Fixing FOREIGN KEY Violation table: %s, column: %s, reference: %s(%s)",
 		fkeyObjects.Table, fkeyObjects.Column, fkeyObjects.Reftable, fkeyObjects.Refcolumn)
 
+	// If its a composite FK relations then pick only one and fix it
+	// TODO: This is a bad logic, this will not quarantee a fix for the composite
+	// TODO: key.  Clean this out later when get a proper solution to overcome
+	// TODO: the composite key
+	col := strings.Split(fkeyObjects.Column, ",")
+	refCol := strings.Split(fkeyObjects.Refcolumn, ",")
+	fkeyObjects.Column = col[0]
+	fkeyObjects.Refcolumn = refCol[0]
+
 	// Loop till we reach the the end of the loop
 	for totalViolators > 0 {
 
@@ -139,7 +152,7 @@ func getForeignKeyColumns(con constraint) *ForeignKey {
 	if err != nil {
 		Fatalf("Unable to extract foreign key column from fk clause: %v", err)
 	}
-	fkCol = strings.Trim(fkCol, "()")
+	fkCol = TrimPrefixNSuffix(fkCol, "(", ")")
 
 	// Extract the reference column from the clause
 	refCol, err := ColExtractor(refClause, `\(.*?\)`)
@@ -150,7 +163,7 @@ func getForeignKeyColumns(con constraint) *ForeignKey {
 	// Extract reference table from the clause
 	refTab := strings.Replace(refClause, refCol, "", -1)
 	refTab = strings.Replace(refTab, "REFERENCES ", "", -1)
-	refCol = strings.Trim(refCol, "()")
+	refCol = TrimPrefixNSuffix(refCol, "(", ")")
 
 	return &ForeignKey{con.table, fkCol, refTab, refCol}
 }
@@ -187,7 +200,7 @@ func recreateAllConstraints() {
 			}
 
 			// Start the progress bar
-			bar := StartProgressBar(fmt.Sprintf("Recreated the Constraint Type \"%s\"", con), len(contents))
+			bar := StartProgressBar(fmt.Sprintf("Recreating the constraint type \"%s\"", con), len(contents))
 
 			// Recreate all constraints one by one, if we can't create it then display the message
 			// on the screen and continue with the rest, since we don't want it to fail if we cannot
@@ -198,7 +211,7 @@ func recreateAllConstraints() {
 					Debugf("Error creating constraint %s, err: %v", content, err)
 					// Try an attempt to recreate constraint again after deleting the
 					// violating row
-					successOrFailure := deleteViolatingPkOrUkConstriants(content)
+					successOrFailure := deleteViolatingPkOrUkConstraints(content)
 					if !successOrFailure { // didn't succeed, ask the user to fix it manually
 						err = WriteToFile(failedConstraintsFile, content+"\n")
 						if err != nil {
@@ -226,15 +239,13 @@ func recreateAllConstraints() {
 // is, we will delete the rows that violates it and hoping that it will help in
 // recreating the constraints. Yes we will loose that row at least that help to
 // recreate constraints ( fingers crossed :) )
-func deleteViolatingPkOrUkConstriants(con string) bool {
+func deleteViolatingPkOrUkConstraints(con string) bool {
 	Debugf("Attempting to run the constraint command %s second time, after deleting violating rows", con)
 	// does the DDL contain PK or UK keyword then do the following
 	// rest send them back for user to fix it.
-	if isSubStringAvailableOnString(con, "ADD CONSTRAINT.*PRIMARY KEY|ADD CONSTRAINT.*UNIQUE") {
-		column, _ := ColExtractor(con, `\(.*?\)`)
-		table, _ := ColExtractor(con, `ALTER TABLE(.*)ADD CONSTRAINT`)
-		table = strings.Trim(strings.Trim(table, "ALTER TABLE"), "ADD CONSTRAINT")
-		column = strings.Trim(column, "()")
+	if isSubStringAvailableOnString(con, "ADD CONSTRAINT.*PRIMARY KEY|ADD CONSTRAINT.*UNIQUE|CREATE UNIQUE INDEX") {
+		// Extract the table and column name
+		table, column := ExtractTableNColumnName(con)
 		err := deleteViolatingConstraintKeys(table, column)
 		if err != nil { // we failed to delete the the constraint violation rows
 			Debugf("Error when deleting rows from the constraint violation rows: %v", err)
@@ -249,4 +260,31 @@ func deleteViolatingPkOrUkConstriants(con string) bool {
 		return true
 	}
 	return false
+}
+
+// Extract the table name and the column from the sql command
+func ExtractTableNColumnName(s string) (string, string) {
+	var isItAlterStatement bool = true
+	var table string
+	var column string
+
+	// Is this a create statement
+	if strings.HasPrefix(s, "CREATE UNIQUE") { // like create unique index statement
+		isItAlterStatement = false
+	}
+
+	// Extract the column name
+	column, _ = ColExtractor(s, `\(([^\[\]]*)\)`)
+	column = TrimPrefixNSuffix(RemoveEverySuffixAfterADelimiter(column, " where "), "(", ")")
+
+	// Extract the table name
+	switch isItAlterStatement {
+	case true:
+		table, _ = ColExtractor(s, `ALTER TABLE(.*)ADD CONSTRAINT`)
+		table = TrimPrefixNSuffix(table, "ALTER TABLE", "ADD CONSTRAINT")
+	case false:
+		table, _ = ColExtractor(s, `ON(.*)USING`)
+		table = TrimPrefixNSuffix(table, "ON", "USING")
+	}
+	return table, column
 }
