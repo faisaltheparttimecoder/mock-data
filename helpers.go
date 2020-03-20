@@ -281,3 +281,10 @@ func CharLen(dt string) (int, error) {
 	}
 	return returnValue, nil
 }
+
+// New line if its not a debug
+func addNewLine() {
+	if !cmdOptions.Debug {
+		fmt.Println()
+	}
+}

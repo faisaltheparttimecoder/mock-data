@@ -412,8 +412,9 @@ func getTotalPKViolator(tab, cols string) int {
 
 	_, err := db.Query(pg.Scan(&total), query)
 	if err != nil {
+		addNewLine()
 		Debugf("query: %s", query)
-		Fatalf("Error when executing the query to extract pk violators: %v", err)
+		Errorf("Error when executing the query to extract pk violators: %v", err)
 	}
 
 	return total
@@ -436,8 +437,9 @@ func GetPKViolators(tab, cols string) []DBViolationRow {
 	query := strings.Replace(getPKViolator(tab, cols), "SELECT "+cols, "SELECT "+cols+" AS row", -1)
 	_, err := db.Query(&result, query)
 	if err != nil {
+		addNewLine()
 		Debugf("query: %s", query)
-		Fatalf("Error when executing the query to extract pk violators for table %s: %v", tab, err)
+		Errorf("Error when executing the query to extract pk violators for table %s: %v", tab, err)
 	}
 
 	return result
@@ -457,9 +459,9 @@ WHERE  ctid =
 	query = fmt.Sprintf(query, tab, col, newdata, whichrow)
 	_, err := ExecuteDB(query)
 	if err != nil {
-		fmt.Println()
+		addNewLine()
 		Debugf("query: %s", query)
-		Fatalf("Error when updating the primary key for table %s, err: %v", tab, err)
+		Errorf("Error when updating the primary key for table %s, err: %v", tab, err)
 	}
 	return ""
 }
@@ -489,8 +491,9 @@ func GetTotalFKViolators(key ForeignKey) int {
 
 	_, err := db.Query(pg.Scan(&total), query)
 	if err != nil {
+		addNewLine()
 		Debugf("Query: %s", query)
-		Fatalf("Error when executing the query to total rows of foreign keys for table %s: %v", key.Table, err)
+		Errorf("Error when executing the query to total rows of foreign keys for table %s: %v", key.Table, err)
 	}
 
 	return total
@@ -507,9 +510,9 @@ func TotalRows(tab string) int {
 
 	_, err := db.Query(pg.Scan(&total), query)
 	if err != nil {
-		fmt.Println()
+		addNewLine()
 		Debugf("query: %s", query)
-		Fatalf("Error when executing the query to total rows: %v", err)
+		Errorf("Error when executing the query to total rows: %v", err)
 	}
 
 	return total
@@ -527,8 +530,9 @@ func GetFKViolators(key ForeignKey) []DBViolationRow {
 	query := strings.Replace(getFKViolators(key), "SELECT "+key.Column, "SELECT "+key.Column+" AS row", -1)
 	_, err := db.Query(&result, query)
 	if err != nil {
+		addNewLine()
 		Debugf("query: %s", query)
-		Fatalf("Error when executing the query to extract fk violators for table %s: %v", key.Table, err)
+		Errorf("Error when executing the query to extract fk violators for table %s: %v", key.Table, err)
 	}
 
 	return result
@@ -547,15 +551,15 @@ WHERE  %[2]s = '%[6]s'
 	query = fmt.Sprintf(query, key.Table, key.Column, key.Refcolumn, key.Reftable, totalRows, whichRow)
 	_, err := ExecuteDB(query)
 	if err != nil {
-		fmt.Println()
+		addNewLine()
 		Debugf("query: %s", query)
-		Fatalf("Error when updating the foreign key for table %s, err: %v", key.Table, err)
+		Errorf("Error when updating the foreign key for table %s, err: %v", key.Table, err)
 	}
 }
 
 // Delete the violating key
 func deleteViolatingConstraintKeys(tab string, column string) error {
-	Debugf("Deleting the rows of the table that violate the constraints: %s:(%s)", tab, column)
+	Debugf("Deleting the rows of the table that violate the constraints: %s(%s)", tab, column)
 	query := `
 DELETE 
 FROM   %[1]s 
@@ -570,6 +574,7 @@ WHERE  (
 	query = fmt.Sprintf(query, tab, column)
 	_, err := ExecuteDB(query)
 	if err != nil {
+		Debug("query: %s", query)
 		return err
 	}
 	return nil
