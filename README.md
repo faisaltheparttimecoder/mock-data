@@ -92,6 +92,7 @@ Flags:
   -w, --password string   Password for the user to connect to database
   -p, --port int          Port number of the postgres database
   -r, --rows int          Total rows to be faked or mocked (default 10)
+      --uri string        Postgres connection URI, eg. postgres://user:pass@host:=port/db?sslmode=disable
   -u, --username string   Username to connect to the database
   -v, --verbose           Enable verbose or debug logging
       --version           version for mock

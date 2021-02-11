@@ -26,6 +26,7 @@ type Command struct {
 	DontPrompt       bool
 	SchemaName       string
 	File             string
+	Uri              string
 }
 
 // Database command line options
@@ -60,6 +61,16 @@ var rootCmd = &cobra.Command{
 		// if the rows are set to below 1, then error out
 		if cmdOptions.Rows < 1 {
 			Fatalf("Argument Error: minimum row cannot be less than 1")
+		}
+
+		// There can only be one option either uri or database connection values
+		isDatabaseArgumentsSet := !IsStringEmpty(cmdOptions.Database) ||
+			!IsStringEmpty(cmdOptions.Hostname) || !IsStringEmpty(cmdOptions.Username) ||
+			!IsStringEmpty(cmdOptions.Password) || cmdOptions.Port > 0
+
+		if !IsStringEmpty(cmdOptions.Uri) && isDatabaseArgumentsSet {
+			Warnf("Database Uri are given preference for database connection, when used along with database " +
+				"connection arguments, using URI to connect to database")
 		}
 
 		// Ensure we can make a successful connection to the database
@@ -209,6 +220,8 @@ func init() {
 		10, "Total rows to be faked or mocked")
 	rootCmd.PersistentFlags().IntVarP(&cmdOptions.Port, "port", "p",
 		viper.GetInt("PGPORT"), "Port number of the postgres database")
+	rootCmd.PersistentFlags().StringVar(&cmdOptions.Uri, "uri",
+		"", "Postgres connection URI, eg. postgres://user:pass@host:=port/db?sslmode=disable")
 	rootCmd.PersistentFlags().StringVarP(&cmdOptions.Hostname, "address", "a",
 		viper.GetString("PGHOSTADDR"), "Hostname where the postgres database lives")
 	rootCmd.PersistentFlags().StringVarP(&cmdOptions.Username, "username", "u",
