@@ -151,10 +151,10 @@ To customize this repository, follow the steps
     export GOPATH=<path to the clone repository>
     ```
 
-3. Install all the dependencies. If you don't have dep installed, follow the instruction from [here](https://github.com/golang/dep)
+3. Install all the dependencies. 
 
     ```
-    dep ensure
+    go mod vendor
     ```
 
 4. Make sure you have a demo postgres database to connect.
