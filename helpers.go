@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"github.com/go-pg/pg"
 	"github.com/k0kubun/go-ansi"
-	"github.com/schollz/progressbar"
+	"github.com/schollz/progressbar/v3"
 	"math"
 	"os"
 	"regexp"
@@ -21,6 +21,14 @@ func TimeNow() string {
 
 // Create a database connection
 func ConnectDB() *pg.DB {
+	if !IsStringEmpty(cmdOptions.Uri) {
+		opt, err := pg.ParseURL(cmdOptions.Uri)
+		if err != nil {
+			Fatalf("Encountered error when making a connection via the uri \"%s\", err: %v", cmdOptions.Uri, err)
+		}
+		return pg.Connect(opt)
+	}
+
 	setDBDefaults()
 	addr := fmt.Sprintf("%s:%d", cmdOptions.Hostname, cmdOptions.Port)
 	return pg.Connect(&pg.Options{
@@ -81,7 +89,6 @@ func StartProgressBar(text string, max int) *progressbar.ProgressBar {
 		}),
 		progressbar.OptionSetWriter(ansi.NewAnsiStdout()),
 		progressbar.OptionEnableColorCodes(true),
-		progressbar.OptionSetBytes(10000),
 		progressbar.OptionSetWidth(50),
 		progressbar.OptionSetDescription(fmt.Sprintf("[cyan]%s[reset]", text)),
 		progressbar.OptionShowCount(),
