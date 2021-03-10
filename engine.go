@@ -52,6 +52,8 @@ func BuildData(dt string) (interface{}, error) {
 		return buildBoolean(dt)
 	} else if strings.HasPrefix(dt, "text") { // Generate Random text
 		return buildText(dt)
+	} else if strings.HasPrefix(dt, "citext") { // Generate CiText text
+		return buildCiText(dt)
 	} else if strings.EqualFold(dt, "bytea") { // Generate Random bytea
 		return buildBytea(dt)
 	} else if StringHasPrefix(dt, floatKeywords) { // Generate Random float values
@@ -150,6 +152,15 @@ func buildText(dt string) (interface{}, error) {
 		return ArrayGenerator("text", dt, 0, 0)
 	}
 	return RandomParagraphs(), nil
+}
+
+// CiText Builder
+func buildCiText(dt string) (interface{}, error) {
+	isItArray, _ := isDataTypeAnArray(dt)
+	if isItArray {
+		return ArrayGenerator("citext", dt, 0, 0)
+	}
+	return RandomCiText(), nil
 }
 
 // Bytea builder
@@ -382,6 +393,8 @@ func randomDataByDataTypeForArray(dt, originalDt string, min, max int) (string, 
 		return RandomBit(max), nil
 	} else if dt == "text" {
 		return fake.WordsN(1), nil
+	} else if dt == "citext" {
+		return RandomCiText(), nil
 	} else if dt == "timetz" {
 		return RandomTimeTz(min, max)
 	} else if dt == "bool" {

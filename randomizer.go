@@ -141,6 +141,11 @@ func RandomParagraphs() string {
 	return fake.ParagraphsN(n)
 }
 
+// Random CiText generator
+func RandomCiText() string {
+	return strings.Title(fake.Words())
+}
+
 // Random IPv6 & IPv4 Address
 func RandomIP() string {
 	number := RandomInt(1, 9999)
