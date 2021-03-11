@@ -18,7 +18,6 @@ func SupportedDataTypes() []string {
 		"char(10),",
 		"varchar(10),",
 		"text,",
-		"citext,",
 		"inet,",
 		"macaddr,",
 		"cidr,",
@@ -66,7 +65,6 @@ func SupportedDataTypes() []string {
 		"timestamp with time zone[],",
 		"timestamp without time zone[],",
 		"text[],",
-		"citext[],",
 		"bool[],",
 		"inet[],",
 		"macaddr[],",
@@ -120,7 +118,6 @@ CREATE TABLE supported_datatypes (
   col_character                               char(10),
   col_character_varying                       varchar(10),
   col_text                                    text,
-  col_citext                                  citext,
 
   -- Network Address Type
   col_inet                                    inet,
@@ -190,7 +187,6 @@ CREATE TABLE supported_datatypes (
   col_timestamp_array                         timestamp with time zone[],
   col_timestamp_tz_array                      timestamp without time zone[],
   col_text_array                              text[],
-  col_citext_array                            citext[],
   col_bool_array                              bool[],
   col_inet_array                              inet[],
   col_macaddr_array                           macaddr[],
