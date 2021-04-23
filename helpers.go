@@ -3,7 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"github.com/k0kubun/go-ansi"
 	"github.com/schollz/progressbar/v3"
 	"math"

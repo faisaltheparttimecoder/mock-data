@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-pg/pg"
+	"github.com/go-pg/pg/v10"
 	"strings"
 )
 
