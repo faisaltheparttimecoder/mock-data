@@ -2,10 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/go-pg/pg/v10"
 	"strings"
+
+	"github.com/go-pg/pg/v10"
 )
 
+// GreenplumOrPostgres ...
 var GreenplumOrPostgres = "greenplum"
 
 type DBTables struct {
@@ -274,9 +276,8 @@ ORDER  BY tablename
 	_, err := db.Query(&result, query)
 	if err != nil {
 		Debugf("query: %s", query)
-		Fatalf("Encountered error when getting all the constriants from database, err: %v", err)
+		Fatalf("Encountered error when getting all the constraints from database, err: %s", err)
 	}
-
 	return result
 }
 
@@ -309,7 +310,7 @@ WHERE  schemaname IN (SELECT nspname
 	_, err := db.Query(&result, query)
 	if err != nil {
 		Debugf("query: %s", query)
-		Fatalf("Encountered error when getting all the constriants from database, err: %v", err)
+		Fatalf("Encountered error when getting all the constraints from database, err: %s", err)
 	}
 
 	return result
@@ -366,9 +367,9 @@ ORDER  BY constrainttype
 	_, err := db.Query(&result, query)
 	if err != nil {
 		Debugf("query: %s", query)
-		Fatalf("Encountered error when getting constraints for table %s from database, err: %v", tabname, err)
+		Fatalf("Encountered error when getting constraints for table %s from database, err: %s",
+			tabname, err)
 	}
-
 	return result
 }
 
@@ -493,7 +494,7 @@ func GetTotalFKViolators(key ForeignKey) int {
 	if err != nil {
 		addNewLine()
 		Debugf("Query: %s", query)
-		Errorf("Error when executing the query to total rows of foreign keys for table %s: %v", key.Table, err)
+		Errorf("Error when executing the query to total rows of foreign keys for table %s: %s", key.Table, err)
 	}
 
 	return total
@@ -574,7 +575,7 @@ WHERE  (
 	query = fmt.Sprintf(query, tab, column)
 	_, err := ExecuteDB(query)
 	if err != nil {
-		Debug("query: %s", query)
+		Debugf("query: %s", query)
 		return err
 	}
 	return nil

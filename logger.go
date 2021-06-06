@@ -2,9 +2,10 @@ package main
 
 import (
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"runtime"
 	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
 var logger = logrus.New()
