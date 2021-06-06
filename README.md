@@ -22,7 +22,8 @@ However, please **DO MAKE SURE TO TAKE A BACKUP** of your database before you mo
 
 Check on the "Known Issues" section below for more information about current identified bugs.
 
-# Table of Contents
+## Table of Contents
+
    * [Important information and disclaimer](#important-information-and-disclaimer)
    * [Supported database engines &amp; data types](#supported-database-engines--data-types)
         * [Database Engine](#database-engine)
@@ -36,11 +37,11 @@ Check on the "Known Issues" section below for more information about current ide
    * [License](#license)
    * [Authors](#authors)
 
-# Important information and disclaimer
+## Important information and disclaimer
 
 Mock-data idea is to generate fake data in new test cluster and it is **NOT TO BE USED IN PRODUCTION ENVIRONMENTS**. Please ensure you have a backup of your database before running Mock-data in an environment you can't afford losing.
 
-# Supported database engines & data types
+## Supported database engines & data types
 
 ### Database Engine
 + PostgresSQL
@@ -51,7 +52,7 @@ Mock-data idea is to generate fake data in new test cluster and it is **NOT TO B
 + All datatypes that are listed on the [postgres datatype](https://www.postgresql.org/docs/9.6/static/datatype.html) website are supported
 + As Greenplum are both base from postgres, the supported postgres datatype also apply in their case
 
-# How it works
+## How it works
 
 + PARSES the CLI arguments
 + CHECKS if the database connection can be established
@@ -66,7 +67,8 @@ Mock-data idea is to generate fake data in new test cluster and it is **NOT TO B
 + CHECK constraints are ignored (coming soon?)
 + LOADS constraints that it had backed up (Mock-data can fail at this stage if its not able to fix the constraint violations)
 
-# Usage
+## Usage
+
 ```
 $ mock --help
 This program generates fake data into a postgres database cluster. 
@@ -100,7 +102,7 @@ Flags:
 Use "mock [command] --help" for more information about a command.
 ```
 
-# Installation
+## Installation
 
 [Download](https://github.com/pivotal/mock-data/releases/latest) the latest release for your OS & Architecture and you're ready to go!
 
@@ -114,7 +116,7 @@ chmod +x /usr/local/bin/mock
 
 provided `/usr/local/bin` is part of the $PATH environment variable.
 
-# Examples
+## Examples
 
 Here is a simple demo of how the tool works, provide us your table and we will load the data for you
 
@@ -129,7 +131,7 @@ For more examples how to use the tool, please check out the [wiki](https://githu
 * Read this section on how the subcommand [tables](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Tables) works
  
 
-# Known Issues
+## Known Issues
 
 1. We do struggle when recreating constraints, even though we do try to fix the primary key , foreign key, unique key. So there is no guarantee that the tool will fix all the constraints and manual intervention is needed in some cases.
 2. If you have a composite unique index where one column is part of foreign key column then there are chances the constraint creation would fail.
@@ -137,7 +139,7 @@ For more examples how to use the tool, please check out the [wiki](https://githu
 4. On Greenplum Database partition tables are not supported (due to check constraint issues defined above), so use the `custom` sub command to define the data to be inserted to the column with check constraints
 5. Custom data types are not supported, use `custom` sub command to control the data for that custom data types
 
-# Developers / Collaboration
+## Developers / Collaboration
 
 You can sumbit issues or pull request via [github](https://github.com/pivotal/mock-data) and we will try our best to fix them.
 
@@ -170,10 +172,10 @@ To customize this repository, follow the steps
     /bin/sh build.sh
     ```
 
-# License
+## License
 
 The Project is licensed under [MIT](https://github.com/pivotal-legacy/mock-data/blob/master/LICENSE)
 
-# Authors
+## Authors
 
 [![Ignacio](https://img.shields.io/badge/github-Ignacio_Elizaga-green.svg?style=social)](https://github.com/ielizaga) [![Aitor](https://img.shields.io/badge/github-Aitor_Cedres-green.svg?style=social)](https://github.com/Zerpet) [![Juan](https://img.shields.io/badge/github-Juan_Ramos-green.svg?style=social)](https://github.com/jujoramos) [![Faisal](https://img.shields.io/badge/github-Faisal_Ali-green.svg?style=social)](https://github.com/faisaltheparttimecoder) [![Adam](https://img.shields.io/badge/github-Adam_Clevy-green.svg?style=social)](https://github.com/adamclevy)
