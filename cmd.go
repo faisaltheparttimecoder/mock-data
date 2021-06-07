@@ -126,7 +126,7 @@ var tablesCmd = &cobra.Command{
 		}
 		// either create fake tables or insert mock table rows are allowed, not together
 		if cmdOptions.Tab.FakeNewTables && !IsStringEmpty(cmdOptions.Tab.FakeTablesRows) {
-			Fatalf("Cannot perform create table & mock tables together, choose one")
+			Fatal("Cannot perform create table & mock tables together, choose one")
 		}
 		// if there is request for new tables and no of tables parameter is below 1 then error out
 		if cmdOptions.Tab.FakeNewTables && cmdOptions.Tab.TotalTables < 1 {
