@@ -29,6 +29,7 @@ RUN addgroup -S mock; \
     adduser -S mock -G mock -D -u 10000 -h /home/mock -s /bin/nologin; \
     chown -R mock:mock /home/mock
 COPY --from=builder /bin/mock /usr/bin/mock
+VOLUME [ "/home/mock" ]
 
 USER 10000
 
