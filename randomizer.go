@@ -3,18 +3,21 @@ package main
 import (
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
-	"github.com/icrowley/fake"
 	"math"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/icrowley/fake"
 )
 
 // Set the seed value of the random generator
 var r *rand.Rand
+
 func init() {
+	// nolint:gosec
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
@@ -46,9 +49,9 @@ func RandomBytea(maxlen int) []byte {
 }
 
 // Random Float generator based on precision specified
-func RandomFloat(min, max, precision int) (float64) {
+func RandomFloat(min, max, precision int) float64 {
 	output := math.Pow(10, float64(precision))
-	randNumber := float64(min) + r.Float64() * float64(max - min) * 100
+	randNumber := float64(min) + r.Float64()*float64(max-min)*100
 	return math.Round(randNumber) / output
 }
 
@@ -96,7 +99,7 @@ func RandomTimeStampTzWithDecimals(fromyear, toyear, decimal int) (string, error
 	var timestampDecimal string
 	d, err := RandomTimestamp(fromYear, toYear)
 	if err != nil {
-		return "", fmt.Errorf("randomizer with timestamp[p] without timezone failed: %v", err)
+		return "", fmt.Errorf("randomizer with timestamp[p] without timezone failed: %w", err)
 	}
 	// use rand() to generate random decimal in timestamp
 	for i := 0; i < decimal; i++ {
@@ -129,10 +132,7 @@ func RandomTimeTz(fromyear, toyear int) (string, error) {
 // Random bool generator based on if number is even or not
 func RandomBoolean() bool {
 	number := RandomInt(1, 9999)
-	if number%2 == 0 {
-		return true
-	}
-	return false
+	return number%2 == 0
 }
 
 // Random Paragraphs
@@ -185,19 +185,18 @@ func RandomMacAddress() string {
 // Random Text Search Query
 func RandomTSQuery() string {
 	number := RandomInt(1, 9999)
-	number = number % 5
-	if number == 0 {
+	switch number % 5 { // TODO: replace magic number 5 to symbol constant. What is mean 5? Why exactly 5?
+	case 0:
 		return fake.WordsN(1) + " & " + fake.WordsN(1)
-	} else if number == 1 {
+	case 1: // TODO: replace magic number to symbol constant. What is mean 1 or 2 or 3?
 		return fake.WordsN(1) + " | " + fake.WordsN(1)
-	} else if number == 2 {
-		return " ! " + fake.WordsN(1) + " & " + fake.WordsN(1)
-	} else if number == 3 {
+	case 2: // TODO: replace magic number to symbol constant
+		return fake.WordsN(1) + " | " + fake.WordsN(1)
+	case 3: // TODO: replace magic number to symbol constant
 		return fake.WordsN(1) + " & " + fake.WordsN(1) + "  & ! " + fake.WordsN(1)
-	} else {
+	default:
 		return fake.WordsN(1) + " & ( " + fake.WordsN(1) + " | " + fake.WordsN(1) + " )"
 	}
-	return ""
 }
 
 // Random Text Search Query
@@ -222,7 +221,6 @@ func RandomGeometricData(randomInt int, GeoMetry string, IsItArray bool) string 
 			RandomInt(1, 999), RandomInt(1, 999))
 		return FormatForArray(data, IsItArray)
 	}
-	return ""
 }
 
 // Random Log Sequence Number
@@ -243,7 +241,7 @@ func RandomTXID() string {
 }
 
 // Random JSON generator
-func RandomJson(IsItArray bool) string {
+func RandomJSON(IsItArray bool) string {
 	jsonData := fmt.Sprintf(JsonSkeleton(), RandomString(24),
 		fake.DigitsN(10), RandomUUID(), strconv.FormatBool(RandomBoolean()), fake.Digits(), fake.DigitsN(2),
 		fake.DomainName(), fake.WordsN(1), fake.DigitsN(2), fake.UserName(), fake.Color(), fake.FullName(),
@@ -258,9 +256,8 @@ func RandomJson(IsItArray bool) string {
 		fake.Brand())
 	if IsItArray {
 		return strings.Replace(jsonData, "\"", "\\\"", -1)
-	} else {
-		return jsonData
 	}
+	return jsonData
 }
 
 // Random XML Generator
@@ -271,9 +268,8 @@ func RandomXML(IsItArray bool) string {
 		fake.Digits(), fake.DigitsN(2), fake.Title(), fake.Digits(), fake.Digits(), fake.DigitsN(2))
 	if IsItArray {
 		return strings.Replace(xmlData, "\"", "\\\"", -1)
-	} else {
-		return xmlData
 	}
+	return xmlData
 }
 
 // Pick Random Value from any array

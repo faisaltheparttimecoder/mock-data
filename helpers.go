@@ -3,23 +3,28 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"github.com/go-pg/pg/v10"
-	"github.com/k0kubun/go-ansi"
-	"github.com/schollz/progressbar/v3"
 	"math"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/go-pg/pg/v10"
+	"github.com/k0kubun/go-ansi"
+	"github.com/schollz/progressbar/v3"
 )
 
-// Extract the current time now.
+const (
+	timestampLayout string = "20060102150405"
+)
+
+// TimeNow presents the current time in 20060102150405 format.
 func TimeNow() string {
-	return time.Now().Format("20060102150405")
+	return time.Now().Format(timestampLayout)
 }
 
-// Create a database connection
+// ConnectDB creates a database connection.
 func ConnectDB() *pg.DB {
 	if !IsStringEmpty(cmdOptions.Uri) {
 		opt, err := pg.ParseURL(cmdOptions.Uri)
@@ -39,7 +44,7 @@ func ConnectDB() *pg.DB {
 	})
 }
 
-// Execute statement in the database
+// ExecuteDB executes statement in the database.
 func ExecuteDB(stmt string) (pg.Result, error) {
 	// Connect to database
 	db := ConnectDB()
@@ -70,10 +75,7 @@ func setDBDefaults() {
 
 // is string empty
 func IsStringEmpty(s string) bool {
-	if strings.TrimSpace(s) != "" {
-		return false
-	}
-	return true
+	return strings.TrimSpace(s) == ""
 }
 
 // Progress Bar
@@ -119,9 +121,8 @@ func RemoveSpecialCharacters(s string) string {
 func FormatForArray(s string, isItArray bool) string {
 	if isItArray {
 		return fmt.Sprintf("\"%s\"", s)
-	} else {
-		return s
 	}
+	return s
 }
 
 // Prompt for confirmation
@@ -140,7 +141,6 @@ func YesOrNoConfirmation() string {
 	fmt.Printf(question, programName, cmdOptions.Database)
 	input := bufio.NewScanner(os.Stdin)
 	for input.Scan() {
-
 		// The choice entered
 		choiceEntered := input.Text()
 
@@ -166,7 +166,7 @@ func IgnoreError(e string, ignoreMsg string, failureMsg string) {
 	}
 }
 
-// If the random value of numeric datatype is greater than specifed, it ends up with
+// If the random value of numeric datatype is greater than specified, it ends up with
 // i.e error "numeric field overflow"
 // The below helper helps to reduce the size of the value
 func TruncateFloat(f float64, max, precision int) float64 {
@@ -179,7 +179,6 @@ func TruncateFloat(f float64, max, precision int) float64 {
 
 // Extract Float precision from the float datatypes
 func FloatPrecision(dt string) (int, int, error) {
-
 	// check if brackets exists, if it doesn't then add some virtual values
 	if !BracketsExists(dt) && strings.HasSuffix(dt, "[]") {
 		dt = strings.Replace(dt, "[]", "", 1) + "(5,3)[]"
@@ -192,11 +191,11 @@ func FloatPrecision(dt string) (int, int, error) {
 	split := strings.Split(rs[1], ",")
 	m, err := strconv.Atoi(split[0])
 	if err != nil {
-		return 0, 0, fmt.Errorf("float Precision (min): %v", err)
+		return 0, 0, fmt.Errorf("float Precision (min): %w", err)
 	}
 	p, err := strconv.Atoi(split[1])
 	if err != nil {
-		return 0, 0, fmt.Errorf("float Precision (precision): %v", err)
+		return 0, 0, fmt.Errorf("float Precision (precision): %w", err)
 	}
 	return m, p, nil
 }
@@ -207,15 +206,13 @@ func ColExtractor(conkey, regExp string) (string, error) {
 	rs := rgx.FindStringSubmatch(conkey)
 	if len(rs) > 0 {
 		return rs[0], nil
-	} else {
-		return "", fmt.Errorf("unable to extract the columns from the constraint key")
 	}
-	return "", nil
+	return "", fmt.Errorf("unable to extract the columns from the constraint key")
 }
 
 // Trim brackets at the start and at the end
 func TrimPrefixNSuffix(s, prefix, suffix string) string {
-	return strings.TrimPrefix(strings.TrimSuffix(s, suffix) , prefix)
+	return strings.TrimPrefix(strings.TrimSuffix(s, suffix), prefix)
 }
 
 // Remove everything after a delimiter
@@ -234,20 +231,13 @@ func RemoveEverySuffixAfterADelimiter(s string, d string) string {
 func BracketsExists(dt string) bool {
 	var rgx = regexp.MustCompile(`\(.*\)`)
 	rs := rgx.FindStringSubmatch(dt)
-	if len(rs) > 0 {
-		return true
-	} else {
-		return false
-	}
+	return len(rs) > 0
 }
 
 // Does the string contain the substring
 func isSubStringAvailableOnString(s string, criteria string) bool {
-	var re = regexp.MustCompile(fmt.Sprintf("%s", criteria))
-	if re.MatchString(s) {
-		return true
-	}
-	return false
+	var re = regexp.MustCompile(criteria)
+	return re.MatchString(s)
 }
 
 // Built a method to find if the values exits with a slice

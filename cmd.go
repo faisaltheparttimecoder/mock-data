@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -125,7 +126,7 @@ var tablesCmd = &cobra.Command{
 		}
 		// either create fake tables or insert mock table rows are allowed, not together
 		if cmdOptions.Tab.FakeNewTables && !IsStringEmpty(cmdOptions.Tab.FakeTablesRows) {
-			Fatalf("Cannot perform create table & mock tables together, choose one", programName)
+			Fatal("Cannot perform create table & mock tables together, choose one")
 		}
 		// if there is request for new tables and no of tables parameter is below 1 then error out
 		if cmdOptions.Tab.FakeNewTables && cmdOptions.Tab.TotalTables < 1 {
@@ -194,7 +195,7 @@ var customCmd = &cobra.Command{
 		}
 		// If both is set
 		if !IsStringEmpty(cmdOptions.Tab.FakeTablesRows) && !IsStringEmpty(cmdOptions.File) {
-			Fatalf("Cannot run the table and loading of data via file together, choose one", programName)
+			Fatalf("Cannot run the table and loading of data via file together, choose one")
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {

@@ -6,7 +6,8 @@ import (
 )
 
 var (
-	programName        = "mock"
+	programName = "mock"
+	// SUGGESTION: implement semantic versioning https://semver.org
 	programVersion     = "v2.9"
 	ExecutionTimestamp = TimeNow()
 	Path               = fmt.Sprintf("%s/%s/%s", os.Getenv("HOME"), programName, ExecutionTimestamp)

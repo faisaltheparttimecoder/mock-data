@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-// Create directory if not exists
+// CreateDirectory creates directory if not exists.
 func CreateDirectory() {
 	if _, err := os.Stat(Path); os.IsNotExist(err) {
 		err := os.MkdirAll(Path, os.ModePerm)

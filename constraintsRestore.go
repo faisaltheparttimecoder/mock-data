@@ -12,15 +12,15 @@ var (
 	maxLoop = 10
 )
 
-// Get Foriegn key objects
+// Get Foreign key objects
 type ForeignKey struct {
 	Table, Column, Reftable, Refcolumn string
 }
 
 // Ty to recreate all the constraints where ever we can
 func FixConstraints() {
-	//Fix the constraints in this order
-	//var constr = []string{"PRIMARY", "UNIQUE", "CHECK", "FOREIGN"}
+	// Fix the constraints in this order
+	// var constr = []string{"PRIMARY", "UNIQUE", "CHECK", "FOREIGN"}
 	var constr = []string{"PRIMARY", "UNIQUE", "FOREIGN"}
 	for _, v := range constr {
 		totalViolations := len(savedConstraints[v])
@@ -33,7 +33,7 @@ func FixConstraints() {
 				fixPKey(con)
 			case v == "UNIQUE": // Run the same logic as primary key
 				fixPKey(con)
-				//case v == "CHECK": // TODO: Its hard to predict the check constraint ATM
+				// case v == "CHECK": // TODO: Its hard to predict the check constraint ATM
 				//  fixCheck(db, con)
 			case v == "FOREIGN":
 				fixFKey(con)
@@ -63,7 +63,6 @@ func fixPKey(pk constraint) {
 		// How many violations are we having, if zero then loop breaks
 		totalViolators = getTotalPKViolator(pk.table, cols)
 		if totalViolators > 0 { // Found violation, time to fix it
-
 			// If there are two or more columns forming a PK or UK
 			pkColumns := strings.Split(cols, ",")
 
@@ -252,7 +251,7 @@ func deleteViolatingPkOrUkConstraints(con string) bool {
 			return false
 		}
 		_, err = ExecuteDB(con) // retry to create the constraint again
-		if err != nil { // we failed to recreate the constraint
+		if err != nil {         // we failed to recreate the constraint
 			Debugf("Error when 2nd attempt to recreate constraint: %v", err)
 			return false
 		}

@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/icrowley/fake"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/icrowley/fake"
 )
 
 var (
@@ -33,7 +34,6 @@ var (
 // Data Generator
 // It provided random data based on data types.
 func BuildData(dt string) (interface{}, error) {
-	var value interface{}
 	if StringHasPrefix(dt, intKeywords) { // Integer builder
 		return buildInteger(dt)
 	} else if strings.HasPrefix(dt, "character") { // String builder
@@ -83,7 +83,6 @@ func BuildData(dt string) (interface{}, error) {
 	} else { // if these are not the defaults, the ony custom we allow is enum data type, check if its them
 		return buildEnumDatatypes(dt)
 	}
-	return value, nil
 }
 
 // Build Integer
@@ -225,7 +224,7 @@ func buildJson(dt string) (interface{}, error) {
 	if isItArray {
 		return JsonXmlArrayGenerator("json"), nil
 	}
-	return RandomJson(false), nil
+	return RandomJSON(false), nil
 }
 
 // Xml Builder
@@ -451,7 +450,7 @@ func JsonXmlArrayGenerator(dt string) string {
 
 		switch dt { // Choose the appropriate random data generators
 		case "json":
-			value = fmt.Sprintf("\"%s\"", RandomJson(true))
+			value = fmt.Sprintf("\"%s\"", RandomJSON(true))
 		case "xml":
 			value = fmt.Sprintf("\"%s\"", RandomXML(true))
 		}
