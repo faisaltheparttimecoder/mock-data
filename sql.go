@@ -112,6 +112,10 @@ WHERE  c.relkind IN ( 'r', '' )
        AND n.nspname !~ '^gp_toolkit' 
        AND c.relkind = 'r' 
        %s 
+UNION
+SELECT foreign_table_schema as SCHEMA,
+       foreign_table_name as table
+FROM information_schema.foreign_tables
 ORDER  BY 1 
 `
 	// add where clause
