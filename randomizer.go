@@ -97,7 +97,7 @@ func RandomTimeStampTz(fromyear, toyear int) (string, error) {
 // Random Timestamp with decimals
 func RandomTimeStampTzWithDecimals(fromyear, toyear, decimal int) (string, error) {
 	var timestampDecimal string
-	d, err := RandomTimestamp(fromYear, toYear)
+	d, err := RandomTimestamp(fromyear, toyear)
 	if err != nil {
 		return "", fmt.Errorf("randomizer with timestamp[p] without timezone failed: %w", err)
 	}
