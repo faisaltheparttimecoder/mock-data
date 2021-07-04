@@ -12,7 +12,7 @@ import (
 var (
 	// ranges of dates
 	fromYear = -10
-	toYear   = 10
+	toYear   = 0
 
 	// Time data types
 	intervalKeywords = []string{"interval", "time without time zone"}
