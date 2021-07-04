@@ -235,7 +235,7 @@ func BracketsExists(dt string) bool {
 }
 
 // Does the string contain the substring
-func isSubStringAvailableOnString(s string, criteria string) bool {
+func IsSubStringAvailableOnString(s string, criteria string) bool {
 	var re = regexp.MustCompile(criteria)
 	return re.MatchString(s)
 }
