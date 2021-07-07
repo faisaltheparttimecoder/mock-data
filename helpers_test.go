@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-var setDatabaseConfig = func() {
+var setDatabaseConfigForTest = func() {
 	cmdOptions.Database = viper.GetString("PGDATABASE")
 	cmdOptions.Password = viper.GetString("PGPASSWORD")
 	cmdOptions.Username = viper.GetString("PGUSER")
@@ -49,7 +49,7 @@ func TestConnectDB(t *testing.T) {
 	})
 	t.Run("validate_non_connection_uri", func(t *testing.T) {
 		db := ConnectDB()
-		setDatabaseConfig()
+		setDatabaseConfigForTest()
 		if db.Options().Database != cmdOptions.Database &&
 			db.Options().Password != cmdOptions.Password &&
 			db.Options().User != cmdOptions.Username &&
@@ -63,7 +63,7 @@ func TestConnectDB(t *testing.T) {
 // Test: ExecuteDB, check if the database connection is able to execute any statement
 func TestExecuteDB(t *testing.T) {
 	t.Run("validate_database_connection_with_query", func(t *testing.T) {
-		setDatabaseConfig()
+		setDatabaseConfigForTest()
 		if _, err := ExecuteDB("select 1"); err != nil {
 			t.Errorf("TestExecuteDB expect to return select, got = %v", err)
 		}
