@@ -13,6 +13,30 @@ import (
 	"time"
 )
 
+// Date unit test cases
+type dateTest []struct {
+	name     string
+	fromYear int
+	toYear   int
+	fromDate time.Time
+	toDate   time.Time
+	decimal  int
+}
+
+var (
+	dateByYear = func(n int) time.Time {
+		return time.Now().AddDate(n, 0, 0)
+	}
+	dateTests = dateTest{
+		{"date_from_ten_years_ago_to_now", -10, 0, dateByYear(-10),
+			dateByYear(0), 2},
+		{"date_from_now_to_future", 0, 10, dateByYear(0),
+			dateByYear(10), 4},
+		{"date_between_past_and_future", -10, 10, dateByYear(-10),
+			dateByYear(10), 6},
+	}
+)
+
 // Test: RandomString, should generate a random string of the requested size
 func TestRandomString(t *testing.T) {
 	tests := []struct {
@@ -101,29 +125,6 @@ func TestRandomFloat(t *testing.T) {
 	}
 }
 
-// Date unit test cases
-type dateTest []struct {
-	name     string
-	fromYear int
-	toYear   int
-	fromDate time.Time
-	toDate   time.Time
-	decimal  int
-}
-
-func dateByYear(n int) time.Time {
-	return time.Now().AddDate(n, 0, 0)
-}
-
-var dateTests = dateTest{
-	{"date_from_ten_years_ago_to_now", -10, 0, dateByYear(-10),
-		dateByYear(0), 2},
-	{"date_from_now_to_future", 0, 10, dateByYear(0),
-		dateByYear(10), 4},
-	{"date_between_past_and_future", -10, 10, dateByYear(-10),
-		dateByYear(10), 6},
-}
-
 // Test: RandomCalenderDateTime, get a unix time in seconds between two years
 func TestRandomCalenderDateTime(t *testing.T) {
 	for _, tt := range dateTests {
@@ -140,10 +141,9 @@ func TestRandomCalenderDateTime(t *testing.T) {
 // RandomDate using the RandomCalenderDateTime, so we have already checked from above that they are
 // in range, so lets check the format here
 func TestRandomDate(t *testing.T) {
-	format := regexp.MustCompile("((19|20|21)\\d\\d)-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])")
 	for _, tt := range dateTests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := RandomDate(tt.fromYear, tt.toYear); !format.MatchString(got) {
+			if got, _ := RandomDate(tt.fromYear, tt.toYear); !doesDataMatchDataType(got, reExpDate) {
 				t.Errorf("TestRandomDate = %v, want in format = YYYY-MM-DD", got)
 			}
 		})
@@ -154,11 +154,9 @@ func TestRandomDate(t *testing.T) {
 // RandomTimestamp using the RandomCalenderDateTime, so we have already checked from above that they are
 // in range, so lets check the format here
 func TestRandomTimestamp(t *testing.T) {
-	format := regexp.MustCompile("((19|20|21)\\d\\d)-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01]) " +
-		"[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}")
 	for _, tt := range dateTests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := RandomTimestamp(tt.fromYear, tt.toYear); !format.MatchString(got) {
+			if got, _ := RandomTimestamp(tt.fromYear, tt.toYear); !doesDataMatchDataType(got, reExpTimeStamp) {
 				t.Errorf("TestRandomTimestamp = %v, want in format = YYYY-MM-DD hh:mm:ss", got)
 			}
 		})
@@ -169,11 +167,9 @@ func TestRandomTimestamp(t *testing.T) {
 // RandomTimeStampTz using the RandomCalenderDateTime, so we have already checked from above that they are
 // in range, so lets check the format here
 func TestRandomTimeStampTz(t *testing.T) {
-	format := regexp.MustCompile("((19|20|21)\\d\\d)-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01]) " +
-		"[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}.\\d")
 	for _, tt := range dateTests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := RandomTimeStampTz(tt.fromYear, tt.toYear); !format.MatchString(got) {
+			if got, _ := RandomTimeStampTz(tt.fromYear, tt.toYear); !doesDataMatchDataType(got, reExpTimeStampTz) {
 				t.Errorf("TestRandomTimeStampTz = %v, want in format = YYYY-MM-DD hh:mm:ss.000000", got)
 			}
 		})
@@ -185,11 +181,9 @@ func TestRandomTimeStampTz(t *testing.T) {
 // in range, so lets check the format here
 func TestRandomTimeStampTzWithDecimals(t *testing.T) {
 	for _, tt := range dateTests {
-		re := fmt.Sprintf("((19|20|21)\\d\\d)-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01]) "+
-			"[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}.(\\d{1,%d})", tt.decimal)
-		format := regexp.MustCompile(re)
+		re := fmt.Sprintf(reExpTimeStampTzWithDecimal, tt.decimal)
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := RandomTimeStampTzWithDecimals(tt.fromYear, tt.toYear, tt.decimal); !format.MatchString(got) {
+			if got, _ := RandomTimeStampTzWithDecimals(tt.fromYear, tt.toYear, tt.decimal); !doesDataMatchDataType(got, re) {
 				t.Errorf("TestRandomTimeStampTz = %v, want in format = YYYY-MM-DD hh:mm:ss.%s", got,
 					strings.Repeat("0", tt.decimal))
 			}
@@ -201,10 +195,9 @@ func TestRandomTimeStampTzWithDecimals(t *testing.T) {
 // RandomTime using the RandomCalenderDateTime, so we have already checked from above that they are
 // in range, so lets check the format here
 func TestRandomTime(t *testing.T) {
-	format := regexp.MustCompile("[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}")
 	for _, tt := range dateTests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := RandomTime(tt.fromYear, tt.toYear); !format.MatchString(got) {
+			if got, _ := RandomTime(tt.fromYear, tt.toYear); !doesDataMatchDataType(got, reExpTimeWithoutTz) {
 				t.Errorf("TestRandomTime = %v, want in format = hh:mm:ss", got)
 			}
 		})
@@ -215,10 +208,9 @@ func TestRandomTime(t *testing.T) {
 // RandomTimeTz using the RandomCalenderDateTime, so we have already checked from above that they are
 // in range, so lets check the format here
 func TestRandomTimeTz(t *testing.T) {
-	format := regexp.MustCompile("[0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2}.\\d")
 	for _, tt := range dateTests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := RandomTimeTz(tt.fromYear, tt.toYear); !format.MatchString(got) {
+			if got, _ := RandomTimeTz(tt.fromYear, tt.toYear); !doesDataMatchDataType(got, reExpTimeWithTz) {
 				t.Errorf("TestRandomTimeTz = %v, want in format = hh:mm:ss.000000", got)
 			}
 		})
@@ -245,9 +237,8 @@ func TestRandomParagraphs(t *testing.T) {
 
 // Test: RandomCiText, check if the words emptied is capitalized
 func TestRandomCiText(t *testing.T) {
-	format := regexp.MustCompile("[A-Z][a-z]*(\\s[A-Z][a-z]*)*")
 	t.Run("check_capitalize_words", func(t *testing.T) {
-		if got := RandomCiText(); !format.MatchString(got) {
+		if got := RandomCiText(); !doesDataMatchDataType(got, reExpCiText) {
 			t.Errorf("TestRandomCiText = %v, want = %v", got, strings.Title(got))
 		}
 	})
@@ -264,7 +255,6 @@ func TestRandomIP(t *testing.T) {
 
 // Test: RandomBit, check if the bit produced is valid and is of the length requested
 func TestRandomBit(t *testing.T) {
-	format := regexp.MustCompile("^(?:[01]+|[01]*\\.[01]+)$")
 	tests := []struct {
 		name   string
 		length int
@@ -276,7 +266,8 @@ func TestRandomBit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := RandomBit(tt.length); !format.MatchString(got) || !(len(got) > 0 && len(got) <= tt.length) {
+			if got := RandomBit(tt.length);
+			!doesDataMatchDataType(got, reExpBit) || !(len(got) > 0 && len(got) <= tt.length) {
 				t.Errorf("TestRandomBit = %v, want valid bit format or length <= %v", got, tt.length)
 			}
 		})
@@ -329,18 +320,12 @@ func TestRandomGeometricData(t *testing.T) {
 		isArray bool
 		re      string
 	}{
-		{"validate_point_non_array", "point", false,
-			"^[0-9]{1,},[0-9]{1,}$"},
-		{"validate_point_array", "point", true,
-			"^\"[0-9]{1,},[0-9]{1,}\"$"},
-		{"validate_circle_non_array", "circle", false,
-			"^<\\([0-9]{1,},[0-9]{1,}\\),[0-9]{1,}>$"},
-		{"validate_circle_array", "circle", true,
-			"^\"<\\([0-9]{1,},[0-9]{1,}\\),[0-9]{1,}>\"$"},
-		{"validate_other_geometric_data_non_array", "others", false,
-			"^[0-9]{1,},[0-9]{1,},[0-9]{1,},[0-9]{1,}$"},
-		{"validate_other_geometric_data_array", "others", true,
-			"^\"[0-9]{1,},[0-9]{1,},[0-9]{1,},[0-9]{1,}\"$"},
+		{"validate_point_non_array", "point", false, reExpPoint},
+		{"validate_point_array", "point", true, reExpPoint},
+		{"validate_circle_non_array", "circle", false, reExpCircle},
+		{"validate_circle_array", "circle", true, reExpCircle},
+		{"validate_other_geometric_data_non_array", "others", false, reExpOtherGeometricData},
+		{"validate_other_geometric_data_array", "others", true, reExpOtherGeometricData},
 	}
 
 	for _, tt := range tests {
@@ -355,9 +340,8 @@ func TestRandomGeometricData(t *testing.T) {
 
 // Test: RandomLSN, check is the send LSN is in valid format
 func TestRandomLSN(t *testing.T) {
-	format := regexp.MustCompile("^([0-9]|[a-zA-Z0-9]){2}\\/([0-9]|[a-zA-Z0-9]){8}$")
 	t.Run("validate_lsn", func(t *testing.T) {
-		if got := RandomLSN(); !format.MatchString(got) {
+		if got := RandomLSN(); !doesDataMatchDataType(got, reExpLogSequenceNumber) {
 			t.Errorf("TestRandomLSN = %v, want valid LSN data in the format eg 43/4e584273", got)
 		}
 	})
@@ -365,9 +349,8 @@ func TestRandomLSN(t *testing.T) {
 
 // Test: RandomTXID, check is the send TXID is in valid format
 func TestRandomTXID(t *testing.T) {
-	format := regexp.MustCompile("^[0-9]{8}:[0-9]{8}:$")
 	t.Run("validate_txid", func(t *testing.T) {
-		if got := RandomTXID(); !format.MatchString(got) {
+		if got := RandomTXID(); !doesDataMatchDataType(got, reExpTransactionXID) {
 			t.Errorf("TestRandomTXID = %v, want valid LSN data in the format eg 77552990:99910540:", got)
 		}
 	})
@@ -426,10 +409,10 @@ func TestRandomValueFromLength(t *testing.T) {
 
 // Test: RandomPickerFromArray, check if the picked value is in the array of elements
 func TestRandomPickerFromArray(t *testing.T) {
-	tests := []struct{
+	tests := []struct {
 		name string
-		ele []string
-	} {
+		ele  []string
+	}{
 		{"null_array_of_elements", []string{}},
 		{"two_array_of_elements", []string{"a", "b"}},
 		{"five_array_of_elements", []string{"a", "b", "c", "d", "e"}},
