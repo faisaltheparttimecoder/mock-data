@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 func SupportedDataTypes() []string {
 	return []string{
 		"int8,",
@@ -88,7 +90,7 @@ func SupportedDataTypes() []string {
 }
 
 // Create a table with supported database
-func supportedDataTypesDemoTable() {
+func supportedDataTypesDemoTable() error {
 	demoTable := `
 DROP TABLE IF EXISTS supported_datatypes;
 CREATE TABLE supported_datatypes (
@@ -212,6 +214,7 @@ CREATE TABLE supported_datatypes (
 	// Execute the demo database dump
 	_, err := ExecuteDB(demoTable)
 	if err != nil {
-		Fatalf("Error when creating the all supported data type table err: %v", err)
+		return fmt.Errorf("error when creating the all supported data type table err: %v", err)
 	}
+	return nil
 }

@@ -109,9 +109,10 @@ func TestSupportedDataTypes(t *testing.T) {
 func TestSupportedDataTypesDemoTable(t *testing.T) {
 	t.Run("create_table_with_all_supported_datatypes", func(t *testing.T) {
 		setDatabaseConfigForTest()
-		supportedDataTypesDemoTable()
-		_, err := ExecuteDB("SELECT 'public.supported_datatypes'::regclass;")
-		if err != nil {
+		if err := supportedDataTypesDemoTable(); err != nil {
+			t.Errorf("TestSupportedDataTypesDemoTable, failed to create table, err: %v", err)
+		}
+		if _, err := ExecuteDB("SELECT 'public.supported_datatypes'::regclass;"); err != nil {
 			t.Errorf("TestSupportedDataTypesDemoTable, had to create a table but its not found in the database")
 		}
 	})
