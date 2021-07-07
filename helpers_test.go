@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-var setDatabaseConfigForTest = func() {
+func setDatabaseConfigForTest() {
 	cmdOptions.Database = viper.GetString("PGDATABASE")
 	cmdOptions.Password = viper.GetString("PGPASSWORD")
 	cmdOptions.Username = viper.GetString("PGUSER")
