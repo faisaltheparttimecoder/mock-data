@@ -242,7 +242,7 @@ func deleteViolatingPkOrUkConstraints(con string) bool {
 	Debugf("Attempting to run the constraint command %s second time, after deleting violating rows", con)
 	// does the DDL contain PK or UK keyword then do the following
 	// rest send them back for user to fix it.
-	if isSubStringAvailableOnString(con, "ADD CONSTRAINT.*PRIMARY KEY|ADD CONSTRAINT.*UNIQUE|CREATE UNIQUE INDEX") {
+	if IsSubStringAvailableOnString(con, "ADD CONSTRAINT.*PRIMARY KEY|ADD CONSTRAINT.*UNIQUE|CREATE UNIQUE INDEX") {
 		// Extract the table and column name
 		table, column := ExtractTableNColumnName(con)
 		err := deleteViolatingConstraintKeys(table, column)
