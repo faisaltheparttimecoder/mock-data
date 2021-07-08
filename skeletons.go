@@ -151,6 +151,10 @@ DROP FUNCTION IF EXISTS public._group_concat(text, text);
 DROP DOMAIN IF EXISTS public.year;
 DROP TYPE IF EXISTS public.mpaa_rating;
 DROP EXTENSION IF EXISTS plpgsql;
+DROP ROLE IF EXISTS postgres;
+CREATE ROLE postgres;
+DROP TYPE IF EXISTS rating;
+CREATE TYPE rating as ENUM ('good', 'ok', 'bad');
 --
 -- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
 --
@@ -523,7 +527,7 @@ CREATE TABLE public.actor (
     last_update timestamp without time zone DEFAULT now() NOT NULL
 );
 
-
+AlTER TABLE  public.actor ADD CONSTRAINT actor_id_check CHECK ( actor_id > 0);
 ALTER TABLE public.actor OWNER TO postgres;
 
 --
@@ -550,7 +554,7 @@ CREATE TABLE public.category (
     last_update timestamp without time zone DEFAULT now() NOT NULL
 );
 
-
+ALTER TABLE public.category ADD CONSTRAINT category_id UNIQUE(category_id);
 ALTER TABLE public.category OWNER TO postgres;
 
 --
@@ -582,6 +586,7 @@ CREATE TABLE public.film (
     length smallint,
     replacement_cost numeric(5,2) DEFAULT 19.99 NOT NULL,
     rating char(1) DEFAULT 'G',
+    user_rating rating,
     last_update timestamp without time zone DEFAULT now() NOT NULL,
     special_features text[],
     fulltext tsvector NOT NULL
@@ -1760,6 +1765,10 @@ DROP FUNCTION IF EXISTS public.film_not_in_stock(p_film_id integer, p_store_id i
 DROP FUNCTION IF EXISTS public.film_in_stock(p_film_id integer, p_store_id integer, OUT p_film_count integer);
 DROP DOMAIN IF EXISTS public.year;
 DROP TYPE IF EXISTS public.mpaa_rating;
+DROP ROLE IF EXISTS postgres;
+CREATE ROLE postgres;
+DROP TYPE IF EXISTS rating;
+CREATE TYPE rating as ENUM ('good', 'ok', 'bad');
 
 --
 -- Name: public; Type: SCHEMA; Schema: -; Owner: gpadmin
@@ -1857,6 +1866,7 @@ CREATE TABLE film (
     length smallint,
     replacement_cost numeric(5,2) DEFAULT 19.99 NOT NULL,
     rating char(1) DEFAULT 'G',
+	user_rating rating,
     last_update timestamp without time zone DEFAULT now() NOT NULL,
     special_features text,
     fulltext tsvector NOT NULL
