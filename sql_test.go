@@ -2,19 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"regexp"
 	"testing"
 )
-
-// TODO: remove this at the end
-func setDatabaseConfigForTest() {
-	cmdOptions.Database = viper.GetString("PGDATABASE")
-	cmdOptions.Password = viper.GetString("PGPASSWORD")
-	cmdOptions.Username = viper.GetString("PGUSER")
-	cmdOptions.Hostname = viper.GetString("PGHOST")
-	cmdOptions.Port = viper.GetInt("PGPORT")
-}
 
 var (
 	fakePkViolationTableName    = "pk_violation_table"
