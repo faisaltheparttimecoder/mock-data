@@ -472,7 +472,7 @@ WHERE  ctid =
 }
 
 // Get the foreign violations keys
-func getFKViolators(key ForeignKey) string {
+func getFKViolator(key ForeignKey) string {
 	query := `
 SELECT %[1]s 
 FROM   %[2]s 
@@ -488,7 +488,7 @@ WHERE %[1]s  NOT IN
 func GetTotalFKViolators(key ForeignKey) int {
 	var total int
 	query := `SELECT COUNT(*) FROM (%s) a`
-	query = fmt.Sprintf(query, getFKViolators(key))
+	query = fmt.Sprintf(query, getFKViolator(key))
 
 	// db connection
 	db := ConnectDB()
@@ -532,7 +532,7 @@ func GetFKViolators(key ForeignKey) []DBViolationRow {
 	db := ConnectDB()
 	defer db.Close()
 
-	query := strings.Replace(getFKViolators(key), "SELECT "+key.Column, "SELECT "+key.Column+" AS row", -1)
+	query := strings.Replace(getFKViolator(key), "SELECT "+key.Column, "SELECT "+key.Column+" AS row", -1)
 	_, err := db.Query(&result, query)
 	if err != nil {
 		addNewLine()
