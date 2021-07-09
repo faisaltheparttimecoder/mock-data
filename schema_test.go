@@ -11,7 +11,7 @@ func TestMockSchema(t *testing.T) {
 	postgresOrGreenplum()
 	fakeTable := "fake_table"
 	cmdOptions.SchemaName = "mock_data_schema"
-    cmdOptions.Rows = 100
+	cmdOptions.Rows = 100
 	createSchemaStmt := fmt.Sprintf("CREATE SCHEMA %s;", cmdOptions.SchemaName)
 	createFakeSchemaTableStmt := `
     DROP TABLE IF EXISTS %[1]s.%[2]s1;
@@ -36,7 +36,7 @@ func TestMockSchema(t *testing.T) {
 	}
 
 	MockSchema()
-	
+
 	for i := 0; i < 5; i++ {
 		tableNumber := i + 1
 		tabName := fmt.Sprintf("%s%d", fakeTable, tableNumber)
@@ -48,4 +48,3 @@ func TestMockSchema(t *testing.T) {
 		})
 	}
 }
-

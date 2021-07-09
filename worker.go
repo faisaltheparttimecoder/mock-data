@@ -12,8 +12,8 @@ type TableCollection struct {
 }
 
 var (
-	skippedTab []string
-	delimiter  = "$"
+	skippedTab     []string
+	delimiter      = "$"
 	oneColumnTable []string
 	progressBarMsg = "Mocking Table %s"
 )
@@ -181,7 +181,6 @@ func CopyData(tab string, col []string, data []string, db *pg.DB) {
 		Fatalf("Error during committing data: %v", err)
 	}
 }
-
 
 // Check its a serial datatype
 func checkIfOneColumnIsASerialDatatype(t DBTables, c []DBColumns) {

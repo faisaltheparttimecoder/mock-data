@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"regexp"
 	"testing"
 )
 
@@ -25,7 +24,7 @@ var (
   INSERT INTO %[3]s VALUES (2, 'jill');
   INSERT INTO %[3]s VALUES (3, 'jerry');
 `
-	fakePKSql                   = fmt.Sprintf(fakeSqlPKFormat, fakePkViolationTableName,
+	fakePKSql = fmt.Sprintf(fakeSqlPKFormat, fakePkViolationTableName,
 		fakePkColumnName, fakePkNonViolationTableName)
 	fakeFkViolationTableName    = "fk_violation_table"
 	fakeFkColumnName            = "id"
@@ -45,9 +44,9 @@ var (
   INSERT INTO %[3]s VALUES (2, 'india');
   INSERT INTO %[3]s VALUES (3, 'spain');
 `
-	fakeFKSql                     = fmt.Sprintf(fakeSqlFKFomat, fakeFkViolationTableName,
+	fakeFKSql = fmt.Sprintf(fakeSqlFKFomat, fakeFkViolationTableName,
 		fakeFkColumnName, fakeFkNonViolationTableName)
-	fakeSql                       = fakePKSql + fakeFKSql
+	fakeSql = fakePKSql + fakeFKSql
 )
 
 // Test: dbVersion, check if the command provides the database version
@@ -344,15 +343,14 @@ func TestGetFKViolator(t *testing.T) {
 	}{
 		{"fk_violation_test_sql", ForeignKey{fakeFkViolationTableName, fakeFkColumnName,
 			fakePkViolationTableName, fakePkColumnName},
-			"SELECTidFROMfk_violation_tableWHEREidNOTIN(SELECTidFROMpk_violation_table)"},
+			"SELECTidFROMfk_violation_tableWHEREidNOTINSELECTidFROMpk_violation_table"},
 		{"fk_non_violation_test_sql", ForeignKey{fakeFkNonViolationTableName, fakeFkColumnName,
 			fakePkNonViolationTableName, fakePkColumnName},
-			"SELECTidFROMfk_non_violation_tableWHEREidNOTIN(SELECTidFROMpk_non_violation_table)"},
+			"SELECTidFROMfk_non_violation_tableWHEREidNOTINSELECTidFROMpk_non_violation_table"},
 	}
-	format := regexp.MustCompile(`[\n\s]*`)
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := format.ReplaceAllString(getFKViolator(tt.fk), "")
+			got := RemoveSpecialCharacters(getFKViolator(tt.fk))
 			if got != tt.want {
 				t.Errorf("TestGetFKViolator = %v, want %v", got, tt.want)
 			}

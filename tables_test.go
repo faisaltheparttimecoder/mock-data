@@ -17,8 +17,7 @@ func TestCreateFakeTables(t *testing.T) {
 	}
 	CreateFakeTables()
 	t.Run("should_provide_the_total_table_created", func(t *testing.T) {
-		if got := allTablesPostgres(fmt.Sprintf("AND n.nspname='%s'", cmdOptions.Tab.SchemaName));
-			len(got) != cmdOptions.Tab.TotalTables {
+		if got := allTablesPostgres(fmt.Sprintf("AND n.nspname='%s'", cmdOptions.Tab.SchemaName)); len(got) != cmdOptions.Tab.TotalTables {
 			t.Errorf("TestCreateFakeTables = %v, want %v", len(got), cmdOptions.Tab.TotalTables)
 		}
 	})

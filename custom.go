@@ -107,7 +107,7 @@ func (c *Skeleton) ReadConfiguration() {
 	// Using viper reading the configuration
 	viper.SetConfigFile(cmdOptions.File)
 	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil { // Handle errors reading the config file
+	if err != nil {             // Handle errors reading the config file
 		Fatalf("Error reading the YAML file, err: %v", err)
 	}
 

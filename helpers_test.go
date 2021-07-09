@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"io/ioutil"
 	"log"
 	"os"
@@ -13,14 +12,6 @@ import (
 	"testing"
 	"time"
 )
-
-func setDatabaseConfigForTest() {
-	cmdOptions.Database = viper.GetString("PGDATABASE")
-	cmdOptions.Password = viper.GetString("PGPASSWORD")
-	cmdOptions.Username = viper.GetString("PGUSER")
-	cmdOptions.Hostname = viper.GetString("PGHOSTADDR")
-	cmdOptions.Port = viper.GetInt("PGPORT")
-}
 
 // Test: TimeNow, check if its on the correct timestamp format
 func TestTimeNow(t *testing.T) {

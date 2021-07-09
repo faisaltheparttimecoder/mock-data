@@ -218,8 +218,7 @@ func TestBuildInteger(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildInteger(tt.dt);
-				doesDataMatchDataType(got, reExpInteger) != tt.want {
+			if got, _ := buildInteger(tt.dt); doesDataMatchDataType(got, reExpInteger) != tt.want {
 				t.Errorf("TestBuildInteger = %v, want = %v", got, tt.want)
 			}
 		})
@@ -245,8 +244,7 @@ func TestBuildCharacter(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildCharacter(tt.dt);
-				doesDataMatchDataType(got, reExpCharacter) != tt.want {
+			if got, _ := buildCharacter(tt.dt); doesDataMatchDataType(got, reExpCharacter) != tt.want {
 				t.Errorf("TestBuildCharacter = %v, want = %v", got, tt.want)
 			}
 		})
@@ -266,8 +264,7 @@ func TestBuildDate(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildDate(tt.dt);
-				doesDataMatchDataType(got, reExpDate) != tt.want {
+			if got, _ := buildDate(tt.dt); doesDataMatchDataType(got, reExpDate) != tt.want {
 				t.Errorf("TestBuildDate = %v, want = %v", got, tt.want)
 			}
 		})
@@ -303,8 +300,7 @@ func TestBuildTimeStamp(t *testing.T) {
 			} else {
 				re = fmt.Sprintf(reExpTimeStampTzWithDecimal, 4)
 			}
-			if got, _ := buildTimeStamp(tt.dt);
-				doesDataMatchDataType(got, re) != tt.want {
+			if got, _ := buildTimeStamp(tt.dt); doesDataMatchDataType(got, re) != tt.want {
 				t.Errorf("TestBuildTimeStamp = %v, want = %v", got, tt.want)
 			}
 		})
@@ -324,8 +320,7 @@ func TestBuildTimeWithTz(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildTimeWithTz(tt.dt);
-				doesDataMatchDataType(got, reExpTimeWithTz) != tt.want {
+			if got, _ := buildTimeWithTz(tt.dt); doesDataMatchDataType(got, reExpTimeWithTz) != tt.want {
 				t.Errorf("TestBuildTimeWithTz = %v, want = %v", got, tt.want)
 			}
 		})
@@ -347,8 +342,7 @@ func TestBuildInterval(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildInterval(tt.dt);
-				doesDataMatchDataType(got, reExpTimeWithoutTz) != tt.want {
+			if got, _ := buildInterval(tt.dt); doesDataMatchDataType(got, reExpTimeWithoutTz) != tt.want {
 				t.Errorf("TestBuildInterval = %v, want = %v", got, tt.want)
 			}
 		})
@@ -370,8 +364,7 @@ func TestBuildIps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildIps(tt.dt);
-				doesDataMatchDataType(got, reExpIps) != tt.want {
+			if got, _ := buildIps(tt.dt); doesDataMatchDataType(got, reExpIps) != tt.want {
 				t.Errorf("TestBuildIps = %v, want = %v", got, tt.want)
 			}
 		})
@@ -391,8 +384,7 @@ func TestBuildBoolean(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildBoolean(tt.dt);
-				doesDataMatchDataType(got, reExpBoolean) != tt.want {
+			if got, _ := buildBoolean(tt.dt); doesDataMatchDataType(got, reExpBoolean) != tt.want {
 				t.Errorf("TestBuildBoolean = %v, want = %v", got, tt.want)
 			}
 		})
@@ -412,8 +404,7 @@ func TestBuildText(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildText(tt.dt);
-				doesDataMatchDataType(got, reExpText) != tt.want {
+			if got, _ := buildText(tt.dt); doesDataMatchDataType(got, reExpText) != tt.want {
 				t.Errorf("TestBuildText = %v, want = %v", got, tt.want)
 			}
 		})
@@ -433,8 +424,7 @@ func TestBuildCiText(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildCiText(tt.dt);
-				doesDataMatchDataType(got, reExpCiText) != tt.want {
+			if got, _ := buildCiText(tt.dt); doesDataMatchDataType(got, reExpCiText) != tt.want {
 				t.Errorf("TestBuildCiText = %v, want = %v", got, tt.want)
 			}
 		})
@@ -464,8 +454,7 @@ func TestBuildFloat(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildFloat(tt.dt);
-				doesDataMatchDataType(got, reExpFloat) != tt.want {
+			if got, _ := buildFloat(tt.dt); doesDataMatchDataType(got, reExpFloat) != tt.want {
 				t.Errorf("TestBuildFloat = %v, want = %v", got, tt.want)
 			}
 		})
@@ -485,8 +474,7 @@ func TestBuildNumeric(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildNumeric(tt.dt);
-				doesDataMatchDataType(got, reExpFloat) != tt.want {
+			if got, _ := buildNumeric(tt.dt); doesDataMatchDataType(got, reExpFloat) != tt.want {
 				t.Errorf("TestBuildNumeric = %v, want = %v", got, tt.want)
 			}
 		})
@@ -508,8 +496,7 @@ func TestBuildBit(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildBit(tt.dt);
-				doesDataMatchDataType(got, reExpBit) != tt.want {
+			if got, _ := buildBit(tt.dt); doesDataMatchDataType(got, reExpBit) != tt.want {
 				t.Errorf("TestBuildBit = %v, want = %v", got, tt.want)
 			}
 		})
@@ -529,8 +516,7 @@ func TestBuildUuid(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildUuid(tt.dt);
-				doesDataMatchDataType(got, reExpUuid) != tt.want {
+			if got, _ := buildUuid(tt.dt); doesDataMatchDataType(got, reExpUuid) != tt.want {
 				t.Errorf("TestBuildUuid = %v, want = %v", got, tt.want)
 			}
 		})
@@ -550,8 +536,7 @@ func TestBuildMacAddr(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildMacAddr(tt.dt);
-				doesDataMatchDataType(got, reExpMacAddress) != tt.want {
+			if got, _ := buildMacAddr(tt.dt); doesDataMatchDataType(got, reExpMacAddress) != tt.want {
 				t.Errorf("TestBuildMacAddr = %v, want = %v", got, tt.want)
 			}
 		})
@@ -608,8 +593,7 @@ func TestBuildTsQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildTsQuery(tt.dt);
-				doesDataMatchDataType(got, reExpTsQuery) != tt.want {
+			if got, _ := buildTsQuery(tt.dt); doesDataMatchDataType(got, reExpTsQuery) != tt.want {
 				t.Errorf("TestBuildMacAddr = %v, want = %v", got, tt.want)
 			}
 		})
@@ -629,8 +613,7 @@ func TestBuildTsVector(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildTsVector(tt.dt);
-				doesDataMatchDataType(got, reExpText) != tt.want { // can be some random text, so this will pass regardless
+			if got, _ := buildTsVector(tt.dt); doesDataMatchDataType(got, reExpText) != tt.want { // can be some random text, so this will pass regardless
 				t.Errorf("TestBuildTsVector = %v, want = %v", got, tt.want)
 			}
 		})
@@ -650,8 +633,7 @@ func TestBuildLseg(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildLseg(tt.dt);
-				doesDataMatchDataType(got, reExpLogSequenceNumber) != tt.want {
+			if got, _ := buildLseg(tt.dt); doesDataMatchDataType(got, reExpLogSequenceNumber) != tt.want {
 				t.Errorf("TestBuildLseg = %v, want = %v", got, tt.want)
 			}
 		})
@@ -671,8 +653,7 @@ func TestBuildTxidSnapShot(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildTxidSnapShot(tt.dt);
-				doesDataMatchDataType(got, reExpTransactionXID) != tt.want {
+			if got, _ := buildTxidSnapShot(tt.dt); doesDataMatchDataType(got, reExpTransactionXID) != tt.want {
 				t.Errorf("TestBuildTxidSnapShot = %v, want = %v", got, tt.want)
 			}
 		})
@@ -762,8 +743,7 @@ func TestFindNumberPrecision(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotInt, gotPrec, _ := findNumberPrecision(tt.dt);
-				gotInt != tt.wantInteger && gotPrec != tt.wantPrecision {
+			if gotInt, gotPrec, _ := findNumberPrecision(tt.dt); gotInt != tt.wantInteger && gotPrec != tt.wantPrecision {
 				t.Errorf("TestFindNumberPrecision = (%v,%v), want %v, %v",
 					gotInt, gotPrec, tt.wantInteger, tt.wantPrecision)
 			}
@@ -845,8 +825,7 @@ func TestRandomDataByDataTypeForArray(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := randomDataByDataTypeForArray(tt.dt, tt.oDt, 4, 5);
-				IsStringEmpty(fmt.Sprintf("%v", got)) != tt.want {
+			if got, _ := randomDataByDataTypeForArray(tt.dt, tt.oDt, 4, 5); IsStringEmpty(fmt.Sprintf("%v", got)) != tt.want {
 				t.Errorf("TestRandomDataByDataTypeForArray = %v, want = %v", got, tt.want)
 			}
 		})
@@ -916,11 +895,11 @@ func TestBuildEnumDataTypes(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestBuildEnumDataTypes: failed with error, %v", err)
 	}
-	fmt.Println(cmdOptions.Database ,
-	cmdOptions.Password ,
-	cmdOptions.Username ,
-	cmdOptions.Hostname,
-	cmdOptions.Port )
+	fmt.Println(cmdOptions.Database,
+		cmdOptions.Password,
+		cmdOptions.Username,
+		cmdOptions.Hostname,
+		cmdOptions.Port)
 	t.Run("check_for_valid_data_from_emum_type", func(t *testing.T) {
 		if got, _ := buildEnumDataTypes("rating"); !StringContains(got, data) {
 			t.Errorf("TestBuildEnumDataTypes = %v, want that matches one of these %v", got, data)

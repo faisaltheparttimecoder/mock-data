@@ -17,20 +17,20 @@ func NewLoggerValidation() (string, *logrus.Logger, *test.Hook) {
 
 // setup test case functions
 type LoggerTest struct {
-	t *testing.T
-	hook *test.Hook
+	t     *testing.T
+	hook  *test.Hook
 	level logrus.Level
-	msg string
+	msg   string
 	fname string
 }
 
 // Run the test cases
 func (l *LoggerTest) RunLoggerTestCases() {
-	tests := []struct{
-		name string
+	tests := []struct {
+		name  string
 		check interface{}
-		want interface{}
-	} {
+		want  interface{}
+	}{
 		{"logger_entries", 1, 1},
 		{"logger_level", l.hook.LastEntry().Level, l.level},
 		{"logger_msg", l.hook.LastEntry().Message, l.msg},
@@ -56,10 +56,10 @@ func TestDebug(t *testing.T) {
 	logger.Level = logrus.DebugLevel
 	logger.Debug(msg)
 	l := &LoggerTest{
-		t: t,
-		hook: hook,
+		t:     t,
+		hook:  hook,
 		level: logrus.DebugLevel,
-		msg: msg,
+		msg:   msg,
 		fname: "TestDebug",
 	}
 	l.RunLoggerTestCases()
@@ -71,10 +71,10 @@ func TestDebugf(t *testing.T) {
 	logger.Level = logrus.DebugLevel
 	logger.Debugf(msg, "user")
 	l := &LoggerTest{
-		t: t,
-		hook: hook,
+		t:     t,
+		hook:  hook,
 		level: logrus.DebugLevel,
-		msg: fmt.Sprintf(msg, "user"),
+		msg:   fmt.Sprintf(msg, "user"),
 		fname: "TestDebugf",
 	}
 	l.RunLoggerTestCases()
@@ -86,10 +86,10 @@ func TestInfo(t *testing.T) {
 	logger.Level = logrus.InfoLevel
 	logger.Info(msg)
 	l := &LoggerTest{
-		t: t,
-		hook: hook,
+		t:     t,
+		hook:  hook,
 		level: logrus.InfoLevel,
-		msg: msg,
+		msg:   msg,
 		fname: "TestInfo",
 	}
 	l.RunLoggerTestCases()
@@ -101,10 +101,10 @@ func TestInfof(t *testing.T) {
 	logger.Level = logrus.InfoLevel
 	logger.Infof(msg, "user")
 	l := &LoggerTest{
-		t: t,
-		hook: hook,
+		t:     t,
+		hook:  hook,
 		level: logrus.InfoLevel,
-		msg: fmt.Sprintf(msg, "user"),
+		msg:   fmt.Sprintf(msg, "user"),
 		fname: "TestInfof",
 	}
 	l.RunLoggerTestCases()
@@ -116,10 +116,10 @@ func TestWarn(t *testing.T) {
 	logger.Level = logrus.WarnLevel
 	logger.Warn(msg)
 	l := &LoggerTest{
-		t: t,
-		hook: hook,
+		t:     t,
+		hook:  hook,
 		level: logrus.WarnLevel,
-		msg: msg,
+		msg:   msg,
 		fname: "TestWarn",
 	}
 	l.RunLoggerTestCases()
@@ -131,15 +131,14 @@ func TestWarnf(t *testing.T) {
 	logger.Level = logrus.WarnLevel
 	logger.Warnf(msg, "user")
 	l := &LoggerTest{
-		t: t,
-		hook: hook,
+		t:     t,
+		hook:  hook,
 		level: logrus.WarnLevel,
-		msg: fmt.Sprintf(msg, "user"),
+		msg:   fmt.Sprintf(msg, "user"),
 		fname: "TestWarnf",
 	}
 	l.RunLoggerTestCases()
 }
-
 
 // Test: Error, checking if correct log error level is set and send
 func TestError(t *testing.T) {
@@ -147,10 +146,10 @@ func TestError(t *testing.T) {
 	logger.Level = logrus.ErrorLevel
 	logger.Error(msg)
 	l := &LoggerTest{
-		t: t,
-		hook: hook,
+		t:     t,
+		hook:  hook,
 		level: logrus.ErrorLevel,
-		msg: msg,
+		msg:   msg,
 		fname: "TestError",
 	}
 	l.RunLoggerTestCases()
@@ -162,10 +161,10 @@ func TestErrorf(t *testing.T) {
 	logger.Level = logrus.ErrorLevel
 	logger.Errorf(msg, "user")
 	l := &LoggerTest{
-		t: t,
-		hook: hook,
+		t:     t,
+		hook:  hook,
 		level: logrus.ErrorLevel,
-		msg: fmt.Sprintf(msg, "user"),
+		msg:   fmt.Sprintf(msg, "user"),
 		fname: "TestErrorf",
 	}
 	l.RunLoggerTestCases()
@@ -195,7 +194,7 @@ func TestPanicf(t *testing.T) {
 func TestFileInfo(t *testing.T) {
 	_, _, line, _ := runtime.Caller(0)
 	// why adding 4 ? the function "fileInfo" is called 4 lines from above call
-	want := fmt.Sprintf("%v:%d", "logger_test.go", line + 4)
+	want := fmt.Sprintf("%v:%d", "logger_test.go", line+4)
 	t.Run("check_the_file_name_and_the_line_number_is_displayed", func(t *testing.T) {
 		if got := fileInfo(1); got != want {
 			t.Errorf("TestFileInfo = %v, want %v", got, want)

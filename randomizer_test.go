@@ -266,8 +266,7 @@ func TestRandomBit(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := RandomBit(tt.length);
-			!doesDataMatchDataType(got, reExpBit) || !(len(got) > 0 && len(got) <= tt.length) {
+			if got := RandomBit(tt.length); !doesDataMatchDataType(got, reExpBit) || !(len(got) > 0 && len(got) <= tt.length) {
 				t.Errorf("TestRandomBit = %v, want valid bit format or length <= %v", got, tt.length)
 			}
 		})

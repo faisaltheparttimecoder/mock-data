@@ -38,6 +38,25 @@ SET search_path = public, pg_catalog;
 --
 -- DROP ALL THE OBJECTS 
 --
+DO $$ DECLARE
+    r RECORD;
+BEGIN
+    -- if the schema you operate on is not "current", you will want to
+    -- replace current_schema() in query with 'schematodeletetablesfrom'
+    -- *and* update the generate 'DROP...' accordingly.
+    FOR r IN (SELECT schemaname, tablename FROM pg_tables WHERE schemaname NOT IN ('pg_catalog', 'information_schema')) LOOP
+        EXECUTE 'DROP TABLE IF EXISTS "' || quote_ident(r.schemaname) ||'"."'|| quote_ident(r.tablename) || '" CASCADE';
+    END LOOP;
+END $$;
+
+--
+-- DROP PUBLIC SCHEMA
+--
+DROP SCHEMA if exists public cascade;
+
+--
+-- DROP ALL THE OBJECTS 
+--
 ALTER TABLE IF EXISTS ONLY public.store DROP CONSTRAINT store_manager_staff_id_fkey;
 ALTER TABLE IF EXISTS ONLY public.store DROP CONSTRAINT store_address_id_fkey;
 ALTER TABLE IF EXISTS ONLY public.staff DROP CONSTRAINT staff_address_id_fkey;
@@ -151,15 +170,18 @@ DROP FUNCTION IF EXISTS public._group_concat(text, text);
 DROP DOMAIN IF EXISTS public.year;
 DROP TYPE IF EXISTS public.mpaa_rating;
 DROP EXTENSION IF EXISTS plpgsql;
+DROP OWNED BY postgres;
 DROP ROLE IF EXISTS postgres;
 CREATE ROLE postgres;
 DROP TYPE IF EXISTS rating;
 CREATE TYPE rating as ENUM ('good', 'ok', 'bad');
+
 --
 -- Name: public; Type: SCHEMA; Schema: -; Owner: postgres
 --
 CREATE SCHEMA IF NOT EXISTS public;
 ALTER SCHEMA public OWNER TO postgres;
+
 --
 -- Name: SCHEMA public; Type: COMMENT; Schema: -; Owner: postgres
 --

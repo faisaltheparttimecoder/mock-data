@@ -61,11 +61,11 @@ func TestBackupIndexes(t *testing.T) {
 
 // Test: constraintFinder, find the postgres name for the shorthand constraint names
 func TestConstraintFinder(t *testing.T) {
-	tests := []struct{
-		name string
+	tests := []struct {
+		name          string
 		shortConnName string
-		want string
-	} {
+		want          string
+	}{
 		{"hunting_check_constraint", "c", "CHECK"},
 		{"hunting_foreign_key_constraint", "f", "FOREIGN"},
 		{"hunting_primary_key_constraint", "p", "PRIMARY"},
