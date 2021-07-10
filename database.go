@@ -2,11 +2,32 @@ package main
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 )
+
+// Execute cleanup of demo database before loading if needed
+func executeDemoDatabasePreCleanup() {
+	// NOTE: This is a hidden feature used mainly by test cases, not used widely
+	// so use this with caution, since it will cleanup all the tables in the said database
+	shouldWeDrop := viper.GetBool("MOCK_DATA_TEST_RUNNER")
+	if shouldWeDrop {
+		Infof("Executing the cleanup of all objects in the database: %s", cmdOptions.Database)
+		_, err := ExecuteDB(dropDemoDatabase())
+		if err != nil {
+			errMsg := fmt.Sprintf("%s", err)
+			failureMsg := fmt.Sprintf("Failure in pre cleanup a demo tables in the database %s, err: %v",
+				cmdOptions.Database, err)
+			IgnoreError(errMsg, "does not exist", failureMsg)
+		}
+	}
+}
 
 // Execute demo database
 func ExecuteDemoDatabase() {
 	Infof("Create demo tables in the database: %s", cmdOptions.Database)
+
+	// pre cleanup script
+	executeDemoDatabasePreCleanup()
 
 	// Execute the demo database dump
 	var err error

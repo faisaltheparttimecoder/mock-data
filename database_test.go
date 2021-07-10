@@ -5,12 +5,32 @@ import (
 	"testing"
 )
 
-func setDatabaseConfigForTest() {
-	cmdOptions.Database = viper.GetString("PGDATABASE")
-	cmdOptions.Password = viper.GetString("PGPASSWORD")
-	cmdOptions.Username = viper.GetString("PGUSER")
-	cmdOptions.Hostname = viper.GetString("PGHOST")
-	cmdOptions.Port = viper.GetInt("PGPORT")
+// Test: executeDemoDatabasePreCleanup, checking for script cleanup ability
+func TestExecuteDemoDatabasePreCleanup(t *testing.T) {
+	setDatabaseConfigForTest()
+	tests := []struct {
+		name string
+		f    bool
+		want int
+	}{
+		{"environment_variable_off", false, 1},
+		{"environment_variable_on", true, 0},
+	}
+	_, err := ExecuteDB("CREATE TABLE testme (id int);") // AT least create one table
+	if err != nil {
+		t.Errorf("TestExecuteDemoDatabasePreCleanup, failed to create a demo table, err: %v", err)
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			viper.Set("MOCK_DATA_TEST_RUNNER", tt.f)
+			executeDemoDatabasePreCleanup()
+			got := allTablesPostgres("")
+			if len(got) < tt.want {
+				t.Errorf("TestExecuteDemoDatabasePreCleanup = %v, want %v", len(got), tt.want)
+			}
+		})
+	}
+	viper.Set("MOCK_DATA_TEST_RUNNER", true) // set this for the reminder of the test
 }
 
 // Test: ExecuteDemoDatabase, check if all the tables are created
