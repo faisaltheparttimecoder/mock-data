@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"strings"
 	"testing"
 )
@@ -11,7 +12,16 @@ const (
 	workerTestSingleColumnTable         = "single_column"
 	workerTestContainSerialColumn       = "contain_serial_column"
 	workerTestUnsupportedDataTypeColumn = "unsupported_datatype"
+	workerTestCopyData                  = "copy_table"
 )
+
+func setDatabaseConfigForTest() {
+	cmdOptions.Database = viper.GetString("PGDATABASE")
+	cmdOptions.Password = viper.GetString("PGPASSWORD")
+	cmdOptions.Username = viper.GetString("PGUSER")
+	cmdOptions.Hostname = viper.GetString("PGHOST")
+	cmdOptions.Port = viper.GetInt("PGPORT")
+}
 
 // Create mocking tables for worker_test
 func createFakeTablesForWorkerTest() []DBTables {
@@ -35,9 +45,12 @@ func createFakeTablesForWorkerTest() []DBTables {
 		CREATE TYPE foo AS (f1 int, f2 text); 
 		DROP TABLE IF EXISTS %[1]s.%[5]s; 
 		CREATE TABLE %[1]s.%[5]s (id serial, name foo);
+		DROP TABLE IF EXISTS %[1]s.%[6]s; 
+		CREATE TABLE %[1]s.%[6]s (name varchar(10), salary money);
 	`
 	sql = fmt.Sprintf(sql, cmdOptions.Tab.SchemaName, workerTestConstraintTable,
-		workerTestSingleColumnTable, workerTestContainSerialColumn, workerTestUnsupportedDataTypeColumn)
+		workerTestSingleColumnTable, workerTestContainSerialColumn,
+		workerTestUnsupportedDataTypeColumn, workerTestCopyData)
 	_, err := ExecuteDB(sql)
 	if err != nil {
 		Fatalf("createFakeTablesForTest, failed to create sql, err %v", err)
@@ -143,12 +156,30 @@ func TestBackupConstraintsAndStartDataLoading(t *testing.T) {
 
 // Test: CommitData
 func TestCommitData(t *testing.T) {
-	// This has been verified by above function, nothing to add specifically
+	// This has been verified by others function, nothing to add specifically, skipped...
 }
 
 // Test: CopyData
 func TestCopyData(t *testing.T) {
-	// This has been verified by above function, nothing to add specifically
+	createFakeTablesForWorkerTest()
+	var result struct {
+		Count int
+	}
+	tab := GenerateTableName(workerTestCopyData, cmdOptions.Tab.SchemaName)
+	col := []string{"name", "salary"}
+	data := []string{"john", "10000"}
+	db := ConnectDB()
+	CopyData(tab, col, data, db)
+	sql := fmt.Sprintf("SELECT COUNT(*) AS count FROM %s WHERE name = '%s';", tab, "john")
+	_, err := db.Query(&result, sql)
+	if err != nil {
+		t.Errorf("TestCopyData error when getting data from the database, err: %v", err)
+	}
+	t.Run("should_return_one_successful_row", func(t *testing.T) {
+		if result.Count != 1 {
+			t.Errorf("TestCopyData = %v, want %v", result.Count, 1)
+		}
+	})
 }
 
 // Test: addDataIfItsASerialDatatype, if it has only one column and that is serial
