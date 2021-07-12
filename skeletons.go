@@ -1792,8 +1792,6 @@ DROP FUNCTION IF EXISTS public.film_not_in_stock(p_film_id integer, p_store_id i
 DROP FUNCTION IF EXISTS public.film_in_stock(p_film_id integer, p_store_id integer, OUT p_film_count integer);
 DROP DOMAIN IF EXISTS public.year;
 DROP TYPE IF EXISTS public.mpaa_rating;
-DROP ROLE IF EXISTS postgres;
-CREATE ROLE postgres;
 DROP TYPE IF EXISTS rating;
 CREATE TYPE rating as ENUM ('good', 'ok', 'bad');
 
