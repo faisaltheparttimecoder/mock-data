@@ -64,7 +64,7 @@ func TestSupportedDataTypes(t *testing.T) {
 			"char(10)[],",
 			"character varying(10)[],",
 			"bit(10)[],",
-			"varbit(4)[],",
+			"bit varying(4)[],",
 			"numeric[],",
 			"numeric(5,3)[],",
 			"real[],",

@@ -5,6 +5,14 @@ import (
 	"testing"
 )
 
+
+// create fake tables for constraint backup
+func createFakeTablesForConstraintBackup() {
+	setDatabaseConfigForTest()
+	postgresOrGreenplum()
+	ExecuteDemoDatabase()
+}
+
 // Test: BackupDDL
 func TestBackupDDL(t *testing.T) {
 	// Skipping since this function basically calls other function, without doing anything
@@ -12,9 +20,7 @@ func TestBackupDDL(t *testing.T) {
 
 // Test: backupConstraints, check if the function backed up the constraint and wrote to a file
 func TestBackupConstraints(t *testing.T) {
-	setDatabaseConfigForTest()
-	postgresOrGreenplum()
-	ExecuteDemoDatabase()
+	createFakeTablesForConstraintBackup()
 	CreateDirectory()
 	backupConstraints()
 	tests := []struct {
@@ -44,7 +50,7 @@ func TestBackupConstraints(t *testing.T) {
 
 // Test: backupIndexes, check if the function backed up the unique indexes and wrote to a file
 func TestBackupIndexes(t *testing.T) {
-	setDatabaseConfigForTest()
+	createFakeTablesForConstraintBackup()
 	backupIndexes()
 	want := 19
 	t.Run("checking_unique_index_count", func(t *testing.T) {

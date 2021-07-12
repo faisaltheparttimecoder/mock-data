@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"testing"
 )
 
@@ -49,6 +50,25 @@ var (
 	fakeSql = fakePKSql + fakeFKSql
 )
 
+func setDatabaseConfigForTest() {
+	cmdOptions.Database = viper.GetString("PGDATABASE")
+	cmdOptions.Password = viper.GetString("PGPASSWORD")
+	cmdOptions.Username = viper.GetString("PGUSER")
+	cmdOptions.Hostname = viper.GetString("PGHOST")
+	cmdOptions.Port = viper.GetInt("PGPORT")
+}
+
+// create fake table needed to test sql.go
+func createFakeTableForTestSql() {
+	setDatabaseConfigForTest()
+	postgresOrGreenplum()
+	ExecuteDemoDatabase()
+	_, err := ExecuteDB(fakeSql)
+	if err != nil {
+		Fatalf("createFakeTableForTestSql, error in executing the statement, err: %v", err)
+	}
+}
+
 // Test: dbVersion, check if the command provides the database version
 func TestDbVersion(t *testing.T) {
 	setDatabaseConfigForTest()
@@ -71,12 +91,10 @@ func TestPostgresOrGreenplum(t *testing.T) {
 
 // Test: allTablesPostgres, should produce all the tables
 func TestAllTablesPostgres(t *testing.T) {
-	setDatabaseConfigForTest()
+	createFakeTableForTestSql()
 	t.Run("should_extract_all_tables", func(t *testing.T) {
-		postgresOrGreenplum()
-		ExecuteDemoDatabase()
-		if got := allTablesPostgres(""); len(got) != 15 {
-			t.Errorf("TestAllTablesPostgres = %v, want %d tables", len(got), 15)
+		if got := allTablesPostgres(""); len(got) < 15 {
+			t.Errorf("TestAllTablesPostgres = %v, want >= %d tables", len(got), 15)
 		}
 	})
 }
@@ -110,7 +128,7 @@ func TestColumnExtractorPostgres(t *testing.T) {
 		{"column_staff_table", "public", "staff", 11},
 		{"column_store_table", "public", "store", 4},
 	}
-	setDatabaseConfigForTest()
+	createFakeTableForTestSql()
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := columnExtractorPostgres(tt.schema, tt.table); len(got) != tt.want {
@@ -231,11 +249,7 @@ func TestGetDatatype(t *testing.T) {
 
 // Test: getTotalPKViolator, check the table reports any PK violation
 func TestGetTotalPKViolator(t *testing.T) {
-	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fakePKSql)
-	if err != nil {
-		Fatalf("TestGetTotalPKViolator, error in executing the statement, err: %v", err)
-	}
+	createFakeTableForTestSql()
 	tests := []struct {
 		name  string
 		table string
@@ -255,11 +269,7 @@ func TestGetTotalPKViolator(t *testing.T) {
 
 // Test: getPKViolator, check the sql generated for PK violation is valid
 func TestGetPKViolator(t *testing.T) {
-	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fakePKSql)
-	if err != nil {
-		Fatalf("TestGetPKViolator, error in executing the statement, err: %v", err)
-	}
+	createFakeTableForTestSql()
 	tests := []struct {
 		name  string
 		table string
@@ -281,11 +291,7 @@ func TestGetPKViolator(t *testing.T) {
 
 // Test: GetPKViolators, check the data of PK violation
 func TestGetPKViolators(t *testing.T) {
-	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fakePKSql)
-	if err != nil {
-		Fatalf("TestGetPKViolators, error in executing the statement, err: %v", err)
-	}
+	createFakeTableForTestSql()
 	tests := []struct {
 		name  string
 		table string
@@ -305,11 +311,7 @@ func TestGetPKViolators(t *testing.T) {
 
 // Test: UpdatePKKey, make sure all the PK is fixed
 func TestUpdatePKKey(t *testing.T) {
-	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fakePKSql)
-	if err != nil {
-		Fatalf("TestUpdatePKKey, error in executing the statement, err: %v", err)
-	}
+	createFakeTableForTestSql()
 	tests := []struct {
 		name     string
 		table    string
@@ -331,11 +333,7 @@ func TestUpdatePKKey(t *testing.T) {
 
 // Test: getFKViolator, make sure we get a valid fk check sql
 func TestGetFKViolator(t *testing.T) {
-	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fakeSql)
-	if err != nil {
-		Fatalf("TestGetFKViolator, error in executing the statement, err: %v", err)
-	}
+	createFakeTableForTestSql()
 	tests := []struct {
 		name string
 		fk   ForeignKey
@@ -360,11 +358,7 @@ func TestGetFKViolator(t *testing.T) {
 
 // Test: GetTotalFKViolators, get the total FK violators
 func TestGetTotalFKViolators(t *testing.T) {
-	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fakeSql)
-	if err != nil {
-		Fatalf("TestGetTotalFKViolators, error in executing the statement, err: %v", err)
-	}
+	createFakeTableForTestSql()
 	tests := []struct {
 		name string
 		fk   ForeignKey
@@ -407,11 +401,7 @@ func TestTotalRows(t *testing.T) {
 
 // Test: GetFKViolators, get the total FK violators
 func TestGetFKViolators(t *testing.T) {
-	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fakeSql)
-	if err != nil {
-		Fatalf("TestGetFKViolators, error in executing the statement, err: %v", err)
-	}
+	createFakeTableForTestSql()
 	tests := []struct {
 		name string
 		fk   ForeignKey
@@ -433,11 +423,7 @@ func TestGetFKViolators(t *testing.T) {
 
 // Test: UpdateFKeys, fix the foreign key violation
 func TestUpdateFKeys(t *testing.T) {
-	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fakeSql)
-	if err != nil {
-		Fatalf("TestUpdateFKeys, error in executing the statement, err: %v", err)
-	}
+	createFakeTableForTestSql()
 	fk := ForeignKey{fakeFkViolationTableName, fakeFkColumnName,
 		fakePkViolationTableName, fakePkColumnName}
 	totalRowsOnPkTable := TotalRows(fk.Reftable)
@@ -456,11 +442,7 @@ func TestUpdateFKeys(t *testing.T) {
 
 // Test: deleteViolatingConstraintKeys, delete the pk, uk column that violates the constraint even after the fix
 func TestDeleteViolatingConstraintKeys(t *testing.T) {
-	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fakePKSql)
-	if err != nil {
-		Fatalf("TestDeleteViolatingConstraintKeys, error in executing the statement, err: %v", err)
-	}
+	createFakeTableForTestSql()
 	check := func(want int) {
 		if got := getTotalPKViolator(fakePkViolationTableName, fakePkColumnName); got != want {
 			t.Errorf("TestDeleteViolatingConstraintKeys = %v, want %v", got, want)

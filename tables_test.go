@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// create fake tables needed for testing tables.go
 func createFakeTablesForTablesTest() {
 	setDatabaseConfigForTest()
 	cmdOptions.Tab.SchemaName = "mock_data_table"

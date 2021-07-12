@@ -5,9 +5,20 @@ import (
 	"testing"
 )
 
+// create fake database for testing database.go
+func createFakeTableForDatabaseTest() {
+	setDatabaseConfigForTest()
+	postgresOrGreenplum()
+	ExecuteDemoDatabase()
+	_, err := ExecuteDB("CREATE TABLE testme (id int);") // AT least create one table
+	if err != nil {
+		Fatalf("TestExecuteDemoDatabasePreCleanup, failed to create a demo table, err: %v", err)
+	}
+}
+
 // Test: executeDemoDatabasePreCleanup, checking for script cleanup ability
 func TestExecuteDemoDatabasePreCleanup(t *testing.T) {
-	setDatabaseConfigForTest()
+	createFakeTableForDatabaseTest()
 	tests := []struct {
 		name string
 		f    bool
@@ -15,10 +26,6 @@ func TestExecuteDemoDatabasePreCleanup(t *testing.T) {
 	}{
 		{"environment_variable_off", false, 1},
 		{"environment_variable_on", true, 0},
-	}
-	_, err := ExecuteDB("CREATE TABLE testme (id int);") // AT least create one table
-	if err != nil {
-		t.Errorf("TestExecuteDemoDatabasePreCleanup, failed to create a demo table, err: %v", err)
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -35,19 +42,17 @@ func TestExecuteDemoDatabasePreCleanup(t *testing.T) {
 
 // Test: ExecuteDemoDatabase, check if all the tables are created
 func TestExecuteDemoDatabase(t *testing.T) {
-	setDatabaseConfigForTest()
+	createFakeTableForDatabaseTest()
 	t.Run("should_extract_all_tables", func(t *testing.T) {
-		postgresOrGreenplum()
-		ExecuteDemoDatabase()
-		if got := allTablesPostgres(""); len(got) != 15 {
-			t.Errorf("TestExecuteDemoDatabase = %v, want %d tables", len(got), 15)
+		if got := allTablesPostgres(""); len(got) < 15 {
+			t.Errorf("TestExecuteDemoDatabase = %v, want >= %d tables", len(got), 15)
 		}
 	})
 }
 
 // Test: MockDatabase, Mock the entire database
 func TestMockDatabase(t *testing.T) {
-	setDatabaseConfigForTest()
+	createFakeTableForDatabaseTest()
 	cmdOptions.Rows = 100
 	MockDatabase()
 	tests := []struct {
@@ -83,10 +88,10 @@ func TestMockDatabase(t *testing.T) {
 
 // Test: dbExtractTables, check if all the tables are returned
 func TestDbExtractTables(t *testing.T) {
-	setDatabaseConfigForTest()
+	createFakeTableForDatabaseTest()
 	t.Run("should_return_all_tables", func(t *testing.T) {
-		if got := dbExtractTables(""); len(got) != 15 {
-			t.Errorf("TestExecuteDemoDatabase = %v, want %d tables", len(got), 15)
+		if got := dbExtractTables(""); len(got) < 15 {
+			t.Errorf("TestDbExtractTables = %v, want >= %d tables", len(got), 15)
 		}
 	})
 }
