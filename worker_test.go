@@ -7,14 +7,6 @@ import (
 	"testing"
 )
 
-func setDatabaseConfigForTest() {
-	cmdOptions.Database = viper.GetString("PGDATABASE")
-	cmdOptions.Password = viper.GetString("PGPASSWORD")
-	cmdOptions.Username = viper.GetString("PGUSER")
-	cmdOptions.Hostname = viper.GetString("PGHOST")
-	cmdOptions.Port = viper.GetInt("PGPORT")
-}
-
 const (
 	workerTestConstraintTable           = "constraint_table"
 	workerTestSingleColumnTable         = "single_column"

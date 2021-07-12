@@ -5,16 +5,25 @@ import (
 	"testing"
 )
 
-// Test: CreateFakeTables, test the creation of fake tables
-func TestCreateFakeTables(t *testing.T) {
+func createFakeTablesForTablesTest() {
 	setDatabaseConfigForTest()
 	cmdOptions.Tab.SchemaName = "mock_data_table"
-	cmdOptions.Tab.TotalTables = 100
-	createSchemaStmt := fmt.Sprintf("CREATE SCHEMA %s;", cmdOptions.Tab.SchemaName)
-	_, err := ExecuteDB(createSchemaStmt)
+	sql := `
+		DROP SCHEMA IF EXISTS %[1]s CASCADE; 
+		CREATE SCHEMA %[1]s;
+	`
+	sql = fmt.Sprintf(sql, cmdOptions.Tab.SchemaName)
+	_, err := ExecuteDB(sql)
 	if err != nil {
-		t.Errorf("TestCreateFakeTables, failed creating schema, err: %v", err)
+		Fatalf("createFakeTablesForTablesTest, failed creating schema, err: %v", err)
 	}
+}
+
+// Test: CreateFakeTables, test the creation of fake tables
+func TestCreateFakeTables(t *testing.T) {
+	cmdOptions.Tab.SchemaName = "mock_data_table"
+	cmdOptions.Tab.TotalTables = 100
+	createFakeTablesForTablesTest()
 	CreateFakeTables()
 	t.Run("should_provide_the_total_table_created", func(t *testing.T) {
 		if got := allTablesPostgres(fmt.Sprintf("AND n.nspname='%s'", cmdOptions.Tab.SchemaName)); len(got) != cmdOptions.Tab.TotalTables {
@@ -25,7 +34,6 @@ func TestCreateFakeTables(t *testing.T) {
 
 // Test: tableNameGenerator, test name should match the regex
 func TestTableNameGenerator(t *testing.T) {
-	setDatabaseConfigForTest()
 	randomNumber := 456
 	cmdOptions.Tab.TableNamePrefix = "mock_data_table_random"
 	t.Run("should_provide_a_random_table_name", func(t *testing.T) {
@@ -38,15 +46,10 @@ func TestTableNameGenerator(t *testing.T) {
 
 // Test: createTableStatementGenerator, should generate different table name based on parameter passed
 func TestCreateTableStatementGenerator(t *testing.T) {
-	setDatabaseConfigForTest()
 	cmdOptions.Tab.SchemaName = "mock_data_table2"
 	cmdOptions.Tab.ColumnNamePrefix = "mock_data_column"
 	randomNumber := 9877
-	createSchemaStmt := fmt.Sprintf("CREATE SCHEMA %s;", cmdOptions.Tab.SchemaName)
-	_, err := ExecuteDB(createSchemaStmt)
-	if err != nil {
-		t.Errorf("TestCreateTableStatementGenerator, failed creating schema, err: %v", err)
-	}
+	createFakeTablesForTablesTest()
 
 	tests := []struct {
 		name          string
