@@ -15,13 +15,16 @@ const (
 	constraintRestoreForeignKeyTable             = "fk_table"
 )
 
+var resetSavedConstraints = func() {
+	savedConstraints = map[string][]constraint{} // reset
+}
+
 func createFakeTablesFromConstraintRestoreTest() {
 	setDatabaseConfigForTest()
 	cmdOptions.Tab.SchemaName = "mock_data_table4"
 	cmdOptions.DontPrompt = true
 	cmdOptions.Rows = 30
 	postgresOrGreenplum()
-	savedConstraints = map[string][]constraint{} // reset
 	sql := `
 		DROP SCHEMA IF EXISTS %[1]s CASCADE;
 		CREATE SCHEMA %[1]s;
@@ -55,6 +58,7 @@ func TestFixConstraints(t *testing.T) {
 // Test: fixPKey, check if the primary keys are fixed
 func TestFixPKey(t *testing.T) {
 	createFakeTablesFromConstraintRestoreTest()
+	defer resetSavedConstraints() // reset
 	for _, conStr := range []string{"PRIMARY", "UNIQUE"} {
 		data, ok := savedConstraints[conStr]
 		t.Run("check_for_saved_constraint_"+conStr, func(t *testing.T) {
@@ -82,6 +86,7 @@ func TestFixPKey(t *testing.T) {
 // Test: fixPKViolator, test if the function actually cleans up the pk violation
 func TestFixPKViolator(t *testing.T) {
 	createFakeTablesFromConstraintRestoreTest()
+	defer resetSavedConstraints() // reset
 	for _, conStr := range []string{"PRIMARY", "UNIQUE"} {
 		var col string = constraintRestorePrimaryKeyColumn
 		var dtype string = "int"
@@ -102,6 +107,7 @@ func TestFixPKViolator(t *testing.T) {
 // Test: fixFKey, check if the fk's are fixed and the constraint restored
 func TestFixFKey(t *testing.T) {
 	createFakeTablesFromConstraintRestoreTest()
+	defer resetSavedConstraints() // reset
 	data, ok := savedConstraints["FOREIGN"]
 	t.Run("check_for_saved_constraint_FOREIGN", func(t *testing.T) {
 		if !ok {
@@ -127,6 +133,7 @@ func TestFixFKey(t *testing.T) {
 // Test: getForeignKeyColumns, should provide us with value fkcolumn, fktable, ref table, ref column
 func TestGetForeignKeyColumns(t *testing.T) {
 	createFakeTablesFromConstraintRestoreTest()
+	defer resetSavedConstraints() // reset
 	data, _ := savedConstraints["FOREIGN"]
 	var found = false
 	for _, ck := range data {
@@ -183,6 +190,7 @@ func TestIgnoreErrorString(t *testing.T) {
 // Test: recreateAllConstraints, test if all recreating is done
 func TestRecreateAllConstraints(t *testing.T) {
 	createFakeTablesFromConstraintRestoreTest()
+	defer resetSavedConstraints() // reset
 	failedConstraintsFile := fmt.Sprintf("%s/failed_constraint_creations.sql", Path)
 	recreateAllConstraints()
 	for _, conStr := range []string{"PRIMARY", "UNIQUE", "FOREIGN"} {
@@ -207,6 +215,7 @@ func TestRecreateAllConstraints(t *testing.T) {
 // Test: deleteViolatingPkOrUkConstraints, should delete violating rows
 func TestDeleteViolatingPkOrUkConstraints(t *testing.T) {
 	createFakeTablesFromConstraintRestoreTest()
+	defer resetSavedConstraints() // reset
 	executeStatement := func(stmt string) error {
 		_, err := ExecuteDB(stmt)
 		return err
