@@ -17,8 +17,6 @@ func TestCreateDirectory(t *testing.T) {
 	})
 	t.Run("should_create_a_directory", func(t *testing.T) {
 		CreateDirectory()
-		p, _ := os.Stat(Path)
-		fmt.Println(p.Name(), Path)
 		if p, err := os.Stat(Path); !p.IsDir() || err != nil {
 			t.Errorf("TestCreateDirectory didn't create the directory, failed")
 		}

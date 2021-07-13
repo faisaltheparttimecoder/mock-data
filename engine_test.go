@@ -895,11 +895,6 @@ func TestBuildEnumDataTypes(t *testing.T) {
 	if err != nil {
 		t.Errorf("TestBuildEnumDataTypes: failed with error, %v", err)
 	}
-	fmt.Println(cmdOptions.Database,
-		cmdOptions.Password,
-		cmdOptions.Username,
-		cmdOptions.Hostname,
-		cmdOptions.Port)
 	t.Run("check_for_valid_data_from_emum_type", func(t *testing.T) {
 		if got, _ := buildEnumDataTypes("rating"); !StringContains(got, data) {
 			t.Errorf("TestBuildEnumDataTypes = %v, want that matches one of these %v", got, data)

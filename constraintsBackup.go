@@ -103,7 +103,7 @@ func RemoveConstraints(table string) {
 	for _, c := range constraints {
 		// Generate the DROP DDL command
 		if c.Constrainttype == "index" { // if the constraint is a index
-			statement = fmt.Sprintf("DROP INDEX \"%s\" CASCADE;", c.Constraintname)
+			statement = fmt.Sprintf("DROP INDEX %s CASCADE;", c.Constraintname)
 		} else { // if the constraint is a constraint
 			statement = fmt.Sprintf("ALTER TABLE %s DROP CONSTRAINT \"%s\" CASCADE;", table, c.Constraintname)
 		}

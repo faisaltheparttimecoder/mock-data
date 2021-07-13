@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
 	"strings"
 	"testing"
 )
@@ -14,14 +13,6 @@ const (
 	workerTestUnsupportedDataTypeColumn = "unsupported_datatype"
 	workerTestCopyData                  = "copy_table"
 )
-
-func setDatabaseConfigForTest() {
-	cmdOptions.Database = viper.GetString("PGDATABASE")
-	cmdOptions.Password = viper.GetString("PGPASSWORD")
-	cmdOptions.Username = viper.GetString("PGUSER")
-	cmdOptions.Hostname = viper.GetString("PGHOST")
-	cmdOptions.Port = viper.GetInt("PGPORT")
-}
 
 // Create mocking tables for worker_test
 func createFakeTablesForWorkerTest() []DBTables {

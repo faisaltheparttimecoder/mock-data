@@ -325,40 +325,47 @@ func GetConstraintsPertab(tabname string) []DBConstraintsByTable {
 	Debugf("Extracting constraint info for table: %s", tabname)
 	var result []DBConstraintsByTable
 	query := `
-SELECT * 
-FROM   (SELECT n.nspname 
-               || '.' 
-               || c.relname                                   tablename, 
-               con.conname                                    constraintname, 
-               pg_catalog.Pg_get_constraintdef(con.oid, TRUE) constraintcol, 
-               'constraint'                                   constrainttype 
-        FROM   pg_catalog.pg_class c, 
-               pg_catalog.pg_constraint con, 
-               pg_namespace n 
-        WHERE  c.oid = '%[1]s' :: regclass 
-               AND conrelid = c.oid 
-               AND n.oid = c.relnamespace 
-               AND contype IN ( 'u', 'f', 'c', 'p' ) 
-        UNION 
-        SELECT schemaname 
-               || '.' 
-               || tablename tablename, 
-               indexname    conname, 
-               indexdef     concol, 
-               'index'      contype 
-        FROM   pg_indexes 
-        WHERE  schemaname IN (SELECT nspname 
-                              FROM   pg_namespace 
-                              WHERE  nspname NOT IN ( 
-                                     'pg_catalog', 'information_schema' 
-                                     , 
-                                     'pg_aoseg', 
-                                     'gp_toolkit', 
-                                     'pg_toast', 'pg_bitmapindex' )) 
-               AND indexdef LIKE 'CREATE UNIQUE%[2]s' 
-               AND '"' || schemaname || '"'
-                   || '."' 
-                   || tablename || '"' = '%[1]s') a 
+SELECT *
+FROM   (SELECT n.nspname
+               || '.'
+               || c.relname                                   tablename,
+               con.conname                                    constraintname,
+               pg_catalog.Pg_get_constraintdef(con.oid, TRUE) constraintcol,
+               'constraint'                                   constrainttype
+        FROM   pg_catalog.pg_class c,
+               pg_catalog.pg_constraint con,
+               pg_namespace n
+        WHERE  c.oid = '%[1]s' :: regclass
+               AND conrelid = c.oid
+               AND n.oid = c.relnamespace
+               AND contype IN ( 'u', 'f', 'c', 'p' )
+        UNION
+        SELECT schemaname
+               || '.'
+               || tablename tablename,
+               '"'
+               || schemaname
+               || '"."'
+               || indexname
+               || '"'       conname,
+               indexdef     concol,
+               'index'      contype
+        FROM   pg_indexes
+        WHERE  schemaname IN (SELECT nspname
+                              FROM   pg_namespace
+                              WHERE  nspname NOT IN (
+                                     'pg_catalog', 'information_schema'
+                                     ,
+                                     'pg_aoseg',
+                                     'gp_toolkit',
+                                     'pg_toast', 'pg_bitmapindex' ))
+               AND indexdef LIKE 'CREATE UNIQUE%[2]s'
+               AND '"'
+                   || schemaname
+                   || '"'
+                   || '."'
+                   || tablename
+                   || '"' = '%[1]s') a
 ORDER  BY constrainttype 
 `
 	// db connection
