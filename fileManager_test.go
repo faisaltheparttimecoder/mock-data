@@ -33,7 +33,7 @@ func TestWriteToFile(t *testing.T) {
 		}
 	})
 	t.Run("check_if_the_content_exists", func(t *testing.T) {
-		c, err := ReadFile(f);
+		c, err := ReadFile(f)
 		if len(c) <= 0 {
 			t.Errorf("TestWriteToFile %d content found in the file: %v", len(c), f)
 		} else {

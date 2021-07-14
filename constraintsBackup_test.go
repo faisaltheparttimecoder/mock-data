@@ -5,7 +5,6 @@ import (
 	"testing"
 )
 
-
 // create fake tables for constraint backup
 func createFakeTablesForConstraintBackup() {
 	setDatabaseConfigForTest()

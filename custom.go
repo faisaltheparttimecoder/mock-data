@@ -46,7 +46,7 @@ var fakeRealisticMaps = func() map[string]interface{} {
 		"AddressStateAbbr":             faker.Address().StateAbbr(),               // => "IL"
 		"AddressCountry":               faker.Address().Country(),                 // => "Uruguay"
 		"AddressCountryCode":           faker.Address().CountryCode(),             // => "JP"
-		"AddressContinent":             fake.Continent(),                          // Africa
+		"AddressContinent":             fake.Continent(),                          // => Africa
 		"AddressLatitude":              faker.Address().Latitude(),                // => (float32) -38.811367
 		"AddressLongitude":             faker.Address().Longitude(),               // => (float32) 89.2171
 		"AddressString":                faker.Address().String(),                  // => "6071 Heaney Island Suite 553, Ebbaville Texas 37307"Address
@@ -127,7 +127,6 @@ var fakeRealisticMaps = func() map[string]interface{} {
 		"NameFemaleFirstName":          fake.FemaleFirstName(),                    // <= Debra
 		"NameFemaleLastName":           fake.FemaleLastName(),                     // <= Ramirez
 		"NameFemaleFullNameWithPrefix": fake.FemaleFullNameWithPrefix(),           // <= Mrs. Ms. Miss Diana Brooks
-		"NameEmail":                    fake.EmailAddress(),                       // => "CherylHenderson@Skalith.mil"
 		"NameGender":                   fake.Gender(),                             // => "Female", "Male"
 		"NameGenderAbbrev":             fake.GenderAbbrev(),                       // => "f", "m"
 		"NamePrefix":                   faker.Name().Prefix(),                     // => "Dr."
@@ -177,6 +176,7 @@ func GenerateMockPlan() {
 
 // Realistic data generator
 func RealisticDataBuilder(keyMap string) interface{} {
+	Debugf("Getting data from realistic map for the key: %s", keyMap)
 	// All the fake keys available
 	var fakeMaps = fakeRealisticMaps()
 
@@ -185,7 +185,7 @@ func RealisticDataBuilder(keyMap string) interface{} {
 	if !IsStringEmpty(keyMap) {
 		data, ok := fakeMaps[keyMap]
 		if !ok {
-			Fatalf("The requested realistic request key %s doesn't exists or currently not implemented", keyMap)
+			Fatalf("The requested realistic request key \"%s\" doesn't exists or currently not implemented, check your yaml", keyMap)
 		}
 		return data
 	}

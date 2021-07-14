@@ -272,9 +272,8 @@ func TestExtractTableNColumnName(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotTable, gotColumn := ExtractTableNColumnName(tt.s);
-				removeWhiteSpaces(gotTable) != removeWhiteSpaces(tt.wantTable) ||
-					removeWhiteSpaces(gotColumn) != removeWhiteSpaces(tt.wantColumn) {
+			if gotTable, gotColumn := ExtractTableNColumnName(tt.s); removeWhiteSpaces(gotTable) != removeWhiteSpaces(tt.wantTable) ||
+				removeWhiteSpaces(gotColumn) != removeWhiteSpaces(tt.wantColumn) {
 				t.Errorf("TestExtractTableNColumnName() = %v / %v, want %v / %v",
 					gotTable, gotColumn, tt.wantTable, tt.wantColumn)
 			}
