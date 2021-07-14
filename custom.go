@@ -5,7 +5,6 @@ import (
 	"github.com/icrowley/fake"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
-	"log"
 	"strings"
 	"syreclabs.com/go/faker"
 )
@@ -174,24 +173,6 @@ func GenerateMockPlan() {
 	}
 }
 
-// Realistic data generator
-func RealisticDataBuilder(keyMap string) interface{} {
-	Debugf("Getting data from realistic map for the key: %s", keyMap)
-	// All the fake keys available
-	var fakeMaps = fakeRealisticMaps()
-
-	// If the request is to give the data via the key
-	// then send the data
-	if !IsStringEmpty(keyMap) {
-		data, ok := fakeMaps[keyMap]
-		if !ok {
-			Fatalf("The requested realistic request key \"%s\" doesn't exists or currently not implemented, check your yaml", keyMap)
-		}
-		return data
-	}
-	return ""
-}
-
 // Build the skeleton Yaml
 func BuildSkeletonYaml(column []TableCollection) Skeleton {
 	Debugf("Build skeleton yaml")
@@ -262,8 +243,26 @@ func (c *Skeleton) ReadConfiguration() {
 	// Load the configuration onto struct
 	err = viper.Unmarshal(&c)
 	if err != nil {
-		log.Fatalf("unable to decode into struct, %v", err)
+		Fatalf("unable to decode into struct, %v", err)
 	}
+}
+
+// Realistic data generator
+func RealisticDataBuilder(keyMap string) interface{} {
+	Debugf("Getting data from realistic map for the key: %s", keyMap)
+	// All the fake keys available
+	var fakeMaps = fakeRealisticMaps()
+
+	// If the request is to give the data via the key
+	// then send the data
+	if !IsStringEmpty(keyMap) {
+		data, ok := fakeMaps[keyMap]
+		if !ok {
+			Fatalf("The requested realistic request key \"%s\" doesn't exists or currently not implemented, check your yaml", keyMap)
+		}
+		return data
+	}
+	return ""
 }
 
 // Load the data based on custom configuration
