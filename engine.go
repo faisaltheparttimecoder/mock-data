@@ -20,7 +20,7 @@ var (
 	geoDataTypekeywords = []string{"path", "polygon", "line", "lseg", "box", "circle", "point"} // Geometry data types
 )
 
-// Data Generator
+// BuildData: Data Generator
 // It provided random data based on data types.
 func BuildData(dt string) (interface{}, error) {
 	if StringHasPrefix(dt, intKeywords) { // Integer builder
@@ -60,9 +60,9 @@ func BuildData(dt string) (interface{}, error) {
 	} else if strings.HasPrefix(dt, "xml") { // Random Xml
 		return buildXml(dt)
 	} else if strings.HasPrefix(dt, "tsquery") { // Random Text Search Query
-		return buildTsQuery(dt)
+		return buildTSQuery(dt)
 	} else if strings.HasPrefix(dt, "tsvector") { // Random Text Search Vector
-		return buildTsVector(dt)
+		return buildTSVector(dt)
 	} else if strings.HasPrefix(dt, "pg_lsn") { // Random Log Sequence number
 		return buildLseg(dt)
 	} else if strings.HasPrefix(dt, "txid_snapshot") { // Random transaction XID snapshot
@@ -258,7 +258,7 @@ func buildXml(dt string) (interface{}, error) {
 }
 
 // Ts Query Builder
-func buildTsQuery(dt string) (interface{}, error) {
+func buildTSQuery(dt string) (interface{}, error) {
 	isItArray, _ := isDataTypeAnArray(dt)
 	if isItArray {
 		return ArrayGenerator("tsquery", dt, 0, 0)
@@ -267,7 +267,7 @@ func buildTsQuery(dt string) (interface{}, error) {
 }
 
 // Ts Vector Builder
-func buildTsVector(dt string) (interface{}, error) {
+func buildTSVector(dt string) (interface{}, error) {
 	isItArray, _ := isDataTypeAnArray(dt)
 	if isItArray {
 		return ArrayGenerator("tsvector", dt, 0, 0)
@@ -337,7 +337,7 @@ func isDataTypeAnArray(dt string) (bool, string) {
 	return false, dt
 }
 
-// Random array generator for array data types
+// ArrayGenerator: Random array generator for array data types
 func ArrayGenerator(dt, originalDt string, min, max int) (string, error) {
 	maxValues := RandomInt(1, 6) // Getting the value of iterators
 	maxIteration := RandomInt(1, 3)
@@ -392,9 +392,8 @@ func randomDataByDataTypeForArray(dt, originalDt string, min, max int) (string, 
 	} else if dt == "bool" {
 		if RandomBoolean() {
 			return "true", nil
-		} else {
-			return "false", nil
 		}
+		return "false", nil
 	} else if dt == "IP" {
 		return RandomIP(), nil
 	} else if dt == "macaddr" {
@@ -414,7 +413,7 @@ func randomDataByDataTypeForArray(dt, originalDt string, min, max int) (string, 
 	}
 }
 
-// Random geometric array generators
+// GeometricArrayGenerator: Random geometric array generators
 func GeometricArrayGenerator(maxInt int, geometryType string) string {
 	// Getting the value of iterators
 	maxIterations := RandomInt(1, 6)
@@ -433,7 +432,7 @@ func GeometricArrayGenerator(maxInt int, geometryType string) string {
 	return fmt.Sprintf("{%s}", strings.Join(resultArray, ","))
 }
 
-// Random XML & Json array generators.
+// JsonXmlArrayGenerator: Random XML & Json array generators.
 func JsonXmlArrayGenerator(dt string) string {
 	// Getting the value of iterators
 	maxIterations := RandomInt(1, 6)

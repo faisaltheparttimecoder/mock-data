@@ -14,7 +14,7 @@ var (
 	constraints      = []string{"p", "f", "u", "c"}
 )
 
-// Backup DDL of objects which are going to drop to
+// BackupDDL of objects which are going to drop to
 // allow faster and smooth transition of inputting data.
 func BackupDDL() {
 	// Create the necessary directory of this run
@@ -90,7 +90,7 @@ func constraintFinder(contype string) (string, error) {
 	return "", nil
 }
 
-// Remove the constraints before loading to ease the pain of any
+// RemoveConstraints removes the constraints before loading to ease the pain of any
 // failure due to constraint errors
 func RemoveConstraints(table string) {
 	Debugf("Removing constraints for table: %s", table)

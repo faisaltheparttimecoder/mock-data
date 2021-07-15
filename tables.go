@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// CreateFakeTables, creates fakes tables has requested by the user
 func CreateFakeTables() {
 	Infof("Create %d fake tables on the database: %s", cmdOptions.Tab.TotalTables, cmdOptions.Database)
 
@@ -14,7 +15,7 @@ func CreateFakeTables() {
 	// Create tables
 	for i := 1; i <= cmdOptions.Tab.TotalTables; i++ {
 		createTable(i)
-		bar.Add(1)
+		_ = bar.Add(1)
 	}
 
 	Infof("Completed creating %d fake tables on the database: %s", cmdOptions.Tab.TotalTables, cmdOptions.Database)
@@ -71,7 +72,7 @@ func createTable(n int) {
 	}
 }
 
-// Mock provided tables
+// MockTables mocks the provided tables
 func MockTables() {
 	Infof("Starting mocking of table: %s", cmdOptions.Tab.FakeTablesRows)
 	whereClause := generateWhereClause()

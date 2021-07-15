@@ -27,10 +27,10 @@ func TimeNow() string {
 
 // ConnectDB creates a database connection.
 func ConnectDB() *pg.DB {
-	if !IsStringEmpty(cmdOptions.Uri) {
-		opt, err := pg.ParseURL(cmdOptions.Uri)
+	if !IsStringEmpty(cmdOptions.URI) {
+		opt, err := pg.ParseURL(cmdOptions.URI)
 		if err != nil {
-			Fatalf("Encountered error when making a connection via the uri \"%s\", err: %v", cmdOptions.Uri, err)
+			Fatalf("Encountered error when making a connection via the uri \"%s\", err: %v", cmdOptions.URI, err)
 		}
 		return pg.Connect(opt)
 	}

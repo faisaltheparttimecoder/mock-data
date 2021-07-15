@@ -1,4 +1,4 @@
-# Mock Data [![go version](https://img.shields.io/github/go-mod/go-version/pivotal-gss/mock-data?filename=go.mod&style=flat&logo=go&label=GoLang)](https://golang.org/dl/) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/CI?logo=github&style=flat&label=CI%20Workflow)](https://github.com/pivotal-gss/mock-data/actions/workflows/ci.yml) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/Tests?logo=github&style=flat&label=Tests%20Workflow)](https://github.com/pivotal-gss/mock-data/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/pivotal-gss/mock-data/branch/master/graph/badge.svg)](https://codecov.io/gh/pivotal-gss/mock-data)
+# Mock Data [![go version](https://img.shields.io/github/go-mod/go-version/pivotal-gss/mock-data?filename=go.mod&style=flat&logo=go&label=GoLang)](https://golang.org/dl/) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/CI?logo=github&style=flat&label=CI%20Workflow)](https://github.com/pivotal-gss/mock-data/actions/workflows/ci.yml) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/Tests?logo=github&style=flat&label=Tests%20Workflow)](https://github.com/pivotal-gss/mock-data/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/pivotal-gss/mock-data/branch/master/graph/badge.svg)](https://codecov.io/gh/pivotal-gss/mock-data) [![Go Report Card](https://goreportcard.com/badge/github.com/pivotal-gss/mock-data?logo=go)](https://goreportcard.com/report/github.com/pivotal-gss/mock-data)
 
     Here are my tables
     Load them [with data] for me
@@ -182,18 +182,22 @@ To customize this repository, follow the steps
     ```
     go run . <commands> <flags.........>
     ```
-6. To run test, use 
+6. Run the golang linter to analyzes & fix source code to flag programming errors, bugs, stylistic errors, and suspicious constructs.
+    ```
+    golangci-lint run
+    ```
+   to install golangci-lint check [here](https://golangci-lint.run/usage/install/), config file `.golangci.yml` is provided with the repo
+7. To run test, use 
     ```
     # Edit the database environment variables on the "Makefile"
     make unit_tests
     make integration_tests
     make tests # Runs the above two test simultaneously 
     ```
-7. To build the package use
+8. To build the package use
     ```
     make build
     ```
-**[Optional]** For formatting and checking your code you can use linters. We have [.golangci.yml](https://github.com/pivotal-gss/mock-data/blob/master/.golangci.yml) available with the repository, check out this [blog](https://betterprogramming.pub/how-to-improve-code-quality-with-an-automatic-check-in-go-d18a5eb85f09) on how to set it up.
 
 **--- HAPPY HACKING ---**
 

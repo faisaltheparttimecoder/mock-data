@@ -22,7 +22,8 @@ func executeDemoDatabasePreCleanup() {
 	}
 }
 
-// Execute demo database
+// ExecuteDemoDatabase creates a demo database based on the flavour of postgres i.e
+// native postgres or greenplum
 func ExecuteDemoDatabase() {
 	Infof("Create demo tables in the database: %s", cmdOptions.Database)
 
@@ -46,7 +47,7 @@ func ExecuteDemoDatabase() {
 	Infof("Completed creating demo tables in the database: %s", cmdOptions.Database)
 }
 
-// Mock the whole database
+// MockDatabase mocks the whole database
 func MockDatabase() {
 	// Get the table list that we have to mock the data
 	Infof("Starting the program to mock full database")

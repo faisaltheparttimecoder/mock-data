@@ -9,16 +9,19 @@ import (
 	"syreclabs.com/go/faker"
 )
 
+// Skeleton the main type with captures all the yaml data
 type Skeleton struct {
 	Custom []TableModel `yaml:"Custom"`
 }
 
+// TableModel is a skeleton that captures the table construct
 type TableModel struct {
 	Schema string        `yaml:"Schema"`
 	Table  string        `yaml:"Table"`
 	Column []ColumnModel `yaml:"Column"`
 }
 
+// ColumnModel, captures all is used to constructs all the column of the table
 type ColumnModel struct {
 	Name      string   `yaml:"Name"`
 	Type      string   `yaml:"Type"`
@@ -26,6 +29,7 @@ type ColumnModel struct {
 	Realistic string   `yaml:"Realistic"`
 }
 
+// fakeRealisticMaps is the realistic data map
 var fakeRealisticMaps = func() map[string]interface{} {
 	return map[string]interface{}{
 		"AddressCity":                  faker.Address().City(),                    // => "North Dessie"
@@ -155,7 +159,7 @@ var fakeRealisticMaps = func() map[string]interface{} {
 	}
 }
 
-// Generate a YAML of the mock plan related to this table
+// GenerateMockPlan generates a YAML of the mock plan related to this table
 func GenerateMockPlan() {
 	Infof("Generating a skeleton YAML for the list of table provided")
 
@@ -173,7 +177,7 @@ func GenerateMockPlan() {
 	}
 }
 
-// Build the skeleton Yaml
+// BuildSkeletonYaml builds the skeleton Yaml
 func BuildSkeletonYaml(column []TableCollection) Skeleton {
 	Debugf("Build skeleton yaml")
 	var s Skeleton
@@ -194,7 +198,7 @@ func BuildSkeletonYaml(column []TableCollection) Skeleton {
 	return s
 }
 
-// Create a yaml file and write the contents onto the file
+// RegisterSkeletonYamlToFile create a yaml file and write the contents onto the file
 func RegisterSkeletonYamlToFile(skeleton Skeleton) {
 	Debugf("Save the yaml skeleton to file")
 	f := fmt.Sprintf("%s_skeleton_%s.yaml", programName, ExecutionTimestamp)
@@ -214,7 +218,7 @@ func RegisterSkeletonYamlToFile(skeleton Skeleton) {
 	Infof("The YAML is saved to file: %s/%s", CurrentDir(), f)
 }
 
-// Load the custom configuration and mock data based on that configuration
+// MockCustoms load the custom configuration and mock data based on that configuration
 func MockCustoms() {
 	Infof("Loading the table using custom configuration")
 	c := Skeleton{}
@@ -229,7 +233,7 @@ func MockCustoms() {
 	skipTablesWarning()
 }
 
-// Read Configuration and load it to skeleton struct
+// ReadConfiguration reads the configuration file and load it to skeleton struct
 func (c *Skeleton) ReadConfiguration() {
 	Debugf("Reading the configuration file: %s", cmdOptions.File)
 
@@ -247,7 +251,7 @@ func (c *Skeleton) ReadConfiguration() {
 	}
 }
 
-// Realistic data generator
+// RealisticDataBuilder generates realistic data
 func RealisticDataBuilder(keyMap string) interface{} {
 	Debugf("Getting data from realistic map for the key: %s", keyMap)
 	// All the fake keys available
@@ -265,7 +269,7 @@ func RealisticDataBuilder(keyMap string) interface{} {
 	return ""
 }
 
-// Load the data based on custom configuration
+// LoadDataByConfiguration loads the data based on custom configuration
 func (c *Skeleton) LoadDataByConfiguration() {
 	Infof("Loading data to the table based on what is defined by file %s", cmdOptions.File)
 
@@ -300,7 +304,7 @@ func (c *Skeleton) LoadDataByConfiguration() {
 						if strings.HasPrefix(fmt.Sprint(err), "unsupported datatypes found") {
 							Debugf("Table %s skipped: %v", tab, err)
 							skippedTab = append(skippedTab, tab)
-							bar.Add(cmdOptions.Rows)
+							_ = bar.Add(cmdOptions.Rows)
 							break DataTypePickerLoop
 						} else {
 							Fatalf("Error when building data for table %s: %v", tab, err)
@@ -313,7 +317,7 @@ func (c *Skeleton) LoadDataByConfiguration() {
 
 			// Copy the data to the table
 			CopyData(tab, col, data, db)
-			bar.Add(1)
+			_ = bar.Add(1)
 		}
 	}
 }

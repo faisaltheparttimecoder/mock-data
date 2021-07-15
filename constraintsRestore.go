@@ -12,12 +12,12 @@ var (
 	maxLoop = 10
 )
 
-// Get Foreign key objects
+// ForeignKey gets Foreign key objects
 type ForeignKey struct {
 	Table, Column, Reftable, Refcolumn string
 }
 
-// Ty to recreate all the constraints where ever we can
+// FixConstraints tries to recreate all the constraints where ever we can
 func FixConstraints() {
 	// Fix the constraints in this order
 	// var constr = []string{"PRIMARY", "UNIQUE", "CHECK", "FOREIGN"}
@@ -38,7 +38,7 @@ func FixConstraints() {
 			case v == "FOREIGN":
 				fixFKey(con)
 			}
-			bar.Add(1)
+			_ = bar.Add(1)
 		}
 	}
 
@@ -102,7 +102,7 @@ func fixPKViolator(tab, col, dttype string) {
 func fixFKey(con constraint) {
 	totalViolators := 1
 
-	// The objects involved in this foriegn key clause
+	// The objects involved in this foreign key clause
 	fkeyObjects := getForeignKeyColumns(con)
 
 	// Time to fix the foreign key issues
@@ -167,7 +167,7 @@ func getForeignKeyColumns(con constraint) *ForeignKey {
 	return &ForeignKey{con.table, fkCol, refTab, refCol}
 }
 
-// Ignore Error strings matches
+// IgnoreErrorString ignores error strings matches
 func IgnoreErrorString(errmsg string) bool {
 	for _, ignore := range ignoreErr {
 		if strings.HasSuffix(errmsg, ignore) || strings.HasPrefix(errmsg, ignore) {
@@ -220,7 +220,7 @@ func recreateAllConstraints() {
 						AnyError = true
 					}
 				}
-				bar.Add(1)
+				_ = bar.Add(1)
 			}
 		}
 	}
@@ -261,7 +261,7 @@ func deleteViolatingPkOrUkConstraints(con string) bool {
 	return false
 }
 
-// Extract the table name and the column from the sql command
+// ExtractTableNColumnName extracts the table name and the column from the sql command
 func ExtractTableNColumnName(s string) (string, string) {
 	var isItAlterStatement bool = true
 	var table string

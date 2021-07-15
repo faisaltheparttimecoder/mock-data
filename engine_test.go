@@ -580,7 +580,7 @@ func TestBuildXml(t *testing.T) {
 	})
 }
 
-// Test: buildTsQuery, check if the text search query that is send is valid
+// Test: buildTSQuery, check if the text search query that is send is valid
 // for array it should be "{animi | dolor,quos & hic,temporibus & tenetur  & ! et,....}"
 func TestBuildTsQuery(t *testing.T) {
 	tests := []struct {
@@ -593,14 +593,14 @@ func TestBuildTsQuery(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildTsQuery(tt.dt); doesDataMatchDataType(got, reExpTsQuery) != tt.want {
+			if got, _ := buildTSQuery(tt.dt); doesDataMatchDataType(got, reExpTsQuery) != tt.want {
 				t.Errorf("TestBuildMacAddr = %v, want = %v", got, tt.want)
 			}
 		})
 	}
 }
 
-// Test: buildTsVector, check if the text search vector that is send is valid
+// Test: buildTSVector, check if the text search vector that is send is valid
 // for array it should be "{text,text,....}"
 func TestBuildTsVector(t *testing.T) {
 	tests := []struct {
@@ -613,7 +613,7 @@ func TestBuildTsVector(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := buildTsVector(tt.dt); doesDataMatchDataType(got, reExpText) != tt.want { // can be some random text, so this will pass regardless
+			if got, _ := buildTSVector(tt.dt); doesDataMatchDataType(got, reExpText) != tt.want { // can be some random text, so this will pass regardless
 				t.Errorf("TestBuildTsVector = %v, want = %v", got, tt.want)
 			}
 		})

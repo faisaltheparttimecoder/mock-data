@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+// SupportedDataTypes: List of all the supported data types
 func SupportedDataTypes() []string {
 	return []string{
 		"int8,",

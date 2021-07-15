@@ -21,7 +21,7 @@ func init() {
 	r = rand.New(rand.NewSource(time.Now().UnixNano()))
 }
 
-// Random String generator
+// RandomString: Random String generator
 func RandomString(strlen int) string {
 	const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 	result := make([]byte, strlen)
@@ -31,7 +31,7 @@ func RandomString(strlen int) string {
 	return string(result)
 }
 
-// Random Number generator based on the min and max specified
+// RandomInt: Random Number generator based on the min and max specified
 func RandomInt(min, max int) int {
 	if min >= max {
 		return r.Intn(min-max) + min
@@ -39,7 +39,7 @@ func RandomInt(min, max int) int {
 	return r.Intn(max-min) + min
 }
 
-// Random Bytea data
+// RandomBytea: Random Bytea data
 func RandomBytea(maxlen int) []byte {
 	result := make([]byte, r.Intn(maxlen)+1)
 	for i := range result {
@@ -48,14 +48,14 @@ func RandomBytea(maxlen int) []byte {
 	return result
 }
 
-// Random Float generator based on precision specified
+// RandomFloat: Random Float generator based on precision specified
 func RandomFloat(min, max, precision int) float64 {
 	output := math.Pow(10, float64(precision))
 	randNumber := float64(min) + r.Float64()*float64(max-min)*100
 	return math.Round(randNumber) / output
 }
 
-// Random calender date time generator
+// RandomCalenderDateTime: Random calender date time generator
 func RandomCalenderDateTime(fromyear, toyear int) (time.Time, error) {
 	if fromyear > toyear {
 		return time.Now(), errors.New("number of years behind is greater than number of years in future")
@@ -67,7 +67,7 @@ func RandomCalenderDateTime(fromyear, toyear int) (time.Time, error) {
 	return time.Unix(sec, 0), nil
 }
 
-// Random date
+// RandomDate: Random date
 func RandomDate(fromyear, toyear int) (string, error) {
 	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
@@ -76,7 +76,7 @@ func RandomDate(fromyear, toyear int) (string, error) {
 	return timestamp.Format("2006-01-02"), nil
 }
 
-// Random Timestamp without time zone
+// RandomTimestamp: Random Timestamp without time zone
 func RandomTimestamp(fromyear, toyear int) (string, error) {
 	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
@@ -85,7 +85,7 @@ func RandomTimestamp(fromyear, toyear int) (string, error) {
 	return timestamp.Format("2006-01-02 15:04:05"), nil
 }
 
-// Random Timestamp with time zone
+// RandomTimeStampTz: Random Timestamp with time zone
 func RandomTimeStampTz(fromyear, toyear int) (string, error) {
 	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
@@ -94,7 +94,7 @@ func RandomTimeStampTz(fromyear, toyear int) (string, error) {
 	return timestamp.Format("2006-01-02 15:04:05.000000"), nil
 }
 
-// Random Timestamp with decimals
+// RandomTimeStampTzWithDecimals: Random Timestamp with decimals
 func RandomTimeStampTzWithDecimals(fromyear, toyear, decimal int) (string, error) {
 	var timestampDecimal string
 	d, err := RandomTimestamp(fromyear, toyear)
@@ -111,7 +111,7 @@ func RandomTimeStampTzWithDecimals(fromyear, toyear, decimal int) (string, error
 	return d, nil
 }
 
-// Random Time without time zone
+// RandomTime: Random Time without time zone
 func RandomTime(fromyear, toyear int) (string, error) {
 	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
@@ -120,7 +120,7 @@ func RandomTime(fromyear, toyear int) (string, error) {
 	return timestamp.Format("15:04:05"), nil
 }
 
-// Random Timestamp without time zone
+// RandomTimeTz: Random Timestamp without time zone
 func RandomTimeTz(fromyear, toyear int) (string, error) {
 	timestamp, err := RandomCalenderDateTime(fromyear, toyear)
 	if err != nil {
@@ -129,24 +129,24 @@ func RandomTimeTz(fromyear, toyear int) (string, error) {
 	return timestamp.Format("15:04:05.000000"), nil
 }
 
-// Random bool generator based on if number is even or not
+// RandomBoolean: Random bool generator based on if number is even or not
 func RandomBoolean() bool {
 	number := RandomInt(1, 9999)
 	return number%2 == 0
 }
 
-// Random Paragraphs
+// RandomParagraphs: Random Paragraphs
 func RandomParagraphs() string {
 	n := RandomInt(1, 5)
 	return fake.ParagraphsN(n)
 }
 
-// Random CiText generator
+// RandomCiText: Random CiText generator
 func RandomCiText() string {
 	return strings.Title(fake.Words())
 }
 
-// Random IPv6 & IPv4 Address
+// RandomIP: Random IPv6 & IPv4 Address
 func RandomIP() string {
 	number := RandomInt(1, 9999)
 	var ip string
@@ -156,7 +156,7 @@ func RandomIP() string {
 	return ip
 }
 
-// Random bit
+// RandomBit: Random bit
 func RandomBit(max int) string {
 	var bitValue string
 	for i := 0; i < max; i++ {
@@ -169,12 +169,12 @@ func RandomBit(max int) string {
 	return bitValue
 }
 
-// Random UUID
+// RandomUUID: Random UUID
 func RandomUUID() string {
 	return uuid.New().String()
 }
 
-// Random Mac Address
+// RandomMacAddress: Random Mac Address
 func RandomMacAddress() string {
 	return fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x",
 		RandomString(1), RandomString(1),
@@ -182,7 +182,7 @@ func RandomMacAddress() string {
 		RandomString(1), RandomString(1))
 }
 
-// Random Text Search Query
+// RandomTSQuery: Random Text Search Query
 func RandomTSQuery() string {
 	number := RandomInt(1, 9999)
 	switch number % 5 { // TODO: replace magic number 5 to symbol constant. What is mean 5? Why exactly 5?
@@ -199,12 +199,12 @@ func RandomTSQuery() string {
 	}
 }
 
-// Random Text Search Query
+// RandomTSVector: Random Text Search Query
 func RandomTSVector() string {
 	return fake.SentencesN(fake.Day())
 }
 
-// Random Geometric data
+// RandomGeometricData: Random Geometric data
 func RandomGeometricData(randomInt int, GeoMetry string, IsItArray bool) string {
 	var data string
 	if GeoMetry == "point" { // Syntax for point data type
@@ -223,13 +223,13 @@ func RandomGeometricData(randomInt int, GeoMetry string, IsItArray bool) string 
 	}
 }
 
-// Random Log Sequence Number
+// RandomLSN: Random Log Sequence Number
 func RandomLSN() string {
 	return fmt.Sprintf("%02x/%02x",
 		RandomString(1), RandomString(4))
 }
 
-// Random transaction XID
+// RandomTXID: Random transaction XID
 func RandomTXID() string {
 	x, _ := strconv.Atoi(fake.DigitsN(8))
 	y, _ := strconv.Atoi(fake.DigitsN(8))
@@ -240,7 +240,7 @@ func RandomTXID() string {
 	return z
 }
 
-// Random JSON generator
+// RandomJSON: Random JSON generator
 func RandomJSON(IsItArray bool) string {
 	jsonData := fmt.Sprintf(JsonSkeleton(), RandomString(24),
 		fake.DigitsN(10), RandomUUID(), strconv.FormatBool(RandomBoolean()), fake.Digits(), fake.DigitsN(2),
@@ -260,7 +260,7 @@ func RandomJSON(IsItArray bool) string {
 	return jsonData
 }
 
-// Random XML Generator
+// RandomXML: Random XML Generator
 func RandomXML(IsItArray bool) string {
 	xmlData := fmt.Sprintf(XMLSkeleton(), fake.Digits(), fake.DomainName(),
 		fake.DigitsN(4), fake.WordsN(1), fake.FullName(), fake.FullName(), fake.StreetAddress(), fake.City(),
@@ -272,7 +272,7 @@ func RandomXML(IsItArray bool) string {
 	return xmlData
 }
 
-// Pick Random Value from any array
+// RandomPickerFromArray: Picks Random Value from any array
 func RandomPickerFromArray(a []string) string {
 	if len(a) == 0 {
 		return ""
@@ -280,7 +280,7 @@ func RandomPickerFromArray(a []string) string {
 	return a[RandomValueFromLength(len(a))]
 }
 
-// Random value from length
+// RandomValueFromLength: Random value from length
 func RandomValueFromLength(i int) int {
 	if i == 0 {
 		return 0
