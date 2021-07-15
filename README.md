@@ -142,10 +142,10 @@ Here is a simple demo of how the tool works, provide us your table and we will l
 For more examples how to use the tool, please check out the [wiki](https://github.com/pivotal-legacy/mock-data/wiki) page for categories like
 
 * Look here on how the [database connection](https://github.com/pivotal-legacy/mock-data/wiki/Connecting-to-Database) works
-* Read this section on how the subcommand [custom](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Custom) works
-* Read this section on how the subcommand [database](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Database) works
-* Read this section on how the subcommand [schema](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Schema) works
-* Read this section on how the subcommand [tables](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Tables) works
+* For realistic & controlled data, read this section on how the subcommand [custom](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Custom) works
+* For mocking the whole database or creating a demo database, read this section on how the subcommand [database](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Database) works
+* For mocking the whole tables of the schema, read this section on how the subcommand [schema](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Schema) works
+* For creating fake tables and mocking selected tables, read this section on how the subcommand [tables](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Tables) works
  
 
 ## Known Issues
