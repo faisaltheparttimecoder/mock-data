@@ -44,6 +44,15 @@ integration_tests:
 	make drop_db
 .PHONY: integration_tests
 
+# Run Mock data test codecov
+codecov_tests:
+	make recreate_db
+	@echo "#### Running Mock Data Test"
+	MOCK_DATA_TEST_RUNNER=$(MOCK_DATA_TEST_RUNNER) PGPASSWORD=$(PGPASSWORD) PGDATABASE=$(PGDATABASE) PGUSER=$(PGUSER) PGHOST=$(PGHOST) PGPORT=$(PGPORT) GOFLAGS="-count=1" go test -v . -coverprofile=coverage.txt -covermode=atomic
+	@echo "#### Finished Mock Data Test"
+	make drop_db
+.PHONY: unit_tests
+
 # Run all mock data test
 tests:
 	make unit_tests

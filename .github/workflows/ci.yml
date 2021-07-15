@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - master
+      - v3.0
 jobs:
   tests:
     strategy:
@@ -48,6 +49,20 @@ jobs:
     needs: tests
     name: Code Coverage
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:12
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_USER: postgres
+          POSTGRES_DB: testmockdb
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
     steps:
       - uses: actions/checkout@v2
         with:
@@ -56,7 +71,7 @@ jobs:
         with:
           go-version: '1.16'
       - name: Run coverage
-        run: go test -coverprofile=coverage.txt -covermode=atomic ./...
+        run: make codecov_tests
       - name: Upload coverage to Codecov
         run: bash <(curl -s https://codecov.io/bash)
 
