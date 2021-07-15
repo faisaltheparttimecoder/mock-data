@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - master
-      - docker-containerizing # for test, remove after pass
+      - v3.0
 jobs:
   tests:
     strategy:
@@ -28,11 +28,13 @@ jobs:
           key: ${{ runner.os }}-v1-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-v1-go-
+
       - name: Test
-        run: go test ./... -race -cover
+        run: make tests
 
   codecov:
     needs: tests
+    name: Code Coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -57,12 +59,30 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.CR_PAT }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       - name: Push to GitHub Packages
         uses: docker/build-push-action@v2
         with:
           push: true
           context: .
           file: ./build/Dockerfile
-          tags: ghcr.io/art-frela/mock-data:latest
+          tags: ghcr.io/pivotal-gss/mock-data:latest
+
+  add-contributors:
+    needs: [tests]
+    name: Adding Contributors
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: BobAnkh/add-contributors@master
+        with:
+          REPO_NAME: 'pivotal-gss/mock-data'
+          CONTRIBUTOR: '## Contributors'
+          COLUMN_PER_ROW: '6'
+          ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          IMG_WIDTH: '100'
+          FONT_SIZE: '14'
+          PATH: '/README.md'
+          COMMIT_MESSAGE: 'docs(README): update contributors'
+          AVATAR_SHAPE: 'round'

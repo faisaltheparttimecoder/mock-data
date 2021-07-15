@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 	"io/ioutil"
-	"log"
 	"os"
 	"reflect"
 	"regexp"
@@ -137,6 +137,7 @@ func TestIsStringEmpty(t *testing.T) {
 // Test: StartProgressBar, check if the progress bar is started with correct arguments
 func TestStartProgressBar(t *testing.T) {
 	t.Run("checking_the_progress_bar_status", func(t *testing.T) {
+		viper.Set("MOCK_DATA_TEST_RUNNER", "false")
 		// Start Progress bar
 		bar := StartProgressBar("Running go progress bar unit test case", 100)
 		defer bar.Close()
@@ -165,6 +166,7 @@ func TestStartProgressBar(t *testing.T) {
 			t.Errorf("TestStartProgressBar, got = %s, want (Speed mismatched) = %s",
 				kbPerSec, "0.01")
 		}
+		viper.Set("MOCK_DATA_TEST_RUNNER", "true")
 	})
 }
 
@@ -225,17 +227,17 @@ func TestYesOrNoConfirmation(t *testing.T) {
 		content := []byte("y")
 		tmpFile, err := ioutil.TempFile("", "testingYesOrNoConfirmation.tmp")
 		if err != nil {
-			log.Fatal(err)
+			t.Errorf("TestYesOrNoConfirmation, failed to create temp file, err:%v", err)
 		}
 
 		defer os.Remove(tmpFile.Name()) // clean up
 
 		// Write the content to the file
 		if _, err := tmpFile.Write(content); err != nil {
-			log.Fatal(err)
+			t.Errorf("TestYesOrNoConfirmation, failed to write to file, err: %v", err)
 		}
 		if _, err := tmpFile.Seek(0, 0); err != nil {
-			log.Fatal(err)
+			t.Errorf("TestYesOrNoConfirmation, failed to seek tempfile, err: %v", err)
 		}
 
 		// Pass the data as standard input
@@ -251,7 +253,7 @@ func TestYesOrNoConfirmation(t *testing.T) {
 
 		// Close the temp files
 		if err := tmpFile.Close(); err != nil {
-			log.Fatal(err)
+			t.Errorf("TestYesOrNoConfirmation, failed to close the temp file, err: %v", err)
 		}
 	})
 

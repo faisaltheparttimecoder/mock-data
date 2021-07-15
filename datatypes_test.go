@@ -24,7 +24,7 @@ func TestSupportedDataTypes(t *testing.T) {
 			"real,",
 			"double precision,",
 			"numeric(4,2),",
-			"bit,",
+			"bit(1),",
 			"bit varying(4),",
 			"boolean,",
 			"character(10),",

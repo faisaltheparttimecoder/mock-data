@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/spf13/viper"
 	"math"
 	"os"
 	"regexp"
@@ -81,7 +82,7 @@ func IsStringEmpty(s string) bool {
 // Progress Bar
 func StartProgressBar(text string, max int) *progressbar.ProgressBar {
 	// Turn off the progress bar when the Debug is one
-	if cmdOptions.Debug {
+	if cmdOptions.Debug || viper.GetBool("MOCK_DATA_TEST_RUNNER") {
 		return &progressbar.ProgressBar{}
 	}
 

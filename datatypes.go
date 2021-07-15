@@ -15,7 +15,7 @@ func SupportedDataTypes() []string {
 		"real,",
 		"double precision,",
 		"numeric(4,2),",
-		"bit,",
+		"bit(1),",
 		"bit varying(4),",
 		"boolean,",
 		"character(10),",

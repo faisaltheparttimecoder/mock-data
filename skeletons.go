@@ -31,6 +31,9 @@ END $$;
 -- DROP PUBLIC SCHEMA
 --
 DROP SCHEMA if exists public cascade;
+CREATE SCHEMA public;
+DROP ROLE IF EXISTS mockdata;
+CREATE ROLE mockdata;
 `
 }
 

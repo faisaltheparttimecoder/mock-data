@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"log"
 	"os"
 	"path/filepath"
 )
@@ -48,7 +47,7 @@ func ReadFile(filename string) ([]string, error) {
 	// Open th file
 	file, err := os.Open(filename)
 	if err != nil {
-		log.Fatal(err)
+		Fatalf("Error opening the file: %v", err)
 	}
 	defer file.Close()
 

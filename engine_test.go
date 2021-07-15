@@ -891,12 +891,12 @@ func TestBuildEnumDataTypes(t *testing.T) {
 	data := []string{"good", "ok", "bad"}
 	// create the table in the database
 	setDatabaseConfigForTest()
-	_, err := ExecuteDB(fmt.Sprintf("CREATE TYPE rating as ENUM ('good', 'ok', 'bad');"))
+	_, err := ExecuteDB(fmt.Sprintf("CREATE TYPE rating_test as ENUM ('good', 'ok', 'bad');"))
 	if err != nil {
 		t.Errorf("TestBuildEnumDataTypes: failed with error, %v", err)
 	}
 	t.Run("check_for_valid_data_from_emum_type", func(t *testing.T) {
-		if got, _ := buildEnumDataTypes("rating"); !StringContains(got, data) {
+		if got, _ := buildEnumDataTypes("rating_test"); !StringContains(got, data) {
 			t.Errorf("TestBuildEnumDataTypes = %v, want that matches one of these %v", got, data)
 		}
 	})

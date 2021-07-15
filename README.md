@@ -1,4 +1,4 @@
-# Mock-data [![Go Version](https://img.shields.io/badge/go-v1.13.4-green.svg?style=flat-square)](https://golang.org/dl/)
+# Mock-data [![Go Version](https://img.shields.io/badge/GoLang-v1.16.5-green.svg)](https://golang.org/dl/) [![CI](https://github.com/pivotal-gss/mock-data/actions/workflows/ci.yml/badge.svg?style=flat-square)](https://github.com/pivotal-gss/mock-data/actions/workflows/ci.yml) [![Unit Tests](https://github.com/pivotal-gss/mock-data/actions/workflows/test.yml/badge.svg)](https://github.com/pivotal-gss/mock-data/actions/workflows/test.yml)
 
     Here are my tables
     Load them [with data] for me
@@ -24,7 +24,7 @@ Check on the "Known Issues" section below for more information about current ide
 
 ## Table of Contents
 
-   * [Important information and disclaimer](#important-information-and-disclaimer)
+   * [Important & Disclaimer](#important--disclaimer)
    * [Supported database engines &amp; data types](#supported-database-engines--data-types)
         * [Database Engine](#database-engine)
         * [Data types](#data-types)
@@ -34,12 +34,12 @@ Check on the "Known Issues" section below for more information about current ide
    * [Examples](#examples)
    * [Known Issues](#known-issues)
    * [Developers / Collaboration](#developers--collaboration)
+   * [Contributors](#Contributors)
    * [License](#license)
-   * [Authors](#authors)
 
-## Important information and disclaimer
+## Important & Disclaimer
 
-Mock-data idea is to generate fake data in new test cluster and it is **NOT TO BE USED IN PRODUCTION ENVIRONMENTS**. Please ensure you have a backup of your database before running Mock-data in an environment you can't afford losing.
+Mock-data idea is to generate fake data in new test cluster, and it is **NOT TO BE USED IN PRODUCTION ENVIRONMENTS**. Please ensure you have a backup of your database before running Mock-data in an environment you can't afford losing.
 
 ## Supported database engines & data types
 
@@ -104,17 +104,33 @@ Use "mock [command] --help" for more information about a command.
 
 ## Installation
 
+### Using Binary
 [Download](https://github.com/pivotal/mock-data/releases/latest) the latest release for your OS & Architecture and you're ready to go!
 
-**Optional:**
+**[Optional]** You can copy the mock program to the PATH folder, so that you can use the mock from anywhere in the terminal, for eg.s
 
-You can copy the mock program to the PATH folder, so that you can use the mock from anywhere in the terminal, for eg.s
-```
-cp mock-darwin-amd64-v2.0 /usr/local/bin/mock
-chmod +x /usr/local/bin/mock
-```
+    cp mock-darwin-amd64-v2.0 /usr/local/bin/mock
+    chmod +x /usr/local/bin/mock
 
 provided `/usr/local/bin` is part of the $PATH environment variable.
+
+### Via docker
++ Pull the image & you are all set
+    ```
+    docker pull ghcr.io/pivotal-gss/mock-data:latest
+    ```
++ **[OPTIONAL]** add a tag for easy acess
+    ```
+    docker image tag ghcr.io/pivotal-gss/mock-data mock
+    ```
++ For mac users to connect to the host database you can run the below command
+    ```
+    docker run mock -a host.docker.internal <flags...>
+    ```
+  eg
+    ```
+    docker run mock database -f -a host.docker.internal -u postgres -d demodb
+    ```
 
 ## Examples
 
@@ -146,36 +162,42 @@ You can sumbit issues or pull request via [github](https://github.com/pivotal/mo
 To customize this repository, follow the steps
 
 1. Clone the git repository
-
 2. Export the GOPATH
-
     ```
     export GOPATH=<path to the clone repository>
     ```
-
 3. Install all the dependencies. 
-
     ```
     go mod vendor
     ```
-
-4. Make sure you have a demo postgres database to connect.
+4. Make sure you have a demo postgres database to connect or if you are using mac, you can use 
+    ```
+    make install_postgres
+    make start_postgres
+    make stop_postgres
+    make uninstall_postgres
+    ```
 5. You are all set, you can run it locally using
+    ```
+    go run . <commands> <flags.........>
+    ```
+6. To run test, use 
+    ```
+    # Edit the database environment variables on the "Makefile"
+    make unit_tests
+    make integration_tests
+    make tests # Runs the above two test simultaneously 
+    ```
+7. To build the package use
+    ```
+    make build
+    ```
+**[Optional]** For formatting and checking your code you can use linters. We have [.golangci.yml](https://github.com/pivotal-gss/mock-data/blob/master/.golangci.yml) available with the repository, check out this [blog](https://betterprogramming.pub/how-to-improve-code-quality-with-an-automatic-check-in-go-d18a5eb85f09) on how to set it up.
 
-    ```
-    go run *.go <commands> <flags.........>
-    ```
+**--- HAPPY HACKING ---**
 
-6. To build the package use
-
-    ```
-    /bin/sh build.sh
-    ```
+## Contributors
 
 ## License
 
 The Project is licensed under [MIT](https://github.com/pivotal-legacy/mock-data/blob/master/LICENSE)
-
-## Authors
-
-[![Ignacio](https://img.shields.io/badge/github-Ignacio_Elizaga-green.svg?style=social)](https://github.com/ielizaga) [![Aitor](https://img.shields.io/badge/github-Aitor_Cedres-green.svg?style=social)](https://github.com/Zerpet) [![Juan](https://img.shields.io/badge/github-Juan_Ramos-green.svg?style=social)](https://github.com/jujoramos) [![Faisal](https://img.shields.io/badge/github-Faisal_Ali-green.svg?style=social)](https://github.com/faisaltheparttimecoder) [![Adam](https://img.shields.io/badge/github-Adam_Clevy-green.svg?style=social)](https://github.com/adamclevy)
