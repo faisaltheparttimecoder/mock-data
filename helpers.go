@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"github.com/spf13/viper"
 	"math"
 	"os"
 	"regexp"
@@ -26,10 +27,10 @@ func TimeNow() string {
 
 // ConnectDB creates a database connection.
 func ConnectDB() *pg.DB {
-	if !IsStringEmpty(cmdOptions.Uri) {
-		opt, err := pg.ParseURL(cmdOptions.Uri)
+	if !IsStringEmpty(cmdOptions.URI) {
+		opt, err := pg.ParseURL(cmdOptions.URI)
 		if err != nil {
-			Fatalf("Encountered error when making a connection via the uri \"%s\", err: %v", cmdOptions.Uri, err)
+			Fatalf("Encountered error when making a connection via the uri \"%s\", err: %v", cmdOptions.URI, err)
 		}
 		return pg.Connect(opt)
 	}
@@ -81,7 +82,7 @@ func IsStringEmpty(s string) bool {
 // Progress Bar
 func StartProgressBar(text string, max int) *progressbar.ProgressBar {
 	// Turn off the progress bar when the Debug is one
-	if cmdOptions.Debug {
+	if cmdOptions.Debug || viper.GetBool("MOCK_DATA_TEST_RUNNER") {
 		return &progressbar.ProgressBar{}
 	}
 
@@ -235,7 +236,7 @@ func BracketsExists(dt string) bool {
 }
 
 // Does the string contain the substring
-func isSubStringAvailableOnString(s string, criteria string) bool {
+func IsSubStringAvailableOnString(s string, criteria string) bool {
 	var re = regexp.MustCompile(criteria)
 	return re.MatchString(s)
 }

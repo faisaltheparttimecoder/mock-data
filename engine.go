@@ -10,28 +10,17 @@ import (
 )
 
 var (
-	// ranges of dates
-	fromYear = -10
-	toYear   = 10
-
-	// Time data types
-	intervalKeywords = []string{"interval", "time without time zone"}
-
-	// Networking data types
-	ipKeywords = []string{"inet", "cidr"}
-
-	// Integer data types
-	intKeywords = []string{"smallint", "integer", "bigint", "oid"}
-	intRanges   = map[string]int{"smallint": 2767, "integer": 7483647, "bigint": 372036854775807, "oid": 7483647}
-
-	// Decimal data types
-	floatKeywords = []string{"double precision", "real", "money"}
-
-	// Geometry data types
-	geoDataTypekeywords = []string{"path", "polygon", "line", "lseg", "box", "circle", "point"}
+	fromYear            = -10 // ranges of dates
+	toYear              = 0
+	intervalKeywords    = []string{"interval", "time without time zone"}   // Time data types
+	ipKeywords          = []string{"inet", "cidr"}                         // Networking data types
+	intKeywords         = []string{"smallint", "integer", "bigint", "oid"} // Integer data types
+	intRanges           = map[string]int{"smallint": 2767, "integer": 7483647, "bigint": 372036854775807, "oid": 7483647}
+	floatKeywords       = []string{"double precision", "real", "money"}                         // Decimal data types
+	geoDataTypekeywords = []string{"path", "polygon", "line", "lseg", "box", "circle", "point"} // Geometry data types
 )
 
-// Data Generator
+// BuildData: Data Generator
 // It provided random data based on data types.
 func BuildData(dt string) (interface{}, error) {
 	if StringHasPrefix(dt, intKeywords) { // Integer builder
@@ -71,9 +60,9 @@ func BuildData(dt string) (interface{}, error) {
 	} else if strings.HasPrefix(dt, "xml") { // Random Xml
 		return buildXml(dt)
 	} else if strings.HasPrefix(dt, "tsquery") { // Random Text Search Query
-		return buildTsQuery(dt)
+		return buildTSQuery(dt)
 	} else if strings.HasPrefix(dt, "tsvector") { // Random Text Search Vector
-		return buildTsVector(dt)
+		return buildTSVector(dt)
 	} else if strings.HasPrefix(dt, "pg_lsn") { // Random Log Sequence number
 		return buildLseg(dt)
 	} else if strings.HasPrefix(dt, "txid_snapshot") { // Random transaction XID snapshot
@@ -81,7 +70,7 @@ func BuildData(dt string) (interface{}, error) {
 	} else if StringHasPrefix(dt, geoDataTypekeywords) { // Random GeoMetric data
 		return buildGeometry(dt)
 	} else { // if these are not the defaults, the ony custom we allow is enum data type, check if its them
-		return buildEnumDatatypes(dt)
+		return buildEnumDataTypes(dt)
 	}
 }
 
@@ -117,6 +106,29 @@ func buildDate(dt string) (interface{}, error) {
 	return RandomDate(fromYear, toYear)
 }
 
+// TimeStamp Builder
+func buildTimeStamp(dt string) (interface{}, error) {
+	isItArray, t := isDataTypeAnArray(dt)
+	if t == "timestamp without time zone" { // Without time zone
+		if isItArray {
+			return ArrayGenerator("timestamp", dt, fromYear, toYear)
+		}
+		return RandomTimestamp(fromYear, toYear)
+	} else if t == "timestamp with time zone" { // With time zone
+		if isItArray {
+			return ArrayGenerator("timestamptz", dt, fromYear, toYear)
+		}
+		return RandomTimeStampTz(fromYear, toYear)
+	} else if regexp.MustCompile(`timestamp\([0-6]\) without time zone`).MatchString(dt) ||
+		regexp.MustCompile(`timestamp\([0-6]\) with time zone`).MatchString(dt) { // time zone with precision
+		if isItArray {
+			return ArrayGenerator("timestamptzWithDecimals", dt, fromYear, toYear)
+		}
+		return RandomTimeStampTzWithDecimals(fromYear, toYear, findTimeStampDecimal(dt))
+	}
+	return "", nil
+}
+
 // Time Builder
 func buildTimeWithTz(dt string) (interface{}, error) {
 	isItArray, _ := isDataTypeAnArray(dt)
@@ -124,6 +136,15 @@ func buildTimeWithTz(dt string) (interface{}, error) {
 		return ArrayGenerator("timetz", dt, fromYear, toYear)
 	}
 	return RandomTimeTz(fromYear, toYear)
+}
+
+// Interval builder
+func buildInterval(dt string) (interface{}, error) {
+	isItArray, _ := isDataTypeAnArray(dt)
+	if isItArray {
+		return ArrayGenerator("time", dt, fromYear, toYear)
+	}
+	return RandomTime(fromYear, toYear)
 }
 
 // Ip's builder
@@ -237,7 +258,7 @@ func buildXml(dt string) (interface{}, error) {
 }
 
 // Ts Query Builder
-func buildTsQuery(dt string) (interface{}, error) {
+func buildTSQuery(dt string) (interface{}, error) {
 	isItArray, _ := isDataTypeAnArray(dt)
 	if isItArray {
 		return ArrayGenerator("tsquery", dt, 0, 0)
@@ -246,7 +267,7 @@ func buildTsQuery(dt string) (interface{}, error) {
 }
 
 // Ts Vector Builder
-func buildTsVector(dt string) (interface{}, error) {
+func buildTSVector(dt string) (interface{}, error) {
 	isItArray, _ := isDataTypeAnArray(dt)
 	if isItArray {
 		return ArrayGenerator("tsvector", dt, 0, 0)
@@ -287,41 +308,13 @@ func buildGeometry(dt string) (interface{}, error) {
 	return RandomGeometricData(randomInt, dt, false), nil
 }
 
-// TimeStamp Builder
-func buildTimeStamp(dt string) (interface{}, error) {
-	isItArray, t := isDataTypeAnArray(dt)
-	if t == "timestamp without time zone" { // Without time zone
-		if isItArray {
-			return ArrayGenerator("timestamp", dt, fromYear, toYear)
-		}
-		return RandomTimestamp(fromYear, toYear)
-	} else if t == "timestamp with time zone" { // With time zone
-		if isItArray {
-			return ArrayGenerator("timestamptz", dt, fromYear, toYear)
-		}
-		return RandomTimeStampTz(fromYear, toYear)
-	} else if regexp.MustCompile(`timestamp\([0-6]\) without time zone`).MatchString(dt) ||
-		regexp.MustCompile(`timestamp\([0-6]\) with time zone`).MatchString(dt) { // time zone with precision
-		if isItArray {
-			return ArrayGenerator("timestamptzWithDecimals", dt, fromYear, toYear)
-		}
-		return RandomTimeStampTzWithDecimals(fromYear, toYear, findTimeStampDecimal(dt))
-	}
-	return "", nil
-}
-
-// Interval builder
-func buildInterval(dt string) (interface{}, error) {
-	isItArray, _ := isDataTypeAnArray(dt)
-	if isItArray {
-		return ArrayGenerator("time", dt, fromYear, toYear)
-	}
-	return RandomTime(fromYear, toYear)
-}
-
 // Find the number of decimal points needed
 func findTimeStampDecimal(dt string) int {
 	tsReg := regexp.MustCompile(`\([0-6]\)`)
+	match := tsReg.FindString(dt)
+	if IsStringEmpty(match) {
+		return 0
+	}
 	decimal, _ := strconv.Atoi(strings.Split(tsReg.FindString(dt), "")[1])
 	return decimal
 }
@@ -344,7 +337,7 @@ func isDataTypeAnArray(dt string) (bool, string) {
 	return false, dt
 }
 
-// Random array generator for array datatypes
+// ArrayGenerator: Random array generator for array data types
 func ArrayGenerator(dt, originalDt string, min, max int) (string, error) {
 	maxValues := RandomInt(1, 6) // Getting the value of iterators
 	maxIteration := RandomInt(1, 3)
@@ -399,9 +392,8 @@ func randomDataByDataTypeForArray(dt, originalDt string, min, max int) (string, 
 	} else if dt == "bool" {
 		if RandomBoolean() {
 			return "true", nil
-		} else {
-			return "false", nil
 		}
+		return "false", nil
 	} else if dt == "IP" {
 		return RandomIP(), nil
 	} else if dt == "macaddr" {
@@ -421,7 +413,7 @@ func randomDataByDataTypeForArray(dt, originalDt string, min, max int) (string, 
 	}
 }
 
-// Random geometric array generators
+// GeometricArrayGenerator: Random geometric array generators
 func GeometricArrayGenerator(maxInt int, geometryType string) string {
 	// Getting the value of iterators
 	maxIterations := RandomInt(1, 6)
@@ -440,7 +432,7 @@ func GeometricArrayGenerator(maxInt int, geometryType string) string {
 	return fmt.Sprintf("{%s}", strings.Join(resultArray, ","))
 }
 
-// Random XML & Json array generators.
+// JsonXmlArrayGenerator: Random XML & Json array generators.
 func JsonXmlArrayGenerator(dt string) string {
 	// Getting the value of iterators
 	maxIterations := RandomInt(1, 6)
@@ -460,8 +452,8 @@ func JsonXmlArrayGenerator(dt string) string {
 	return fmt.Sprintf("{%s}", strings.Join(resultArray, ","))
 }
 
-// Enum datatypes
-func buildEnumDatatypes(dt string) (string, error) {
+// Enum data types
+func buildEnumDataTypes(dt string) (string, error) {
 	// Check if the data type is ENUM
 	enumOutput := checkEnumDatatype(dt)
 

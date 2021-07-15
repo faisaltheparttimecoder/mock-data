@@ -2,11 +2,33 @@ package main
 
 import (
 	"fmt"
+	"github.com/spf13/viper"
 )
 
-// Execute demo database
+// Execute cleanup of demo database before loading if needed
+func executeDemoDatabasePreCleanup() {
+	// NOTE: This is a hidden feature used mainly by test cases, not used widely
+	// so use this with caution, since it will cleanup all the tables in the said database
+	shouldWeDrop := viper.GetBool("MOCK_DATA_TEST_RUNNER")
+	if shouldWeDrop {
+		Infof("Executing the cleanup of all objects in the database: %s", cmdOptions.Database)
+		_, err := ExecuteDB(dropDemoDatabase())
+		if err != nil {
+			errMsg := fmt.Sprintf("%s", err)
+			failureMsg := fmt.Sprintf("Failure in pre cleanup a demo tables in the database %s, err: %v",
+				cmdOptions.Database, err)
+			IgnoreError(errMsg, "does not exist", failureMsg)
+		}
+	}
+}
+
+// ExecuteDemoDatabase creates a demo database based on the flavour of postgres i.e
+// native postgres or greenplum
 func ExecuteDemoDatabase() {
 	Infof("Create demo tables in the database: %s", cmdOptions.Database)
+
+	// pre cleanup script
+	executeDemoDatabasePreCleanup()
 
 	// Execute the demo database dump
 	var err error
@@ -25,7 +47,7 @@ func ExecuteDemoDatabase() {
 	Infof("Completed creating demo tables in the database: %s", cmdOptions.Database)
 }
 
-// Mock the whole database
+// MockDatabase mocks the whole database
 func MockDatabase() {
 	// Get the table list that we have to mock the data
 	Infof("Starting the program to mock full database")

@@ -10,10 +10,12 @@ import (
 
 var logger = logrus.New()
 
+// SetLogLevel, set the logger level
 func SetLogLevel(level logrus.Level) {
 	logger.Level = level
 }
 
+// SetLogFormatter, format the log entry formats
 func SetLogFormatter(formatter logrus.Formatter) {
 	logger.Formatter = formatter
 }
@@ -29,7 +31,7 @@ func Debug(args ...interface{}) {
 	}
 }
 
-// Debug logs with format message at level Debug on the standard logger.
+// Debugf logs with format message at level Debug on the standard logger.
 func Debugf(format string, args ...interface{}) {
 	if logger.Level >= logrus.DebugLevel {
 		entry := logger.WithFields(logrus.Fields{})
@@ -51,7 +53,7 @@ func Info(args ...interface{}) {
 	}
 }
 
-// Info logs with format message at level Info on the standard logger.
+// Infof logs with format message at level Info on the standard logger.
 func Infof(format string, args ...interface{}) {
 	if logger.Level >= logrus.InfoLevel {
 		entry := logger.WithFields(logrus.Fields{})
@@ -73,7 +75,7 @@ func Warn(args ...interface{}) {
 	}
 }
 
-// Warn logs with format message at level Warn on the standard logger.
+// Warnf logs with format message at level Warn on the standard logger.
 func Warnf(format string, args ...interface{}) {
 	if logger.Level >= logrus.WarnLevel {
 		entry := logger.WithFields(logrus.Fields{})
@@ -84,16 +86,16 @@ func Warnf(format string, args ...interface{}) {
 	}
 }
 
-// Error logs a message at level Error on the standard logger.
-func Error(args ...interface{}) {
-	if logger.Level >= logrus.ErrorLevel {
-		entry := logger.WithFields(logrus.Fields{})
-		if cmdOptions.Debug {
-			entry.Data["file"] = fileInfo(2)
-		}
-		entry.Error(args...)
-	}
-}
+// Error logs a message at level Error on the standard logger. [unused]
+//func Error(args ...interface{}) {
+//	if logger.Level >= logrus.ErrorLevel {
+//		entry := logger.WithFields(logrus.Fields{})
+//		if cmdOptions.Debug {
+//			entry.Data["file"] = fileInfo(2)
+//		}
+//		entry.Error(args...)
+//	}
+//}
 
 // Error logs with format message at level Error on the standard logger.
 func Errorf(format string, args ...interface{}) {
@@ -117,7 +119,7 @@ func Fatal(args ...interface{}) {
 	}
 }
 
-// Fatal logs with format message at level Fatal on the standard logger.
+// Fatalf logs with format message at level Fatal on the standard logger.
 func Fatalf(format string, args ...interface{}) {
 	if logger.Level >= logrus.FatalLevel {
 		entry := logger.WithFields(logrus.Fields{})
@@ -128,27 +130,27 @@ func Fatalf(format string, args ...interface{}) {
 	}
 }
 
-// Panic logs a message at level Panic on the standard logger.
-func Panic(args ...interface{}) {
-	if logger.Level >= logrus.PanicLevel {
-		entry := logger.WithFields(logrus.Fields{})
-		if cmdOptions.Debug {
-			entry.Data["file"] = fileInfo(2)
-		}
-		entry.Panic(args...)
-	}
-}
+// Panic logs a message at level Panic on the standard logger.[unused]
+//func Panic(args ...interface{}) {
+//	if logger.Level >= logrus.PanicLevel {
+//		entry := logger.WithFields(logrus.Fields{})
+//		if cmdOptions.Debug {
+//			entry.Data["file"] = fileInfo(2)
+//		}
+//		entry.Panic(args...)
+//	}
+//}
 
-// Panic logs with format message at level Panic on the standard logger.
-func Panicf(format string, args ...interface{}) {
-	if logger.Level >= logrus.PanicLevel {
-		entry := logger.WithFields(logrus.Fields{})
-		if cmdOptions.Debug {
-			entry.Data["file"] = fileInfo(2)
-		}
-		entry.Panicf(format, args...)
-	}
-}
+// Panic logs with format message at level Panic on the standard logger.[unused]
+//func Panicf(format string, args ...interface{}) {
+//	if logger.Level >= logrus.PanicLevel {
+//		entry := logger.WithFields(logrus.Fields{})
+//		if cmdOptions.Debug {
+//			entry.Data["file"] = fileInfo(2)
+//		}
+//		entry.Panicf(format, args...)
+//	}
+//}
 
 // Display the file and the line number where the command
 // was executed

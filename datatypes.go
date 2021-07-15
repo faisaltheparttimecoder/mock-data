@@ -1,22 +1,26 @@
 package main
 
+import "fmt"
+
+// SupportedDataTypes: List of all the supported data types
 func SupportedDataTypes() []string {
 	return []string{
 		"int8,",
+		"bigint,",
 		"bigserial,",
-		"int,",
+		"integer,",
 		"smallint,",
 		"smallserial,",
 		"serial,",
 		"oid,",
-		"float4,",
-		"float8,",
+		"real,",
+		"double precision,",
 		"numeric(4,2),",
-		"bit,",
-		"varbit(4),",
-		"bool,",
-		"char(10),",
-		"varchar(10),",
+		"bit(1),",
+		"bit varying(4),",
+		"boolean,",
+		"character(10),",
+		"character varying(10),",
 		"text,",
 		"inet,",
 		"macaddr,",
@@ -47,16 +51,16 @@ func SupportedDataTypes() []string {
 		"txid_snapshot,",
 		"uuid,",
 		"smallint[],",
-		"int[],",
+		"integer[],",
 		"bigint[],",
-		"char(10)[],",
-		"varchar(10)[],",
+		"character(10)[],",
+		"character varying(10)[],",
 		"bit(10)[],",
-		"varbit(4)[],",
+		"bit varying(4)[],",
 		"numeric[],",
 		"numeric(5,3)[],",
-		"float4[],",
-		"float8[],",
+		"real[],",
+		"double precision[],",
 		"money[],",
 		"time without time zone[],",
 		"interval[],",
@@ -65,7 +69,7 @@ func SupportedDataTypes() []string {
 		"timestamp with time zone[],",
 		"timestamp without time zone[],",
 		"text[],",
-		"bool[],",
+		"boolean[],",
 		"inet[],",
 		"macaddr[],",
 		"cidr[],",
@@ -88,7 +92,7 @@ func SupportedDataTypes() []string {
 }
 
 // Create a table with supported database
-func supportedDataTypesDemoTable() {
+func supportedDataTypesDemoTable() error {
 	demoTable := `
 DROP TABLE IF EXISTS supported_datatypes;
 CREATE TABLE supported_datatypes (
@@ -212,6 +216,7 @@ CREATE TABLE supported_datatypes (
 	// Execute the demo database dump
 	_, err := ExecuteDB(demoTable)
 	if err != nil {
-		Fatalf("Error when creating the all supported data type table err: %v", err)
+		return fmt.Errorf("error when creating the all supported data type table err: %v", err)
 	}
+	return nil
 }

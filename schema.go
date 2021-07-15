@@ -2,7 +2,7 @@ package main
 
 import "fmt"
 
-// Extract all the table from schema and start mocking
+// MockSchema: Extract all the table from schema and start mocking
 func MockSchema() {
 	Infof("Starting the program to mock all the tables under the schema %s in the database: %s",
 		cmdOptions.SchemaName, cmdOptions.Database)

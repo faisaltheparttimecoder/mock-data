@@ -6,18 +6,20 @@ import (
 	"strings"
 )
 
+// TableCollection: Collects the tables metadata
 type TableCollection struct {
 	DBTables
 	Columns []DBColumns
 }
 
 var (
-	skippedTab []string
-	delimiter  = "$"
+	skippedTab     []string
+	delimiter      = "$"
 	oneColumnTable []string
 	progressBarMsg = "Mocking Table %s"
 )
 
+// MockTable, mocks the tables from the collected list
 func MockTable(tables []DBTables) {
 	// Check if there is any rows on the table list, if yes then start
 	// the loading process
@@ -92,12 +94,12 @@ func columnExtractor(tables []DBTables) []TableCollection {
 		if len(tempColumns) > 0 {
 			collection = append(collection, TableCollection{t, tempColumns})
 		}
-		bar.Add(1)
+		_ = bar.Add(1)
 	}
 	return collection
 }
 
-// Backup and start the loading process
+// BackupConstraintsAndStartDataLoading: Backup and start the loading process
 func BackupConstraintsAndStartDataLoading(tables []TableCollection) {
 	// Backup the DDL first
 	BackupDDL()
@@ -123,7 +125,7 @@ func BackupConstraintsAndStartDataLoading(tables []TableCollection) {
 	Infof("Completed loading mock data to %d tables", totalTables)
 }
 
-// Start Committing data to the database
+// CommitData: Start Committing data to the database
 func CommitData(t TableCollection) {
 	// Start committing data
 	tab := GenerateTableName(t.Table, t.Schema)
@@ -150,7 +152,7 @@ DataTypePickerLoop:
 					Debugf("Table %s skipped, since the column %s, had unknown data type %s: %v",
 						tab, c.Column, c.Datatype, err)
 					skippedTab = append(skippedTab, tab)
-					bar.Add(cmdOptions.Rows)
+					_ = bar.Add(cmdOptions.Rows)
 					break DataTypePickerLoop
 				} else {
 					Fatalf("Error when building data for table %s: %v", tab, err)
@@ -162,11 +164,11 @@ DataTypePickerLoop:
 
 		// Copy the data to the table
 		CopyData(tab, col, data, db)
-		bar.Add(1)
+		_ = bar.Add(1)
 	}
 }
 
-// Copy the data to the database table
+// CopyData: Copy the data to the database table
 func CopyData(tab string, col []string, data []string, db *pg.DB) {
 	// Copy Statement and start loading
 	copyStatment := fmt.Sprintf(`COPY %s("%s") FROM STDIN WITH CSV DELIMITER '%s' QUOTE e'\x01'`,
@@ -181,7 +183,6 @@ func CopyData(tab string, col []string, data []string, db *pg.DB) {
 		Fatalf("Error during committing data: %v", err)
 	}
 }
-
 
 // Check its a serial datatype
 func checkIfOneColumnIsASerialDatatype(t DBTables, c []DBColumns) {
@@ -212,7 +213,7 @@ func addDataIfItsASerialDatatype() {
 				Fatalf("Error when loading the serial datatype for table %s, err: %v", t, err)
 			}
 			total++
-			bar.Add(1)
+			_ = bar.Add(1)
 		}
 	}
 }
@@ -225,7 +226,7 @@ func isItSerialDatatype(c DBColumns) bool {
 	return false
 }
 
-// Generate table name
+// GenerateTableName: Generate table name
 func GenerateTableName(tab, schema string) string {
 	return fmt.Sprintf("\"%s\".\"%s\"", schema, tab)
 }

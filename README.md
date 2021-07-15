@@ -1,4 +1,4 @@
-# Mock-data [![Go Version](https://img.shields.io/badge/go-v1.13.4-green.svg?style=flat-square)](https://golang.org/dl/)
+# Mock Data [![go version](https://img.shields.io/github/go-mod/go-version/pivotal-gss/mock-data?filename=go.mod&style=flat&logo=go&label=Go)](https://golang.org/dl/) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/CI?logo=github&style=flat&label=CI)](https://github.com/pivotal-gss/mock-data/actions/workflows/ci.yml) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/Tests?logo=github&style=flat&label=Tests)](https://github.com/pivotal-gss/mock-data/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/pivotal-gss/mock-data/branch/master/graph/badge.svg)](https://codecov.io/gh/pivotal-gss/mock-data) [![Go Report Card](https://goreportcard.com/badge/github.com/pivotal-gss/mock-data?logo=go)](https://goreportcard.com/report/github.com/pivotal-gss/mock-data)
 
     Here are my tables
     Load them [with data] for me
@@ -6,12 +6,13 @@
     
 Mock-data is the result of a Pivotal internal hackathon in July 2017. The idea behind it is to allow users to test database queries with sets of fake data in any pre-defined table.
 
-With Mock-data users can have 
+With Mock-data users can have
 
-+ Their own tables defined with any particular (supported) data types. It's only needed to provide the target table(s) and the number of rows of randomly generated data to insert.
++ Their own tables defined with any particular (supported) data types. It's only needed to provide the target table(s), and the number of rows of randomly generated data to insert.
 + Create a demo database
 + Create `n` number of table with `n` number of column
 + Custom fit data into the table
++ Option to select `realistic` data to be loaded onto the table
 
 An ideal environment to make Mock-data work without any errors would be 
 
@@ -24,7 +25,7 @@ Check on the "Known Issues" section below for more information about current ide
 
 ## Table of Contents
 
-   * [Important information and disclaimer](#important-information-and-disclaimer)
+   * [Important & Disclaimer](#important--disclaimer)
    * [Supported database engines &amp; data types](#supported-database-engines--data-types)
         * [Database Engine](#database-engine)
         * [Data types](#data-types)
@@ -34,12 +35,12 @@ Check on the "Known Issues" section below for more information about current ide
    * [Examples](#examples)
    * [Known Issues](#known-issues)
    * [Developers / Collaboration](#developers--collaboration)
+   * [Contributors](#Contributors)
    * [License](#license)
-   * [Authors](#authors)
 
-## Important information and disclaimer
+## Important & Disclaimer
 
-Mock-data idea is to generate fake data in new test cluster and it is **NOT TO BE USED IN PRODUCTION ENVIRONMENTS**. Please ensure you have a backup of your database before running Mock-data in an environment you can't afford losing.
+Mock-data idea is to generate fake data in new test cluster, and it is **NOT TO BE USED IN PRODUCTION ENVIRONMENTS**. Please ensure you have a backup of your database before running Mock-data in an environment you can't afford losing.
 
 ## Supported database engines & data types
 
@@ -104,17 +105,33 @@ Use "mock [command] --help" for more information about a command.
 
 ## Installation
 
+### Using Binary
 [Download](https://github.com/pivotal/mock-data/releases/latest) the latest release for your OS & Architecture and you're ready to go!
 
-**Optional:**
+**[Optional]** You can copy the mock program to the PATH folder, so that you can use the mock from anywhere in the terminal, for eg.s
 
-You can copy the mock program to the PATH folder, so that you can use the mock from anywhere in the terminal, for eg.s
-```
-cp mock-darwin-amd64-v2.0 /usr/local/bin/mock
-chmod +x /usr/local/bin/mock
-```
+    cp mock-darwin-amd64-v2.0 /usr/local/bin/mock
+    chmod +x /usr/local/bin/mock
 
 provided `/usr/local/bin` is part of the $PATH environment variable.
+
+### Via docker
++ Pull the image & you are all set
+    ```
+    docker pull ghcr.io/pivotal-gss/mock-data:latest
+    ```
++ **[OPTIONAL]** add a tag for easy acess
+    ```
+    docker image tag ghcr.io/pivotal-gss/mock-data mock
+    ```
++ For mac users to connect to the host database you can run the below command
+    ```
+    docker run mock -a host.docker.internal <flags...>
+    ```
+  eg
+    ```
+    docker run mock database -f -a host.docker.internal -u postgres -d demodb
+    ```
 
 ## Examples
 
@@ -125,10 +142,10 @@ Here is a simple demo of how the tool works, provide us your table and we will l
 For more examples how to use the tool, please check out the [wiki](https://github.com/pivotal-legacy/mock-data/wiki) page for categories like
 
 * Look here on how the [database connection](https://github.com/pivotal-legacy/mock-data/wiki/Connecting-to-Database) works
-* Read this section on how the subcommand [custom](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Custom) works
-* Read this section on how the subcommand [database](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Database) works
-* Read this section on how the subcommand [schema](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Schema) works
-* Read this section on how the subcommand [tables](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Tables) works
+* For realistic & controlled data, read this section on how the subcommand [custom](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Custom) works
+* For mocking the whole database or creating a demo database, read this section on how the subcommand [database](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Database) works
+* For mocking the whole tables of the schema, read this section on how the subcommand [schema](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Schema) works
+* For creating fake tables and mocking selected tables, read this section on how the subcommand [tables](https://github.com/pivotal-legacy/mock-data/wiki/Sub-command:-Tables) works
  
 
 ## Known Issues
@@ -146,36 +163,46 @@ You can sumbit issues or pull request via [github](https://github.com/pivotal/mo
 To customize this repository, follow the steps
 
 1. Clone the git repository
-
 2. Export the GOPATH
-
     ```
     export GOPATH=<path to the clone repository>
     ```
-
 3. Install all the dependencies. 
-
     ```
     go mod vendor
     ```
-
-4. Make sure you have a demo postgres database to connect.
+4. Make sure you have a demo postgres database to connect or if you are using mac, you can use 
+    ```
+    make install_postgres
+    make start_postgres
+    make stop_postgres
+    make uninstall_postgres
+    ```
 5. You are all set, you can run it locally using
+    ```
+    go run . <commands> <flags.........>
+    ```
+6. Run the golang linter to analyzes & fix source code to flag programming errors, bugs, stylistic errors, and suspicious constructs.
+    ```
+    golangci-lint run
+    ```
+   to install golangci-lint check [here](https://golangci-lint.run/usage/install/), config file `.golangci.yml` is provided with the repo
+7. To run test, use 
+    ```
+    # Edit the database environment variables on the "Makefile"
+    make unit_tests
+    make integration_tests
+    make tests # Runs the above two test simultaneously 
+    ```
+8. To build the package use
+    ```
+    make build
+    ```
 
-    ```
-    go run *.go <commands> <flags.........>
-    ```
+**--- HAPPY HACKING ---**
 
-6. To build the package use
-
-    ```
-    /bin/sh build.sh
-    ```
+## Contributors
 
 ## License
 
 The Project is licensed under [MIT](https://github.com/pivotal-legacy/mock-data/blob/master/LICENSE)
-
-## Authors
-
-[![Ignacio](https://img.shields.io/badge/github-Ignacio_Elizaga-green.svg?style=social)](https://github.com/ielizaga) [![Aitor](https://img.shields.io/badge/github-Aitor_Cedres-green.svg?style=social)](https://github.com/Zerpet) [![Juan](https://img.shields.io/badge/github-Juan_Ramos-green.svg?style=social)](https://github.com/jujoramos) [![Faisal](https://img.shields.io/badge/github-Faisal_Ali-green.svg?style=social)](https://github.com/faisaltheparttimecoder) [![Adam](https://img.shields.io/badge/github-Adam_Clevy-green.svg?style=social)](https://github.com/adamclevy)

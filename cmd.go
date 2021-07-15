@@ -12,7 +12,7 @@ var (
 	cmdOptions Command
 )
 
-// Root command line options
+// Command: Root command line options
 type Command struct {
 	Debug            bool
 	Username         string
@@ -27,7 +27,7 @@ type Command struct {
 	DontPrompt       bool
 	SchemaName       string
 	File             string
-	Uri              string
+	URI              string
 }
 
 // Database command line options
@@ -36,7 +36,7 @@ type Database struct {
 	FakeDBTableRows bool
 }
 
-// Table command line options
+// Tables: Table command line options
 type Tables struct {
 	FakeNewTables    bool
 	TotalTables      int
@@ -69,7 +69,7 @@ var rootCmd = &cobra.Command{
 			!IsStringEmpty(cmdOptions.Hostname) || !IsStringEmpty(cmdOptions.Username) ||
 			!IsStringEmpty(cmdOptions.Password) || cmdOptions.Port > 0
 
-		if !IsStringEmpty(cmdOptions.Uri) && isDatabaseArgumentsSet {
+		if !IsStringEmpty(cmdOptions.URI) && isDatabaseArgumentsSet {
 			Warnf("Database Uri are given preference for database connection, when used along with database " +
 				"connection arguments, using URI to connect to database")
 		}
@@ -221,7 +221,7 @@ func init() {
 		10, "Total rows to be faked or mocked")
 	rootCmd.PersistentFlags().IntVarP(&cmdOptions.Port, "port", "p",
 		viper.GetInt("PGPORT"), "Port number of the postgres database")
-	rootCmd.PersistentFlags().StringVar(&cmdOptions.Uri, "uri",
+	rootCmd.PersistentFlags().StringVar(&cmdOptions.URI, "uri",
 		"", "Postgres connection URI, eg. postgres://user:pass@host:=port/db?sslmode=disable")
 	rootCmd.PersistentFlags().StringVarP(&cmdOptions.Hostname, "address", "a",
 		viper.GetString("PGHOSTADDR"), "Hostname where the postgres database lives")
@@ -269,7 +269,7 @@ func init() {
 	// Schema command flags
 	schemaCmd.Flags().StringVarP(&cmdOptions.SchemaName, "schema-name", "n", "",
 		"Provide the schema name whose tables need to be mocked")
-	schemaCmd.MarkFlagRequired("schema-name")
+	_ = schemaCmd.MarkFlagRequired("schema-name")
 
 	// Custom command flags
 	customCmd.Flags().StringVarP(&cmdOptions.File, "file", "f", "",

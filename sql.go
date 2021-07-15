@@ -10,23 +10,27 @@ import (
 // GreenplumOrPostgres ...
 var GreenplumOrPostgres = "greenplum"
 
+// DBTables: Store house of all tables
 type DBTables struct {
 	Schema string
 	Table  string
 }
 
+// DBColumns: Store house of all the columns
 type DBColumns struct {
 	Column   string
 	Datatype string
 	Sequence string
 }
 
+// DBConstraints: Store house of all constraints
 type DBConstraints struct {
 	Tablename      string
 	Constraintname string
 	Constraintkey  string
 }
 
+// DBConstraintsByTable: Store house for constraints by table
 type DBConstraintsByTable struct {
 	Tablename      string
 	Constraintname string
@@ -34,20 +38,24 @@ type DBConstraintsByTable struct {
 	Constrainttype string
 }
 
+// DBConstraintsByDataType: Store house for constraints by datatype
 type DBConstraintsByDataType struct {
 	Colname string
 	Dtype   string
 }
 
+// DBIndex: Store house for indexes
 type DBIndex struct {
 	Tablename string
 	Indexdef  string
 }
 
+// DBViolationRow: Capture violating row
 type DBViolationRow struct {
 	Row string
 }
 
+// EnumDataType: Store house for emun datatype data
 type EnumDataType struct {
 	EnumSchema string
 	EnumName   string
@@ -251,7 +259,7 @@ ORDER BY        a.attnum
 	return result
 }
 
-// Save all the DDL of the constraint ( like PK(p), FK(f), CK(c), UK(u) )
+// GetPGConstraintDDL: Save all the DDL of the constraint ( like PK(p), FK(f), CK(c), UK(u) )
 func GetPGConstraintDDL(conntype string) []DBConstraints {
 	Debugf("Extracting the DDL of the %s constraints", conntype)
 	var result []DBConstraints
@@ -285,7 +293,7 @@ ORDER  BY tablename
 	return result
 }
 
-// Get all the Unique index from the database
+// GetPGIndexDDL: Get all the Unique index from the database
 func GetPGIndexDDL() []DBIndex {
 	Debugf("Extracting the unique indexes")
 	var result []DBIndex
@@ -320,45 +328,52 @@ WHERE  schemaname IN (SELECT nspname
 	return result
 }
 
-// Drop statement for the table
+// GetConstraintsPertab: Drop statement for the table
 func GetConstraintsPertab(tabname string) []DBConstraintsByTable {
 	Debugf("Extracting constraint info for table: %s", tabname)
 	var result []DBConstraintsByTable
 	query := `
-SELECT * 
-FROM   (SELECT n.nspname 
-               || '.' 
-               || c.relname                                   tablename, 
-               con.conname                                    constraintname, 
-               pg_catalog.Pg_get_constraintdef(con.oid, TRUE) constraintcol, 
-               'constraint'                                   constrainttype 
-        FROM   pg_catalog.pg_class c, 
-               pg_catalog.pg_constraint con, 
-               pg_namespace n 
-        WHERE  c.oid = '%[1]s' :: regclass 
-               AND conrelid = c.oid 
-               AND n.oid = c.relnamespace 
-               AND contype IN ( 'u', 'f', 'c', 'p' ) 
-        UNION 
-        SELECT schemaname 
-               || '.' 
-               || tablename tablename, 
-               indexname    conname, 
-               indexdef     concol, 
-               'index'      contype 
-        FROM   pg_indexes 
-        WHERE  schemaname IN (SELECT nspname 
-                              FROM   pg_namespace 
-                              WHERE  nspname NOT IN ( 
-                                     'pg_catalog', 'information_schema' 
-                                     , 
-                                     'pg_aoseg', 
-                                     'gp_toolkit', 
-                                     'pg_toast', 'pg_bitmapindex' )) 
-               AND indexdef LIKE 'CREATE UNIQUE%[2]s' 
-               AND '"' || schemaname || '"'
-                   || '."' 
-                   || tablename || '"' = '%[1]s') a 
+SELECT *
+FROM   (SELECT n.nspname
+               || '.'
+               || c.relname                                   tablename,
+               con.conname                                    constraintname,
+               pg_catalog.Pg_get_constraintdef(con.oid, TRUE) constraintcol,
+               'constraint'                                   constrainttype
+        FROM   pg_catalog.pg_class c,
+               pg_catalog.pg_constraint con,
+               pg_namespace n
+        WHERE  c.oid = '%[1]s' :: regclass
+               AND conrelid = c.oid
+               AND n.oid = c.relnamespace
+               AND contype IN ( 'u', 'f', 'c', 'p' )
+        UNION
+        SELECT schemaname
+               || '.'
+               || tablename tablename,
+               '"'
+               || schemaname
+               || '"."'
+               || indexname
+               || '"'       conname,
+               indexdef     concol,
+               'index'      contype
+        FROM   pg_indexes
+        WHERE  schemaname IN (SELECT nspname
+                              FROM   pg_namespace
+                              WHERE  nspname NOT IN (
+                                     'pg_catalog', 'information_schema'
+                                     ,
+                                     'pg_aoseg',
+                                     'gp_toolkit',
+                                     'pg_toast', 'pg_bitmapindex' ))
+               AND indexdef LIKE 'CREATE UNIQUE%[2]s'
+               AND '"'
+                   || schemaname
+                   || '"'
+                   || '."'
+                   || tablename
+                   || '"' = '%[1]s') a
 ORDER  BY constrainttype 
 `
 	// db connection
@@ -430,7 +445,7 @@ func getPKViolator(tab, cols string) string {
 	return fmt.Sprintf(`SELECT %[1]s FROM %[2]s GROUP BY %[1]s HAVING COUNT(*) > 1`, cols, tab)
 }
 
-// Get the list of the PK violators
+// GetPKViolators: Get the list of the PK violators
 func GetPKViolators(tab, cols string) []DBViolationRow {
 	Debugf("Extracting the unique violations for table %s and column %s", tab, cols)
 	var result []DBViolationRow
@@ -450,7 +465,7 @@ func GetPKViolators(tab, cols string) []DBViolationRow {
 	return result
 }
 
-// Fix PK Violators
+// UpdatePKKey: Fix PK Violators
 func UpdatePKKey(tab, col, whichrow, newdata string) string {
 	query := `
 UPDATE %[1]s 
@@ -472,7 +487,7 @@ WHERE  ctid =
 }
 
 // Get the foreign violations keys
-func getFKViolators(key ForeignKey) string {
+func getFKViolator(key ForeignKey) string {
 	query := `
 SELECT %[1]s 
 FROM   %[2]s 
@@ -484,11 +499,11 @@ WHERE %[1]s  NOT IN
 	return fmt.Sprintf(query, key.Column, key.Table, key.Refcolumn, key.Reftable)
 }
 
-// Get total FK violators
+// GetTotalFKViolators: Get total FK violators
 func GetTotalFKViolators(key ForeignKey) int {
 	var total int
 	query := `SELECT COUNT(*) FROM (%s) a`
-	query = fmt.Sprintf(query, getFKViolators(key))
+	query = fmt.Sprintf(query, getFKViolator(key))
 
 	// db connection
 	db := ConnectDB()
@@ -504,7 +519,7 @@ func GetTotalFKViolators(key ForeignKey) int {
 	return total
 }
 
-// Total rows of the table
+// TotalRows: Total rows of the table
 func TotalRows(tab string) int {
 	var total int
 	query := fmt.Sprintf(`SELECT COUNT(*) FROM %s`, tab)
@@ -523,7 +538,7 @@ func TotalRows(tab string) int {
 	return total
 }
 
-// Get the list of the FK violators
+// GetFKViolators: Get the list of the FK violators
 func GetFKViolators(key ForeignKey) []DBViolationRow {
 	Debugf("Extracting the foreign violations for table %s and column %s", key.Table, key.Reftable)
 	var result []DBViolationRow
@@ -532,7 +547,7 @@ func GetFKViolators(key ForeignKey) []DBViolationRow {
 	db := ConnectDB()
 	defer db.Close()
 
-	query := strings.Replace(getFKViolators(key), "SELECT "+key.Column, "SELECT "+key.Column+" AS row", -1)
+	query := strings.Replace(getFKViolator(key), "SELECT "+key.Column, "SELECT "+key.Column+" AS row", -1)
 	_, err := db.Query(&result, query)
 	if err != nil {
 		addNewLine()
@@ -543,7 +558,7 @@ func GetFKViolators(key ForeignKey) []DBViolationRow {
 	return result
 }
 
-// Update FK violators with rows from the referenced table
+// UpdateFKeys: Update FK violators with rows from the referenced table
 func UpdateFKeys(key ForeignKey, totalRows int, whichRow string) {
 	query := `
 UPDATE %[1]s 

@@ -6,15 +6,17 @@ import (
 )
 
 var (
-	programName = "mock"
-	// SUGGESTION: implement semantic versioning https://semver.org
-	programVersion     = "v2.9"
-	ExecutionTimestamp = TimeNow()
+	programName        = "mock"
+	programVersion     = "v3.0"
+	ExecutionTimestamp = TimeNow() // Current time
 	Path               = fmt.Sprintf("%s/%s/%s", os.Getenv("HOME"), programName, ExecutionTimestamp)
 )
 
 // The main function block
 func main() {
 	// Execute the cobra CLI & run the program
-	rootCmd.Execute()
+	err := rootCmd.Execute()
+	if err != nil {
+		Fatalf("Error executing the mock data command cli, err: %v", err)
+	}
 }
