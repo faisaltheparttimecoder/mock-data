@@ -203,6 +203,62 @@ To customize this repository, follow the steps
 
 ## Contributors
 
+<table>
+<tr>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/faisaltheparttimecoder>
+            <img src=https://avatars.githubusercontent.com/u/16798908?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Faisal Ali/>
+            <br />
+            <sub style="font-size:14px"><b>Faisal Ali</b></sub>
+        </a>
+    </td>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/janpio>
+            <img src=https://avatars.githubusercontent.com/u/183673?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Jan Piotrowski/>
+            <br />
+            <sub style="font-size:14px"><b>Jan Piotrowski</b></sub>
+        </a>
+    </td>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/matt-song>
+            <img src=https://avatars.githubusercontent.com/u/5155257?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Matt Song/>
+            <br />
+            <sub style="font-size:14px"><b>Matt Song</b></sub>
+        </a>
+    </td>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/Zerpet>
+            <img src=https://avatars.githubusercontent.com/u/1515757?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Aitor Pérez Cedres/>
+            <br />
+            <sub style="font-size:14px"><b>Aitor Pérez Cedres</b></sub>
+        </a>
+    </td>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/art-frela>
+            <img src=https://avatars.githubusercontent.com/u/32013768?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Artem/>
+            <br />
+            <sub style="font-size:14px"><b>Artem</b></sub>
+        </a>
+    </td>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/jujoramos>
+            <img src=https://avatars.githubusercontent.com/u/8254001?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Juan José Ramos/>
+            <br />
+            <sub style="font-size:14px"><b>Juan José Ramos</b></sub>
+        </a>
+    </td>
+</tr>
+<tr>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/miguelff>
+            <img src=https://avatars.githubusercontent.com/u/210307?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Miguel Fernández/>
+            <br />
+            <sub style="font-size:14px"><b>Miguel Fernández</b></sub>
+        </a>
+    </td>
+</tr>
+</table>
+
 ## License
 
 The Project is licensed under [MIT](https://github.com/pivotal-legacy/mock-data/blob/master/LICENSE)
