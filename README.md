@@ -6,12 +6,13 @@
     
 Mock-data is the result of a Pivotal internal hackathon in July 2017. The idea behind it is to allow users to test database queries with sets of fake data in any pre-defined table.
 
-With Mock-data users can have 
+With Mock-data users can have
 
-+ Their own tables defined with any particular (supported) data types. It's only needed to provide the target table(s) and the number of rows of randomly generated data to insert.
++ Their own tables defined with any particular (supported) data types. It's only needed to provide the target table(s), and the number of rows of randomly generated data to insert.
 + Create a demo database
 + Create `n` number of table with `n` number of column
 + Custom fit data into the table
++ Option to select `realistic` data to be loaded onto the table
 
 An ideal environment to make Mock-data work without any errors would be 
 
