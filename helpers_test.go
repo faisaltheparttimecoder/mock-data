@@ -27,7 +27,7 @@ func TestTimeNow(t *testing.T) {
 // Test: ConnectDB, check if are able to make successful connection
 func TestConnectDB(t *testing.T) {
 	t.Run("validate_connection_uri", func(t *testing.T) {
-		cmdOptions.Uri = "postgres://user:pass@host:5432/db?sslmode=disable"
+		cmdOptions.URI = "postgres://user:pass@host:5432/db?sslmode=disable"
 		db := ConnectDB()
 		if db.Options().Database != "db" &&
 			db.Options().Password != "pass" &&
@@ -36,7 +36,7 @@ func TestConnectDB(t *testing.T) {
 			t.Errorf("TestConnectDB = The connection parameters via uri are not valid")
 		}
 		db.Close()
-		cmdOptions.Uri = "" // unset this to prevent other scripts from failing
+		cmdOptions.URI = "" // unset this to prevent other scripts from failing
 	})
 	t.Run("validate_non_connection_uri", func(t *testing.T) {
 		db := ConnectDB()
