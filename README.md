@@ -137,7 +137,7 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
     ```
   eg
     ```
-    docker run mock database -f -a host.docker.internal -u postgres -d demodb
+    docker run mock -v /tmp/mock:/home/mock database -f -a host.docker.internal -u postgres -d demodb
     ```
 
 ## Examples
