@@ -32,6 +32,7 @@ COPY --from=builder /bin/mock /usr/bin/mock
 VOLUME [ "/home/mock" ]
 
 USER 10000
+WORKDIR /home/mock
 
 ENTRYPOINT [ "mock" ]
 CMD ["--help"]

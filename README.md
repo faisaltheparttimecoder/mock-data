@@ -123,9 +123,17 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
     ```
     docker image tag ghcr.io/pivotal-gss/mock-data mock
     ```
++ Create a local directory on the host to mount has a volume inside the container, needed to store files (eg.s constraints list) or to send in configuration files to the mock data tool (like custom subcommand)
+    ```
+    mkdir /tmp/mock
+    ```
++ Now run the docker command
+    ```
+    docker run -v /tmp/mock:/home/mock [subcommand] <flags...>
+    ```  
 + For mac users to connect to the host (or local host) database you can run the below command
     ```
-    docker run mock [subcommand] -a host.docker.internal <flags...>
+    docker run mock -v /tmp/mock:/home/mock [subcommand] -a host.docker.internal <flags...>
     ```
   eg
     ```
