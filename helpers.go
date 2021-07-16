@@ -74,12 +74,12 @@ func setDBDefaults() {
 	}
 }
 
-// is string empty
+// IsStringEmpty return a bool if found a string is empty
 func IsStringEmpty(s string) bool {
 	return strings.TrimSpace(s) == ""
 }
 
-// Progress Bar
+// StartProgressBar initialize the progress bar
 func StartProgressBar(text string, max int) *progressbar.ProgressBar {
 	// Turn off the progress bar when the Debug is one
 	if cmdOptions.Debug || viper.GetBool("MOCK_DATA_TEST_RUNNER") {
@@ -104,7 +104,7 @@ func StartProgressBar(text string, max int) *progressbar.ProgressBar {
 		}))
 }
 
-// Remove all special characters
+// RemoveSpecialCharacters removes all special characters
 // Though we allow users to have their own table and column prefix, postgres have limitation on the characters
 // used, so we ensure that we only use valid characters from the string
 func RemoveSpecialCharacters(s string) string {
@@ -116,8 +116,8 @@ func RemoveSpecialCharacters(s string) string {
 	return reg.ReplaceAllString(s, "")
 }
 
-// Inserting a array needs all the single quotes escaped
-// the below function does just that
+// FormatForArray helps an array data, i.e for insert to work all
+// the single quotes need to be escaped and the below function does just that
 // i.e. If its array then replace " with escape to load to database
 func FormatForArray(s string, isItArray bool) string {
 	if isItArray {
@@ -126,7 +126,7 @@ func FormatForArray(s string, isItArray bool) string {
 	return s
 }
 
-// Prompt for confirmation
+// YesOrNoConfirmation prompts user for confirmation
 func YesOrNoConfirmation() string {
 	Debugf("Promoting for yes or no confirmation")
 	var YesOrNo = map[string]string{"y": "y", "ye": "y", "yes": "y", "n": "n", "no": "n"}
@@ -160,14 +160,14 @@ func YesOrNoConfirmation() string {
 	return ""
 }
 
-// Ignore these errors, else error out
+// IgnoreError ignore these errors, else error out
 func IgnoreError(e string, ignoreMsg string, failureMsg string) {
 	if !strings.HasSuffix(e, ignoreMsg) {
 		Fatalf(failureMsg)
 	}
 }
 
-// If the random value of numeric datatype is greater than specified, it ends up with
+// TruncateFloat helps if the random value of numeric datatype is greater than specified, it ends up with
 // i.e error "numeric field overflow"
 // The below helper helps to reduce the size of the value
 func TruncateFloat(f float64, max, precision int) float64 {
@@ -178,7 +178,7 @@ func TruncateFloat(f float64, max, precision int) float64 {
 	return f
 }
 
-// Extract Float precision from the float datatypes
+// FloatPrecision extracts float precision from the float datatypes
 func FloatPrecision(dt string) (int, int, error) {
 	// check if brackets exists, if it doesn't then add some virtual values
 	if !BracketsExists(dt) && strings.HasSuffix(dt, "[]") {
@@ -201,7 +201,7 @@ func FloatPrecision(dt string) (int, int, error) {
 	return m, p, nil
 }
 
-// Column Extractor from the provided constraint key
+// ColExtractor extracts column extractor from the provided constraint key
 func ColExtractor(conkey, regExp string) (string, error) {
 	var rgx = regexp.MustCompile(regExp)
 	rs := rgx.FindStringSubmatch(conkey)
@@ -211,12 +211,12 @@ func ColExtractor(conkey, regExp string) (string, error) {
 	return "", fmt.Errorf("unable to extract the columns from the constraint key")
 }
 
-// Trim brackets at the start and at the end
+// TrimPrefixNSuffix trims brackets at the start and at the end
 func TrimPrefixNSuffix(s, prefix, suffix string) string {
 	return strings.TrimPrefix(strings.TrimSuffix(s, suffix), prefix)
 }
 
-// Remove everything after a delimiter
+// RemoveEverySuffixAfterADelimiter removes everything after a delimiter
 func RemoveEverySuffixAfterADelimiter(s string, d string) string {
 	// Protect from upper case and lower case bugs
 	s = strings.ToLower(s)
@@ -228,20 +228,20 @@ func RemoveEverySuffixAfterADelimiter(s string, d string) string {
 	return s
 }
 
-// If given a datatype see if it has a bracket or not.
+// BracketsExists checks if given a datatype see if it has a bracket or not.
 func BracketsExists(dt string) bool {
 	var rgx = regexp.MustCompile(`\(.*\)`)
 	rs := rgx.FindStringSubmatch(dt)
 	return len(rs) > 0
 }
 
-// Does the string contain the substring
+// IsSubStringAvailableOnString check if the string contain the substring
 func IsSubStringAvailableOnString(s string, criteria string) bool {
 	var re = regexp.MustCompile(criteria)
 	return re.MatchString(s)
 }
 
-// Built a method to find if the values exits with a slice
+// StringContains built's a method to find if the values exits with a slice
 func StringContains(item string, slice []string) bool {
 	set := make(map[string]struct{}, len(slice))
 	for _, s := range slice {
@@ -251,7 +251,7 @@ func StringContains(item string, slice []string) bool {
 	return ok
 }
 
-// Build a method to find if the value starts with specific word within a slice
+// StringHasPrefix build's a method to find if the value starts with specific word within a slice
 func StringHasPrefix(item string, slice []string) bool {
 	set := make(map[string]struct{}, len(slice))
 	for _, s := range slice {
@@ -263,7 +263,7 @@ func StringHasPrefix(item string, slice []string) bool {
 	return ok
 }
 
-// Extract total characters that the datatype char can store.
+// CharLen extracts total characters that the datatype char can store.
 func CharLen(dt string) (int, error) {
 	var rgx = regexp.MustCompile(`\((.*?)\)`)
 	var returnValue int

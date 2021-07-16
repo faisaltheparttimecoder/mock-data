@@ -20,7 +20,7 @@ var (
 	geoDataTypekeywords = []string{"path", "polygon", "line", "lseg", "box", "circle", "point"} // Geometry data types
 )
 
-// BuildData: Data Generator
+// BuildData generates data
 // It provided random data based on data types.
 func BuildData(dt string) (interface{}, error) {
 	if StringHasPrefix(dt, intKeywords) { // Integer builder
@@ -337,7 +337,7 @@ func isDataTypeAnArray(dt string) (bool, string) {
 	return false, dt
 }
 
-// ArrayGenerator: Random array generator for array data types
+// ArrayGenerator generates random array for array data types
 func ArrayGenerator(dt, originalDt string, min, max int) (string, error) {
 	maxValues := RandomInt(1, 6) // Getting the value of iterators
 	maxIteration := RandomInt(1, 3)
@@ -413,7 +413,7 @@ func randomDataByDataTypeForArray(dt, originalDt string, min, max int) (string, 
 	}
 }
 
-// GeometricArrayGenerator: Random geometric array generators
+// GeometricArrayGenerator generates random geometric array
 func GeometricArrayGenerator(maxInt int, geometryType string) string {
 	// Getting the value of iterators
 	maxIterations := RandomInt(1, 6)
@@ -432,7 +432,7 @@ func GeometricArrayGenerator(maxInt int, geometryType string) string {
 	return fmt.Sprintf("{%s}", strings.Join(resultArray, ","))
 }
 
-// JsonXmlArrayGenerator: Random XML & Json array generators.
+// JsonXmlArrayGenerator generates random XML & Json array.
 func JsonXmlArrayGenerator(dt string) string {
 	// Getting the value of iterators
 	maxIterations := RandomInt(1, 6)

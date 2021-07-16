@@ -6,10 +6,12 @@ import (
 )
 
 var (
-	programName        = "mock"
-	programVersion     = "v3.0"
-	ExecutionTimestamp = TimeNow() // Current time
-	Path               = fmt.Sprintf("%s/%s/%s", os.Getenv("HOME"), programName, ExecutionTimestamp)
+	programName    = "mock"
+	programVersion = "v3.0"
+	// ExecutionTimestamp provides the current time to generate log files
+	ExecutionTimestamp = TimeNow()
+	// Path set the path or the location where the files will be generated
+	Path = fmt.Sprintf("%s/%s/%s", os.Getenv("HOME"), programName, ExecutionTimestamp)
 )
 
 // The main function block

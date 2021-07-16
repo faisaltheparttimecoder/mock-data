@@ -10,27 +10,27 @@ import (
 // GreenplumOrPostgres ...
 var GreenplumOrPostgres = "greenplum"
 
-// DBTables: Store house of all tables
+// DBTables store house of all tables
 type DBTables struct {
 	Schema string
 	Table  string
 }
 
-// DBColumns: Store house of all the columns
+// DBColumns store house of all the columns
 type DBColumns struct {
 	Column   string
 	Datatype string
 	Sequence string
 }
 
-// DBConstraints: Store house of all constraints
+// DBConstraints store house of all constraints
 type DBConstraints struct {
 	Tablename      string
 	Constraintname string
 	Constraintkey  string
 }
 
-// DBConstraintsByTable: Store house for constraints by table
+// DBConstraintsByTable store house for constraints by table
 type DBConstraintsByTable struct {
 	Tablename      string
 	Constraintname string
@@ -38,24 +38,24 @@ type DBConstraintsByTable struct {
 	Constrainttype string
 }
 
-// DBConstraintsByDataType: Store house for constraints by datatype
+// DBConstraintsByDataType store house for constraints by datatype
 type DBConstraintsByDataType struct {
 	Colname string
 	Dtype   string
 }
 
-// DBIndex: Store house for indexes
+// DBIndex store house for indexes
 type DBIndex struct {
 	Tablename string
 	Indexdef  string
 }
 
-// DBViolationRow: Capture violating row
+// DBViolationRow capture violating row
 type DBViolationRow struct {
 	Row string
 }
 
-// EnumDataType: Store house for emun datatype data
+// EnumDataType store house for emun datatype data
 type EnumDataType struct {
 	EnumSchema string
 	EnumName   string
@@ -259,7 +259,7 @@ ORDER BY        a.attnum
 	return result
 }
 
-// GetPGConstraintDDL: Save all the DDL of the constraint ( like PK(p), FK(f), CK(c), UK(u) )
+// GetPGConstraintDDL saves all the DDL of the constraint ( like PK(p), FK(f), CK(c), UK(u) )
 func GetPGConstraintDDL(conntype string) []DBConstraints {
 	Debugf("Extracting the DDL of the %s constraints", conntype)
 	var result []DBConstraints
@@ -293,7 +293,7 @@ ORDER  BY tablename
 	return result
 }
 
-// GetPGIndexDDL: Get all the Unique index from the database
+// GetPGIndexDDL gets all the Unique index from the database
 func GetPGIndexDDL() []DBIndex {
 	Debugf("Extracting the unique indexes")
 	var result []DBIndex
@@ -328,7 +328,7 @@ WHERE  schemaname IN (SELECT nspname
 	return result
 }
 
-// GetConstraintsPertab: Drop statement for the table
+// GetConstraintsPertab provides drop statement for the table
 func GetConstraintsPertab(tabname string) []DBConstraintsByTable {
 	Debugf("Extracting constraint info for table: %s", tabname)
 	var result []DBConstraintsByTable
@@ -445,7 +445,7 @@ func getPKViolator(tab, cols string) string {
 	return fmt.Sprintf(`SELECT %[1]s FROM %[2]s GROUP BY %[1]s HAVING COUNT(*) > 1`, cols, tab)
 }
 
-// GetPKViolators: Get the list of the PK violators
+// GetPKViolators gets the list of the PK violators
 func GetPKViolators(tab, cols string) []DBViolationRow {
 	Debugf("Extracting the unique violations for table %s and column %s", tab, cols)
 	var result []DBViolationRow
@@ -465,7 +465,7 @@ func GetPKViolators(tab, cols string) []DBViolationRow {
 	return result
 }
 
-// UpdatePKKey: Fix PK Violators
+// UpdatePKKey fixes PK Violators
 func UpdatePKKey(tab, col, whichrow, newdata string) string {
 	query := `
 UPDATE %[1]s 
@@ -499,7 +499,7 @@ WHERE %[1]s  NOT IN
 	return fmt.Sprintf(query, key.Column, key.Table, key.Refcolumn, key.Reftable)
 }
 
-// GetTotalFKViolators: Get total FK violators
+// GetTotalFKViolators gets total FK violators
 func GetTotalFKViolators(key ForeignKey) int {
 	var total int
 	query := `SELECT COUNT(*) FROM (%s) a`
@@ -519,7 +519,7 @@ func GetTotalFKViolators(key ForeignKey) int {
 	return total
 }
 
-// TotalRows: Total rows of the table
+// TotalRows gets total rows of the table
 func TotalRows(tab string) int {
 	var total int
 	query := fmt.Sprintf(`SELECT COUNT(*) FROM %s`, tab)
@@ -538,7 +538,7 @@ func TotalRows(tab string) int {
 	return total
 }
 
-// GetFKViolators: Get the list of the FK violators
+// GetFKViolators gets the list of the FK violators
 func GetFKViolators(key ForeignKey) []DBViolationRow {
 	Debugf("Extracting the foreign violations for table %s and column %s", key.Table, key.Reftable)
 	var result []DBViolationRow
@@ -558,7 +558,7 @@ func GetFKViolators(key ForeignKey) []DBViolationRow {
 	return result
 }
 
-// UpdateFKeys: Update FK violators with rows from the referenced table
+// UpdateFKeys update FK violators with rows from the referenced table
 func UpdateFKeys(key ForeignKey, totalRows int, whichRow string) {
 	query := `
 UPDATE %[1]s 

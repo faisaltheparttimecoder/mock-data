@@ -1,5 +1,4 @@
-# Mock Data [![go version](https://img.shields.io/github/go-mod/go-version/pivotal-gss/mock-data?filename=go.mod&style=flat&logo=go&label=Go)](https://golang.org/dl/) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/CI?logo=github&style=flat&label=CI)](https://github.com/pivotal-gss/mock-data/actions/workflows/ci.yml) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/Tests?logo=github&style=flat&label=Tests)](https://github.com/pivotal-gss/mock-data/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/pivotal-gss/mock-data/branch/master/graph/badge.svg)](https://codecov.io/gh/pivotal-gss/mock-data) [![Go Report Card](https://goreportcard.com/badge/github.com/pivotal-gss/mock-data?logo=go)](https://goreportcard.com/report/github.com/pivotal-gss/mock-data)
-
+# Mock Data [![go version](https://img.shields.io/github/go-mod/go-version/pivotal-gss/mock-data?filename=go.mod&style=flat&logo=go&label=Go)](https://golang.org/dl/) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/CI?logo=github&style=flat&label=CI)](https://github.com/pivotal-gss/mock-data/actions/workflows/ci.yml) [![CI](https://img.shields.io/github/workflow/status/pivotal-gss/mock-data/Tests?logo=github&style=flat&label=Tests)](https://github.com/pivotal-gss/mock-data/actions/workflows/test.yml) [![codecov](https://codecov.io/gh/pivotal-gss/mock-data/branch/master/graph/badge.svg)](https://codecov.io/gh/pivotal-gss/mock-data) [![Go Report Card](https://goreportcard.com/badge/github.com/pivotal-gss/mock-data?logo=go)](https://goreportcard.com/report/github.com/pivotal-gss/mock-data) [![Github Releases Stats of mock-data](https://img.shields.io/github/downloads/pivotal-gss/mock-data/total.svg?logo=github&label=Downloads)](https://somsubhra.github.io/github-release-stats/?username=pivotal-gss&repository=mock-data)
     Here are my tables
     Load them [with data] for me
     I don't care how
@@ -124,9 +123,9 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
     ```
     docker image tag ghcr.io/pivotal-gss/mock-data mock
     ```
-+ For mac users to connect to the host database you can run the below command
++ For mac users to connect to the host (or local host) database you can run the below command
     ```
-    docker run mock -a host.docker.internal <flags...>
+    docker run mock [subcommand] -a host.docker.internal <flags...>
     ```
   eg
     ```
@@ -182,11 +181,11 @@ To customize this repository, follow the steps
     ```
     go run . <commands> <flags.........>
     ```
-6. Run the golang linter to analyzes & fix source code to flag programming errors, bugs, stylistic errors, and suspicious constructs.
+6. [Recommended] Run the golang linter to analyzes & fix source code programming errors, bugs, stylistic errors, and suspicious constructs.
     ```
     golangci-lint run
     ```
-   to install golangci-lint check [here](https://golangci-lint.run/usage/install/), config file `.golangci.yml` is provided with the repo
+   to install golangci-lint check [here](https://golangci-lint.run/usage/install/), config file `.golangci.yml` has been provided with this repo
 7. To run test, use 
     ```
     # Edit the database environment variables on the "Makefile"

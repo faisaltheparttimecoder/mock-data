@@ -21,7 +21,7 @@ type TableModel struct {
 	Column []ColumnModel `yaml:"Column"`
 }
 
-// ColumnModel, captures all is used to constructs all the column of the table
+// ColumnModel placeholder to store all the column information of the table
 type ColumnModel struct {
 	Name      string   `yaml:"Name"`
 	Type      string   `yaml:"Type"`

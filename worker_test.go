@@ -105,7 +105,7 @@ func TestCheckIfOneColumnIsASerialDatatype(t *testing.T) {
 	_ = createFakeTablesForWorkerTest()
 	checkIfOneColumnIsASerialDatatype(DBTables{Table: workerTestContainSerialColumn,
 		Schema: cmdOptions.Tab.SchemaName}, []DBColumns{
-		DBColumns{"id", "integer", "nextval('id_seq'::regclass)"},
+		{"id", "integer", "nextval('id_seq'::regclass)"},
 	})
 	t.Run("check_if_the_table_is_registered_correctly", func(t *testing.T) {
 		if got := len(oneColumnTable); got <= 0 {

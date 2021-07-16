@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// CreateFakeTables, creates fakes tables has requested by the user
+// CreateFakeTables creates fakes tables has requested by the user
 func CreateFakeTables() {
 	Infof("Create %d fake tables on the database: %s", cmdOptions.Tab.TotalTables, cmdOptions.Database)
 

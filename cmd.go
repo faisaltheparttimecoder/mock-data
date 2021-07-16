@@ -12,7 +12,7 @@ var (
 	cmdOptions Command
 )
 
-// Command: Root command line options
+// Command the root command line options
 type Command struct {
 	Debug            bool
 	Username         string
@@ -30,13 +30,13 @@ type Command struct {
 	URI              string
 }
 
-// Database command line options
+// Database sub command line options
 type Database struct {
 	FakeDB          bool
 	FakeDBTableRows bool
 }
 
-// Tables: Table command line options
+// Tables sub command line options
 type Tables struct {
 	FakeNewTables    bool
 	TotalTables      int

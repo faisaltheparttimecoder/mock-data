@@ -16,7 +16,7 @@ func CreateDirectory() {
 	}
 }
 
-// WriteToFile: Create a file ( if not exists ), append the content and then close the file
+// WriteToFile creates a file ( if not exists ), append the content and then close the file
 func WriteToFile(filename string, message string) error {
 	// open files r, w mode
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0600)
@@ -35,12 +35,12 @@ func WriteToFile(filename string, message string) error {
 	return nil
 }
 
-// ListFile: List all the backup sql file to recreate the constraints
+// ListFile lists all the backup sql file to recreate the constraints
 func ListFile(dir, suffix string) ([]string, error) {
 	return filepath.Glob(filepath.Join(dir, suffix))
 }
 
-// ReadFile: Read the file content and send it across
+// ReadFile reads the file content and send it across
 func ReadFile(filename string) ([]string, error) {
 	var contentSaver []string
 
@@ -63,7 +63,7 @@ func ReadFile(filename string) ([]string, error) {
 	return contentSaver, nil
 }
 
-// CurrentDir: Current working directory
+// CurrentDir provides the current working directory
 func CurrentDir() (cwd string) {
 	cwd, err := os.Getwd()
 	if err != nil {

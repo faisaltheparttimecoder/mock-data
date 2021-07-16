@@ -10,12 +10,12 @@ import (
 
 var logger = logrus.New()
 
-// SetLogLevel, set the logger level
+// SetLogLevel set the logger level
 func SetLogLevel(level logrus.Level) {
 	logger.Level = level
 }
 
-// SetLogFormatter, format the log entry formats
+// SetLogFormatter set the log entry format
 func SetLogFormatter(formatter logrus.Formatter) {
 	logger.Formatter = formatter
 }
@@ -97,7 +97,7 @@ func Warnf(format string, args ...interface{}) {
 //	}
 //}
 
-// Error logs with format message at level Error on the standard logger.
+// Errorf logs with format message at level Error on the standard logger.
 func Errorf(format string, args ...interface{}) {
 	if logger.Level >= logrus.ErrorLevel {
 		entry := logger.WithFields(logrus.Fields{})

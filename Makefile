@@ -51,7 +51,7 @@ codecov_tests:
 	MOCK_DATA_TEST_RUNNER=$(MOCK_DATA_TEST_RUNNER) PGPASSWORD=$(PGPASSWORD) PGDATABASE=$(PGDATABASE) PGUSER=$(PGUSER) PGHOST=$(PGHOST) PGPORT=$(PGPORT) GOFLAGS="-count=1" go test -v . -coverprofile=coverage.txt -covermode=atomic
 	@echo "#### Finished Mock Data Test"
 	make drop_db
-.PHONY: unit_tests
+.PHONY: codecov_tests
 
 # Run all mock data test
 tests:
