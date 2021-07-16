@@ -129,15 +129,19 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
     ```
 + Now run the docker command
     ```
-    docker run -v /tmp/mock:/home/mock [subcommand] <flags...>
+    docker run -v /tmp/mock:/home/mock [docker-image-tag] [subcommand] <flags...>
     ```  
-+ For mac users to connect to the host (or local host) database you can run the below command
+    eg.s
     ```
-    docker run mock -v /tmp/mock:/home/mock [subcommand] -a host.docker.internal <flags...>
+    docker run -v /tmp/mock:/home/mock mock database -f -u postgres -d demodb
     ```
-  eg
++ For mac users to connect to the host(or local host) database you can use the address `host.docker.internal` as shown in the below command
     ```
-    docker run mock -v /tmp/mock:/home/mock database -f -a host.docker.internal -u postgres -d demodb
+    docker run -v /tmp/mock:/home/mock [docker-image-tag] [subcommand] -a host.docker.internal <flags...>
+    ```
+    eg.s
+    ```
+    docker run -v /tmp/mock:/home/mock mock database -f -a host.docker.internal -u postgres -d demodb
     ```
 
 ## Examples
