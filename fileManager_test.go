@@ -49,6 +49,9 @@ func TestListFile(t *testing.T) {
 	f := fmt.Sprintf("%s/%s_file_manager_list_test_case.out", Path, programName)
 	err := WriteToFile(f, "")
 	l, err := ListFile(Path, "*list_test_case.out")
+	if err != nil {
+		t.Errorf("TestListFile, unable to write to file, err: %v", err)
+	}
 	t.Run("should_give_us_valid_list_of_file_from_directory", func(t *testing.T) {
 		if err != nil || len(l) <= 0 {
 			t.Errorf("TestListFile either got err: %v, or return invalid count %v want > 0", err, len(l))

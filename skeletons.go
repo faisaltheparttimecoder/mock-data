@@ -1,11 +1,11 @@
 package main
 
-// JsonSkeleton: Json Skeleton
+// JsonSkeleton provides Json Skeleton
 func JsonSkeleton() string {
 	return `{"_id": "%s","index": "%s","guid": "%s","isActive": "%s","balance": "%s.%s","website": "https://%s/%s","age": "%s","username": "%s","eyeColor": "%s","name": "%s","gender": "%s","company": "%s","email": "%s","phone": "%s","address": "%s","zipcode": "%s","state": "%s","country": "%s","about": "%s","Machine IP": "%s","job title": "%s","registered": "%s-%s-%sT%s:%s:%s-%s:%s","latitude": "%s.%s","longitude": "%s.%s","tags": ["%s","%s","%s","%s","%s","%s","%s"],"friends": [{ "id": "%s", "name": "%s"},{ "id": "%s", "name": "%s"},{ "id": "%s", "name": "%s"}],"greeting": "%s","favoriteBrand": "%s"}`
 }
 
-// XMLSkeleton: XML Skeleton
+// XMLSkeleton provides XML Skeleton
 func XMLSkeleton() string {
 	return `<?xml version="1.0" encoding="UTF-8"?><shiporder orderid="%s" xmlns:xsi="http://%s/%s/%s" xsi:noNamespaceSchemaLocation="shiporder.xsd"> <orderperson>%s</orderperson> <shipto> <name>%s</name> <address>%s</address> <city>%s</city> <country>%s</country> <email>%s</email> <phone>%s</phone> </shipto> <item> <title>%s</title> <note>%s</note> <quantity>%s</quantity> <color>%s</color> <price>%s.%s</price> </item> <item> <title>%s</title> <quantity>%s</quantity> <price>%s.%s</price> </item></shiporder>`
 }

@@ -68,7 +68,7 @@ func TestFixPKey(t *testing.T) {
 		})
 		t.Run("check_for_any_available_constraint_"+conStr, func(t *testing.T) {
 			if got := len(data); got <= 0 {
-				t.Errorf("TestFixPKey = %v, want > 0 %v constriants", got, conStr)
+				t.Errorf("TestFixPKey = %v, want > 0 %v constraints", got, conStr)
 			}
 		})
 		for _, ck := range data {
@@ -116,7 +116,7 @@ func TestFixFKey(t *testing.T) {
 	})
 	t.Run("check_for_any_available_constraint_FOREIGN", func(t *testing.T) {
 		if got := len(data); got <= 0 {
-			t.Errorf("TestFixFKey = %v, want > 0 %v constriants", got, "FOREIGN")
+			t.Errorf("TestFixFKey = %v, want > 0 %v constraints", got, "FOREIGN")
 		}
 	})
 	for _, ck := range data {

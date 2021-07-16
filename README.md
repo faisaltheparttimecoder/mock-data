@@ -124,9 +124,9 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
     ```
     docker image tag ghcr.io/pivotal-gss/mock-data mock
     ```
-+ For mac users to connect to the host database you can run the below command
++ For mac users to connect to the host (or local host) database you can run the below command
     ```
-    docker run mock -a host.docker.internal <flags...>
+    docker run mock [subcommand] -a host.docker.internal <flags...>
     ```
   eg
     ```
@@ -182,11 +182,11 @@ To customize this repository, follow the steps
     ```
     go run . <commands> <flags.........>
     ```
-6. Run the golang linter to analyzes & fix source code to flag programming errors, bugs, stylistic errors, and suspicious constructs.
+6. [Recommended] Run the golang linter to analyzes & fix source code programming errors, bugs, stylistic errors, and suspicious constructs.
     ```
     golangci-lint run
     ```
-   to install golangci-lint check [here](https://golangci-lint.run/usage/install/), config file `.golangci.yml` is provided with the repo
+   to install golangci-lint check [here](https://golangci-lint.run/usage/install/), config file `.golangci.yml` has been provided with this repo
 7. To run test, use 
     ```
     # Edit the database environment variables on the "Makefile"

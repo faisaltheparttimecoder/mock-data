@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// TableCollection: Collects the tables metadata
+// TableCollection used to collect tables metadata
 type TableCollection struct {
 	DBTables
 	Columns []DBColumns
@@ -19,7 +19,7 @@ var (
 	progressBarMsg = "Mocking Table %s"
 )
 
-// MockTable, mocks the tables from the collected list
+// MockTable mocks the tables from the collected list
 func MockTable(tables []DBTables) {
 	// Check if there is any rows on the table list, if yes then start
 	// the loading process
@@ -99,7 +99,7 @@ func columnExtractor(tables []DBTables) []TableCollection {
 	return collection
 }
 
-// BackupConstraintsAndStartDataLoading: Backup and start the loading process
+// BackupConstraintsAndStartDataLoading backs up and start the loading process
 func BackupConstraintsAndStartDataLoading(tables []TableCollection) {
 	// Backup the DDL first
 	BackupDDL()
@@ -125,7 +125,7 @@ func BackupConstraintsAndStartDataLoading(tables []TableCollection) {
 	Infof("Completed loading mock data to %d tables", totalTables)
 }
 
-// CommitData: Start Committing data to the database
+// CommitData start Committing data to the database
 func CommitData(t TableCollection) {
 	// Start committing data
 	tab := GenerateTableName(t.Table, t.Schema)
@@ -168,7 +168,7 @@ DataTypePickerLoop:
 	}
 }
 
-// CopyData: Copy the data to the database table
+// CopyData copies the data to the database table
 func CopyData(tab string, col []string, data []string, db *pg.DB) {
 	// Copy Statement and start loading
 	copyStatment := fmt.Sprintf(`COPY %s("%s") FROM STDIN WITH CSV DELIMITER '%s' QUOTE e'\x01'`,
@@ -226,7 +226,7 @@ func isItSerialDatatype(c DBColumns) bool {
 	return false
 }
 
-// GenerateTableName: Generate table name
+// GenerateTableName generates table name
 func GenerateTableName(tab, schema string) string {
 	return fmt.Sprintf("\"%s\".\"%s\"", schema, tab)
 }
