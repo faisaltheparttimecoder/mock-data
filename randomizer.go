@@ -146,7 +146,7 @@ func RandomCiText() string {
 	return strings.Title(fake.Words())
 }
 
-// RandomIP: Random IPv6 & IPv4 Address
+// RandomIP generates random IPv6 & IPv4 Address
 func RandomIP() string {
 	number := RandomInt(1, 9999)
 	var ip string
@@ -156,7 +156,7 @@ func RandomIP() string {
 	return ip
 }
 
-// RandomBit: Random bit
+// RandomBit generates random bit
 func RandomBit(max int) string {
 	var bitValue string
 	for i := 0; i < max; i++ {
@@ -169,12 +169,12 @@ func RandomBit(max int) string {
 	return bitValue
 }
 
-// RandomUUID: Random UUID
+// RandomUUID generates random UUID
 func RandomUUID() string {
 	return uuid.New().String()
 }
 
-// RandomMacAddress: Random Mac Address
+// RandomMacAddress generates random mac address
 func RandomMacAddress() string {
 	return fmt.Sprintf("%02x:%02x:%02x:%02x:%02x:%02x",
 		RandomString(1), RandomString(1),
@@ -182,7 +182,7 @@ func RandomMacAddress() string {
 		RandomString(1), RandomString(1))
 }
 
-// RandomTSQuery: Random Text Search Query
+// RandomTSQuery generates random text search query data
 func RandomTSQuery() string {
 	number := RandomInt(1, 9999)
 	switch number % 5 { // TODO: replace magic number 5 to symbol constant. What is mean 5? Why exactly 5?
@@ -199,12 +199,12 @@ func RandomTSQuery() string {
 	}
 }
 
-// RandomTSVector: Random Text Search Query
+// RandomTSVector generates random text vector data
 func RandomTSVector() string {
 	return fake.SentencesN(fake.Day())
 }
 
-// RandomGeometricData: Random Geometric data
+// RandomGeometricData generates random geometric data
 func RandomGeometricData(randomInt int, GeoMetry string, IsItArray bool) string {
 	var data string
 	if GeoMetry == "point" { // Syntax for point data type
@@ -223,13 +223,13 @@ func RandomGeometricData(randomInt int, GeoMetry string, IsItArray bool) string 
 	}
 }
 
-// RandomLSN: Random Log Sequence Number
+// RandomLSN generates random log sequence number
 func RandomLSN() string {
 	return fmt.Sprintf("%02x/%02x",
 		RandomString(1), RandomString(4))
 }
 
-// RandomTXID: Random transaction XID
+// RandomTXID generates random transaction XID
 func RandomTXID() string {
 	x, _ := strconv.Atoi(fake.DigitsN(8))
 	y, _ := strconv.Atoi(fake.DigitsN(8))
@@ -240,7 +240,7 @@ func RandomTXID() string {
 	return z
 }
 
-// RandomJSON: Random JSON generator
+// RandomJSON generates random JSON
 func RandomJSON(IsItArray bool) string {
 	jsonData := fmt.Sprintf(JsonSkeleton(), RandomString(24),
 		fake.DigitsN(10), RandomUUID(), strconv.FormatBool(RandomBoolean()), fake.Digits(), fake.DigitsN(2),
@@ -260,7 +260,7 @@ func RandomJSON(IsItArray bool) string {
 	return jsonData
 }
 
-// RandomXML: Random XML Generator
+// RandomXML generates random XML
 func RandomXML(IsItArray bool) string {
 	xmlData := fmt.Sprintf(XMLSkeleton(), fake.Digits(), fake.DomainName(),
 		fake.DigitsN(4), fake.WordsN(1), fake.FullName(), fake.FullName(), fake.StreetAddress(), fake.City(),
@@ -272,7 +272,7 @@ func RandomXML(IsItArray bool) string {
 	return xmlData
 }
 
-// RandomPickerFromArray: Picks Random Value from any array
+// RandomPickerFromArray picks random value from any array
 func RandomPickerFromArray(a []string) string {
 	if len(a) == 0 {
 		return ""
@@ -280,7 +280,7 @@ func RandomPickerFromArray(a []string) string {
 	return a[RandomValueFromLength(len(a))]
 }
 
-// RandomValueFromLength: Random value from length
+// RandomValueFromLength gets random value from the array length
 func RandomValueFromLength(i int) int {
 	if i == 0 {
 		return 0
