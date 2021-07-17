@@ -222,7 +222,7 @@ func init() {
 	rootCmd.PersistentFlags().IntVarP(&cmdOptions.Port, "port", "p",
 		viper.GetInt("PGPORT"), "Port number of the postgres database")
 	rootCmd.PersistentFlags().StringVar(&cmdOptions.URI, "uri",
-		"", "Postgres connection URI, eg. postgres://user:pass@host:=port/db?sslmode=disable")
+		"", "Postgres connection URI, eg. postgres://user:pass@host:port/db?sslmode=disable")
 	rootCmd.PersistentFlags().StringVarP(&cmdOptions.Hostname, "address", "a",
 		viper.GetString("PGHOSTADDR"), "Hostname where the postgres database lives")
 	rootCmd.PersistentFlags().StringVarP(&cmdOptions.Username, "username", "u",

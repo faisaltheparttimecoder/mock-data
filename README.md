@@ -114,7 +114,7 @@ Use "mock [command] --help" for more information about a command.
 
 provided `/usr/local/bin` is part of the $PATH environment variable.
 
-### Via docker
+### Using Docker
 + Pull the image & you are all set
     ```
     docker pull ghcr.io/pivotal-gss/mock-data:latest
@@ -142,6 +142,12 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
     eg.s
     ```
     docker run -v /tmp/mock:/home/mock mock database -f -a host.docker.internal -u postgres -d demodb
+    ```
+ + **[Optional]** You can also make an alias of the above command, for eg.s alias with `.zshrc` 
+    ```
+    echo alias mock=\"docker run -it -v /tmp/mock:/home/mock ghcr.io/pivotal-gss/mock-data:latest\" >> ~/.zshrc
+    source ~/.zshrc
+    mock tables -t "public.gardens" --uri="postgres://pg_user:mypassword@myhost:5432/database_name?sslmode=disable"
     ```
 
 ## Examples
