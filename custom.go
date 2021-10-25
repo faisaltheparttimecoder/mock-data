@@ -11,6 +11,7 @@ import (
 
 // Skeleton the main type with captures all the yaml data
 type Skeleton struct {
+	RandomDataForMissingTables bool `yaml: "RandomDataForMissingTables"`
 	Custom []TableModel `yaml:"Custom"`
 }
 
@@ -277,12 +278,39 @@ func (c *Skeleton) LoadDataByConfiguration() {
 	db := ConnectDB()
 	defer db.Close()
 
+	if c.RandomDataForMissingTables {
+		var w []string
+		for _, s := range c.Custom {
+			w = append(w, fmt.Sprintf("'%s.%s'", s.Table, s.Schema))	
+		}
+		whereClause := fmt.Sprintf("AND (n.nspname    || '.' || c.relname) NOT IN (%s)", strings.Join(w, ","))
+		allTables := dbExtractTables(whereClause)
+	
+		var tablesToAutoMock []DBTables
+		AllTablesLoop:
+		for _, t := range allTables {
+			for _, s := range c.Custom {
+				if t.Table == s.Table && t.Schema == s.Schema {
+					continue AllTablesLoop
+				}
+			}
+			Debugf("Table to automatically mock: %s", t.Table)
+			tablesToAutoMock = append(tablesToAutoMock, t)
+		}
+		tableMocker(tablesToAutoMock)
+	} else {
+		BackupDDL() // tableMocker does it automatically
+	}
+
+
 	for _, s := range c.Custom {
 		// Initialize the mocking process
 		tab := GenerateTableName(s.Table, s.Schema)
 		msg := fmt.Sprintf("Mocking Table %s", tab)
 		bar := StartProgressBar(msg, cmdOptions.Rows)
-
+		if c.RandomDataForMissingTables {
+			RemoveConstraints(tab)
+		}
 		// Name the for loop to break when we encounter error
 	DataTypePickerLoop:
 		// Loop through the row count and start loading the data
@@ -314,10 +342,14 @@ func (c *Skeleton) LoadDataByConfiguration() {
 				col = append(col, v.Name)
 				data = append(data, fmt.Sprintf("%v", d))
 			}
-
 			// Copy the data to the table
 			CopyData(tab, col, data, db)
 			_ = bar.Add(1)
 		}
 	}
+	
+	if c.RandomDataForMissingTables && !cmdOptions.IgnoreConstraint {
+		FixConstraints()
+	} 
+
 }
