@@ -251,12 +251,21 @@ To customize this repository, follow the steps
         </a>
     </td>
     <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
+        <a href=https://github.com/andreasgan>
+            <img src=https://avatars.githubusercontent.com/u/727125?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Andreas Gangsø/>
+            <br />
+            <sub style="font-size:14px"><b>Andreas Gangsø</b></sub>
+        </a>
+    </td>
+    <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
         <a href=https://github.com/art-frela>
             <img src=https://avatars.githubusercontent.com/u/32013768?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Artem/>
             <br />
             <sub style="font-size:14px"><b>Artem</b></sub>
         </a>
     </td>
+</tr>
+<tr>
     <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
         <a href=https://github.com/jujoramos>
             <img src=https://avatars.githubusercontent.com/u/8254001?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Juan José Ramos/>
@@ -264,8 +273,6 @@ To customize this repository, follow the steps
             <sub style="font-size:14px"><b>Juan José Ramos</b></sub>
         </a>
     </td>
-</tr>
-<tr>
     <td align="center" style="word-wrap: break-word; width: 150.0; height: 150.0">
         <a href=https://github.com/miguelff>
             <img src=https://avatars.githubusercontent.com/u/210307?v=4 width="100;"  style="border-radius:50%;align-items:center;justify-content:center;overflow:hidden;padding-top:10px" alt=Miguel Fernández/>
