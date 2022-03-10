@@ -117,11 +117,11 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
 ### Using Docker
 + Pull the image & you are all set
     ```
-    docker pull ghcr.io/pivotal-gss/mock-data:latest
+    docker pull ghcr.io/faisaltheparttimecoder/mock-data:latest
     ```
 + **[OPTIONAL]** add a tag for easy acess
     ```
-    docker image tag ghcr.io/pivotal-gss/mock-data mock
+    docker image tag ghcr.io/faisaltheparttimecoder/mock-data mock
     ```
 + Create a local directory on the host to mount has a volume inside the container, needed to store files (eg.s constraints list) or to send in configuration files to the mock data tool (like custom subcommand)
     ```
@@ -145,7 +145,7 @@ provided `/usr/local/bin` is part of the $PATH environment variable.
     ```
  + **[Optional]** You can also make an alias of the above command, for eg.s alias with `.zshrc` 
     ```
-    echo alias mock=\"docker run -it -v /tmp/mock:/home/mock ghcr.io/pivotal-gss/mock-data:latest\" >> ~/.zshrc
+    echo alias mock=\"docker run -it -v /tmp/mock:/home/mock ghcr.io/faisaltheparttimecoder/mock-data:latest\" >> ~/.zshrc
     source ~/.zshrc
     mock tables -t "public.gardens" --uri="postgres://pg_user:mypassword@myhost:5432/database_name?sslmode=disable"
     ```
