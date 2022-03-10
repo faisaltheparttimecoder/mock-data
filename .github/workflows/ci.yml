@@ -93,7 +93,7 @@ jobs:
           push: true
           context: .
           file: ./build/Dockerfile
-          tags: ghcr.io/pivotal-gss/mock-data:latest
+          tags: ghcr.io/faisaltheparttimecoder/mock-data:latest
 
   add-contributors:
     needs: [tests]
